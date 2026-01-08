@@ -1,0 +1,21 @@
+{
+  "name": "slop-haus",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "db:generate": "pnpm --filter @slop/db run generate",
+    "db:migrate": "pnpm --filter @slop/db run migrate",
+    "db:push": "pnpm --filter @slop/db run push",
+    "db:studio": "pnpm --filter @slop/db run studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.2"
+}

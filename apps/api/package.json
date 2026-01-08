@@ -1,0 +1,24 @@
+{
+  "name": "@slop/api",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "dotenv -e ../../.env -- node dist/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "better-auth": "^1.2.3",
+    "drizzle-orm": "^0.41.0",
+    "hono": "^4.6.16",
+    "@slop/db": "workspace:*",
+    "@slop/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "dotenv-cli": "^8.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
