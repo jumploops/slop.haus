@@ -4,8 +4,10 @@ import {
   projects,
   projectMedia,
   projectTools,
+  projectRevisions,
   tools,
   user,
+  jobs,
 } from "@slop/db/schema";
 import { eq, desc, and, gte, sql, inArray, like } from "drizzle-orm";
 import { requireAuth, requireGitHub, getSession } from "../middleware/auth";
@@ -15,6 +17,7 @@ import {
   feedQuerySchema,
 } from "@slop/shared";
 import { slugify, generateUniqueSlug } from "@slop/shared";
+import { moderateProject } from "../lib/moderation";
 
 const projectRoutes = new Hono();
 
@@ -100,7 +103,10 @@ projectRoutes.get("/", async (c) => {
     .leftJoin(user, eq(projects.authorUserId, user.id))
     .where(and(...conditions))
     .orderBy(orderBy)
-    .limit(sort === "hot" ? 200 : limit) // Fetch more for hot sorting
+    // For hot sort, fetch more items to sort in memory
+    // TODO: For production, precompute hot scores periodically and store in DB
+    // This in-memory approach has a practical limit of ~50 pages (1000 items)
+    .limit(sort === "hot" ? Math.max(1000, offset + limit) : limit)
     .offset(sort === "hot" ? 0 : offset);
 
   let result = projectList;
@@ -288,10 +294,54 @@ projectRoutes.post("/", requireGitHub(), async (c) => {
     }
   }
 
+  // Run synchronous moderation
+  const modResult = await moderateProject({
+    id: project.id,
+    title: data.title,
+    tagline: data.tagline,
+    description: data.description,
+    mainUrl: data.mainUrl,
+    repoUrl: data.repoUrl,
+  });
+
+  // If moderation fails, hide the project
+  if (!modResult.approved) {
+    await db
+      .update(projects)
+      .set({ status: "hidden", updatedAt: new Date() })
+      .where(eq(projects.id, project.id));
+
+    return c.json(
+      {
+        project: { ...project, status: "hidden" },
+        moderation: {
+          approved: false,
+          reason: modResult.reason || "Content flagged for review",
+        },
+      },
+      201
+    );
+  }
+
+  // Create enrichment job
+  if (data.mainUrl) {
+    // If mainUrl exists, enrich with screenshot
+    await db.insert(jobs).values({
+      type: "enrich_screenshot",
+      payload: { projectId: project.id },
+    });
+  } else if (data.repoUrl) {
+    // Otherwise if repoUrl exists, enrich with README
+    await db.insert(jobs).values({
+      type: "enrich_readme",
+      payload: { projectId: project.id },
+    });
+  }
+
   return c.json({ project }, 201);
 });
 
-// Update project
+// Update project (creates revision for moderation)
 projectRoutes.patch("/:slug", requireAuth(), async (c) => {
   const session = c.get("session");
   const slug = c.req.param("slug");
@@ -320,52 +370,111 @@ projectRoutes.patch("/:slug", requireAuth(), async (c) => {
 
   const data = parsed.data;
 
-  // Build update object
-  const updates: Record<string, any> = {
-    updatedAt: new Date(),
-    lastEditedAt: new Date(),
-  };
+  // Check for pending revision
+  const [pendingRevision] = await db
+    .select()
+    .from(projectRevisions)
+    .where(
+      and(
+        eq(projectRevisions.projectId, existing.id),
+        eq(projectRevisions.status, "pending")
+      )
+    );
 
-  if (data.title !== undefined) updates.title = data.title;
-  if (data.tagline !== undefined) updates.tagline = data.tagline;
-  if (data.description !== undefined) updates.description = data.description;
-  if (data.mainUrl !== undefined) updates.mainUrl = data.mainUrl;
-  if (data.repoUrl !== undefined) updates.repoUrl = data.repoUrl;
-  if (data.vibeMode !== undefined) updates.vibeMode = data.vibeMode;
-  if (data.vibePercent !== undefined) updates.vibePercent = data.vibePercent;
-  if (data.vibeDetails !== undefined) updates.vibeDetailsJson = data.vibeDetails;
+  if (pendingRevision) {
+    return c.json(
+      { error: "A revision is already pending review", revisionId: pendingRevision.id },
+      409
+    );
+  }
 
-  // Update project
-  const [updated] = await db
-    .update(projects)
-    .set(updates)
-    .where(eq(projects.id, existing.id))
+  // Create revision
+  const [revision] = await db
+    .insert(projectRevisions)
+    .values({
+      projectId: existing.id,
+      title: data.title,
+      tagline: data.tagline,
+      description: data.description,
+      mainUrl: data.mainUrl,
+      repoUrl: data.repoUrl,
+      vibeMode: data.vibeMode,
+      vibePercent: data.vibePercent,
+      vibeDetailsJson: data.vibeDetails,
+    })
     .returning();
 
-  // Update tools if provided
-  if (data.tools !== undefined) {
-    // Remove existing
-    await db.delete(projectTools).where(eq(projectTools.projectId, existing.id));
+  // Run moderation on changed text content
+  const textContent = [
+    data.title,
+    data.tagline,
+    data.description,
+  ].filter(Boolean).join("\n\n");
 
-    // Add new
-    if (data.tools.length > 0) {
-      const toolRecords = await db
-        .select()
-        .from(tools)
-        .where(inArray(tools.slug, data.tools));
+  if (textContent) {
+    const modResult = await moderateProject({
+      id: revision.id,
+      title: data.title || existing.title,
+      tagline: data.tagline || existing.tagline,
+      description: data.description,
+      mainUrl: data.mainUrl,
+      repoUrl: data.repoUrl,
+    });
 
-      if (toolRecords.length > 0) {
-        await db.insert(projectTools).values(
-          toolRecords.map((t) => ({
-            projectId: existing.id,
-            toolId: t.id,
-          }))
-        );
+    if (modResult.approved) {
+      // Auto-approve: apply changes immediately
+      const updates: Record<string, any> = {
+        updatedAt: new Date(),
+        lastEditedAt: new Date(),
+      };
+
+      if (data.title !== undefined) updates.title = data.title;
+      if (data.tagline !== undefined) updates.tagline = data.tagline;
+      if (data.description !== undefined) updates.description = data.description;
+      if (data.mainUrl !== undefined) updates.mainUrl = data.mainUrl;
+      if (data.repoUrl !== undefined) updates.repoUrl = data.repoUrl;
+      if (data.vibeMode !== undefined) updates.vibeMode = data.vibeMode;
+      if (data.vibePercent !== undefined) updates.vibePercent = data.vibePercent;
+      if (data.vibeDetails !== undefined) updates.vibeDetailsJson = data.vibeDetails;
+
+      const [updated] = await db
+        .update(projects)
+        .set(updates)
+        .where(eq(projects.id, existing.id))
+        .returning();
+
+      // Mark revision as approved
+      await db
+        .update(projectRevisions)
+        .set({ status: "approved", reviewedAt: new Date() })
+        .where(eq(projectRevisions.id, revision.id));
+
+      // Handle tools update
+      if (data.tools !== undefined) {
+        await db.delete(projectTools).where(eq(projectTools.projectId, existing.id));
+        if (data.tools.length > 0) {
+          const toolRecords = await db
+            .select()
+            .from(tools)
+            .where(inArray(tools.slug, data.tools));
+          if (toolRecords.length > 0) {
+            await db.insert(projectTools).values(
+              toolRecords.map((t) => ({ projectId: existing.id, toolId: t.id }))
+            );
+          }
+        }
       }
+
+      return c.json({ project: updated, revision: { ...revision, status: "approved" } });
     }
   }
 
-  return c.json({ project: updated });
+  // Moderation flagged or no text changes - revision stays pending
+  return c.json({
+    message: "Revision submitted for review",
+    revision,
+    project: existing,
+  });
 });
 
 // Delete project (soft delete)
@@ -395,6 +504,99 @@ projectRoutes.delete("/:slug", requireAuth(), async (c) => {
     .where(eq(projects.id, existing.id));
 
   return c.json({ success: true });
+});
+
+// Re-enrich project (refresh screenshots/README)
+projectRoutes.post("/:slug/refresh", requireAuth(), async (c) => {
+  const session = c.get("session");
+  const slug = c.req.param("slug");
+
+  // Find project
+  const [existing] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.slug, slug));
+
+  if (!existing) {
+    return c.json({ error: "Project not found" }, 404);
+  }
+
+  // Check ownership
+  if (existing.authorUserId !== session.user.id && session.user.role !== "admin") {
+    return c.json({ error: "Forbidden" }, 403);
+  }
+
+  // Check cooldown: max once per hour
+  const lastJob = await db
+    .select()
+    .from(jobs)
+    .where(
+      and(
+        sql`${jobs.payload}->>'projectId' = ${existing.id}`,
+        gte(jobs.createdAt, new Date(Date.now() - 60 * 60 * 1000))
+      )
+    )
+    .limit(1);
+
+  if (lastJob.length > 0) {
+    return c.json(
+      { error: "Refresh already requested recently. Please wait an hour." },
+      429
+    );
+  }
+
+  // Create new enrichment job
+  if (existing.mainUrl) {
+    await db.insert(jobs).values({
+      type: "enrich_screenshot",
+      payload: { projectId: existing.id },
+    });
+  } else if (existing.repoUrl) {
+    await db.insert(jobs).values({
+      type: "enrich_readme",
+      payload: { projectId: existing.id },
+    });
+  } else {
+    return c.json({ error: "Project has no URL to enrich" }, 400);
+  }
+
+  // Update enrichment status to pending
+  await db
+    .update(projects)
+    .set({ enrichmentStatus: "pending", updatedAt: new Date() })
+    .where(eq(projects.id, existing.id));
+
+  return c.json({ success: true, message: "Enrichment job queued" });
+});
+
+// Get project revision history (author only)
+projectRoutes.get("/:slug/revisions", requireAuth(), async (c) => {
+  const session = c.get("session");
+  const slug = c.req.param("slug");
+
+  // Find project
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.slug, slug));
+
+  if (!project) {
+    return c.json({ error: "Project not found" }, 404);
+  }
+
+  // Check ownership (or admin)
+  if (project.authorUserId !== session.user.id && session.user.role !== "admin") {
+    return c.json({ error: "Forbidden" }, 403);
+  }
+
+  // Get revisions
+  const revisions = await db
+    .select()
+    .from(projectRevisions)
+    .where(eq(projectRevisions.projectId, project.id))
+    .orderBy(desc(projectRevisions.submittedAt));
+
+  return c.json({ revisions });
 });
 
 export { projectRoutes };

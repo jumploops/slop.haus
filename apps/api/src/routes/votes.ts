@@ -8,6 +8,7 @@ import {
   getPublicRater,
   getDevRater,
 } from "../lib/rater";
+import { checkRateLimit, VOTE_RATE_LIMITS } from "../lib/rateLimit";
 
 const voteRoutes = new Hono();
 
@@ -55,6 +56,38 @@ voteRoutes.post("/:slug/vote", async (c) => {
       );
     }
     raterKeyHash = devRater;
+  }
+
+  // Rate limiting: max 30 votes/minute per rater
+  const raterLimit = checkRateLimit(
+    `vote:rater:${raterKeyHash}`,
+    VOTE_RATE_LIMITS.perRater
+  );
+  if (!raterLimit.allowed) {
+    return c.json(
+      {
+        error: "Too many votes. Please slow down.",
+        code: "RATE_LIMITED",
+        retryAfter: Math.ceil((raterLimit.resetAt - Date.now()) / 1000),
+      },
+      429
+    );
+  }
+
+  // Rate limiting: max 10 vote changes/hour per project+rater
+  const projectRaterLimit = checkRateLimit(
+    `vote:project:${project.id}:${raterKeyHash}`,
+    VOTE_RATE_LIMITS.perProjectRater
+  );
+  if (!projectRaterLimit.allowed) {
+    return c.json(
+      {
+        error: "Too many vote changes on this project. Please wait.",
+        code: "RATE_LIMITED",
+        retryAfter: Math.ceil((projectRaterLimit.resetAt - Date.now()) / 1000),
+      },
+      429
+    );
   }
 
   // Handle the vote in a transaction

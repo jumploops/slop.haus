@@ -29,7 +29,8 @@ export const auth = betterAuth({
   account: {
     accountLinking: {
       enabled: true,
-      trustedProviders: ["google", "github"],
+      // No trustedProviders - requires explicit linking via linkSocial()
+      // This prevents auto-merging accounts by email on sign-in
     },
   },
   session: {

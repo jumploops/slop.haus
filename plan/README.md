@@ -18,6 +18,7 @@ This plan breaks down the slop.haus design into 11 implementation phases. Each p
 | 7 | [Moderation](./phase-7-moderation.md) | LLM moderation, flagging, mod queue | 3, 5, 6 |
 | 8 | [Edit Staging](./phase-8-edit-staging.md) | Revision system for edits | 3, 7 |
 | 9 | [Frontend](./phase-9-frontend.md) | Next.js web application | 2-8 |
+| 9.5 | [Enrichment Testing](./phase-9.5-enrichment-testing.md) | Validate Firecrawl, add tests | 9 |
 | 10 | [Polish](./phase-10-polish.md) | Performance, security, production | All |
 
 ## Recommended Build Order
@@ -32,7 +33,7 @@ Ship the core product: projects, voting, comments. This is a usable MVP.
 Add enrichment, moderation, and edit staging for production quality.
 
 ### Milestone 4: Ship It (Phases 9-10)
-Build the frontend and harden for launch.
+Build the frontend, validate enrichment, and harden for launch.
 
 ## Tech Stack Summary
 

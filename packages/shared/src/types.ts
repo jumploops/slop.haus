@@ -1,13 +1,14 @@
 export type UserRole = "user" | "mod" | "admin";
 export type ProjectStatus = "published" | "hidden" | "removed";
 export type VibeMode = "overview" | "detailed";
+export type EnrichmentStatus = "pending" | "completed" | "failed";
 export type RaterType = "public" | "dev";
 export type CommentStatus = "visible" | "hidden" | "removed";
 
 export interface User {
   id: string;
-  email: string | null;
-  name: string | null;
+  email: string;
+  name: string;
   image: string | null;
   role: UserRole;
   devVerified: boolean;
@@ -25,6 +26,7 @@ export interface Project {
   repoUrl: string | null;
   vibeMode: VibeMode;
   vibePercent: number;
+  vibeDetailsJson: Record<string, number> | null;
   normalUp: number;
   normalDown: number;
   normalScore: number;
@@ -33,6 +35,7 @@ export interface Project {
   devScore: number;
   commentCount: number;
   status: ProjectStatus;
+  enrichmentStatus: EnrichmentStatus;
   createdAt: Date;
   updatedAt: Date;
   lastEditedAt: Date | null;

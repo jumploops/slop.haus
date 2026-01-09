@@ -23,6 +23,16 @@ export type AuthSession = {
   };
 };
 
+// Better Auth user type with our custom fields
+interface BetterAuthUserWithCustomFields {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  role?: "user" | "mod" | "admin";
+  devVerified?: boolean;
+}
+
 // Get session from request (returns null if not authenticated)
 export async function getSession(c: Context): Promise<AuthSession | null> {
   const session = await auth.api.getSession({
@@ -31,14 +41,17 @@ export async function getSession(c: Context): Promise<AuthSession | null> {
 
   if (!session) return null;
 
+  // Cast to our extended type for custom fields
+  const user = session.user as BetterAuthUserWithCustomFields;
+
   return {
     user: {
-      id: session.user.id,
-      name: session.user.name,
-      email: session.user.email,
-      image: session.user.image ?? null,
-      role: (session.user as any).role || "user",
-      devVerified: (session.user as any).devVerified || false,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image ?? null,
+      role: user.role || "user",
+      devVerified: user.devVerified || false,
     },
     session: {
       id: session.session.id,

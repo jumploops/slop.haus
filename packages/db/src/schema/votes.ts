@@ -6,6 +6,7 @@ import {
   timestamp,
   pgEnum,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 import { projects } from "./projects";
 
@@ -29,5 +30,6 @@ export const projectVotes = pgTable(
       table.raterType,
       table.raterKeyHash
     ),
+    index("project_votes_project_id_idx").on(table.projectId),
   ]
 );

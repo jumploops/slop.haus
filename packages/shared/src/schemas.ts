@@ -56,6 +56,10 @@ export const createCommentSchema = z.object({
   parentCommentId: z.string().uuid().optional(),
 });
 
+export const updateCommentSchema = z.object({
+  body: z.string().min(1).max(10000),
+});
+
 export const createFlagSchema = z.object({
   targetType: z.enum(["project", "comment"]),
   targetId: z.string().uuid(),
@@ -74,5 +78,6 @@ export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type VoteInput = z.infer<typeof voteSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
+export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
 export type CreateFlagInput = z.infer<typeof createFlagSchema>;
 export type FeedQuery = z.infer<typeof feedQuerySchema>;

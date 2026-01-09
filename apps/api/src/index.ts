@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -8,6 +9,11 @@ import { projectRoutes } from "./routes/projects";
 import { toolRoutes } from "./routes/tools";
 import { voteRoutes } from "./routes/votes";
 import { commentRoutes } from "./routes/comments";
+import { projectCommentRoutes } from "./routes/projectComments";
+import { favoriteRoutes } from "./routes/favorites";
+import { userRoutes } from "./routes/users";
+import { adminRoutes } from "./routes/admin";
+import { flagRoutes } from "./routes/flags";
 import type { AuthSession } from "./middleware/auth";
 
 // Extend Hono context with session
@@ -34,6 +40,15 @@ app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Static file serving for uploads (MVP - local storage)
+app.use(
+  "/uploads/*",
+  serveStatic({
+    root: process.env.STORAGE_LOCAL_PATH || "./uploads",
+    rewriteRequestPath: (path) => path.replace(/^\/uploads/, ""),
+  })
+);
+
 // Better Auth handler - handles all /api/auth/* routes
 // This handles: sign in, sign out, callbacks, account linking, etc.
 app.on(["GET", "POST"], "/api/auth/*", (c) => {
@@ -44,8 +59,12 @@ app.on(["GET", "POST"], "/api/auth/*", (c) => {
 app.route("/api/v1/auth", authRoutes);
 app.route("/api/v1/projects", projectRoutes);
 app.route("/api/v1/projects", voteRoutes); // Vote routes under projects
-app.route("/api/v1/projects", commentRoutes); // Comment routes under projects
-app.route("/api/v1/comments", commentRoutes); // Also mount for edit/delete by ID
+app.route("/api/v1/projects", projectCommentRoutes); // Comment list/create under projects
+app.route("/api/v1/projects", favoriteRoutes); // Favorite routes under projects
+app.route("/api/v1/comments", commentRoutes); // Comment edit/delete by ID
+app.route("/api/v1/users", userRoutes); // User routes
+app.route("/api/v1/admin", adminRoutes); // Admin routes
+app.route("/api/v1/flags", flagRoutes); // Flagging routes
 app.route("/api/v1/tools", toolRoutes);
 
 // API info

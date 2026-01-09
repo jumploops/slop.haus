@@ -1,140 +1,11 @@
 import { Hono } from "hono";
 import { db } from "@slop/db";
-import { comments, projects, user } from "@slop/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { comments, projects } from "@slop/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { requireAuth } from "../middleware/auth";
-import { createCommentSchema } from "@slop/shared";
-
-const MAX_DEPTH = 10;
+import { updateCommentSchema } from "@slop/shared";
 
 const commentRoutes = new Hono();
-
-// List comments for a project
-commentRoutes.get("/:slug/comments", async (c) => {
-  const slug = c.req.param("slug");
-
-  // Get project
-  const [project] = await db
-    .select({ id: projects.id })
-    .from(projects)
-    .where(eq(projects.slug, slug));
-
-  if (!project) {
-    return c.json({ error: "Project not found" }, 404);
-  }
-
-  // Get all comments with authors
-  const commentList = await db
-    .select({
-      id: comments.id,
-      body: comments.body,
-      parentCommentId: comments.parentCommentId,
-      depth: comments.depth,
-      status: comments.status,
-      createdAt: comments.createdAt,
-      updatedAt: comments.updatedAt,
-      author: {
-        id: user.id,
-        name: user.name,
-        image: user.image,
-        devVerified: user.devVerified,
-      },
-    })
-    .from(comments)
-    .leftJoin(user, eq(comments.authorUserId, user.id))
-    .where(eq(comments.projectId, project.id))
-    .orderBy(comments.depth, comments.createdAt);
-
-  // Filter out removed comments body but keep structure
-  const result = commentList.map((comment) => ({
-    ...comment,
-    body: comment.status === "removed" ? "[removed]" : comment.body,
-  }));
-
-  return c.json({ comments: result });
-});
-
-// Create comment
-commentRoutes.post("/:slug/comments", requireAuth(), async (c) => {
-  const session = c.get("session");
-  const slug = c.req.param("slug");
-  const body = await c.req.json();
-
-  // Validate
-  const parsed = createCommentSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json({ error: "Validation failed", details: parsed.error.issues }, 400);
-  }
-
-  const { body: commentBody, parentCommentId } = parsed.data;
-
-  // Get project
-  const [project] = await db
-    .select({ id: projects.id })
-    .from(projects)
-    .where(eq(projects.slug, slug));
-
-  if (!project) {
-    return c.json({ error: "Project not found" }, 404);
-  }
-
-  let depth = 0;
-
-  // If replying to a parent, validate it
-  if (parentCommentId) {
-    const [parent] = await db
-      .select({ id: comments.id, depth: comments.depth, projectId: comments.projectId })
-      .from(comments)
-      .where(eq(comments.id, parentCommentId));
-
-    if (!parent) {
-      return c.json({ error: "Parent comment not found" }, 404);
-    }
-
-    if (parent.projectId !== project.id) {
-      return c.json({ error: "Parent comment belongs to different project" }, 400);
-    }
-
-    depth = parent.depth + 1;
-
-    if (depth > MAX_DEPTH) {
-      return c.json({ error: `Maximum comment depth (${MAX_DEPTH}) exceeded` }, 400);
-    }
-  }
-
-  // Create comment and update count in transaction
-  const [comment] = await db.transaction(async (tx) => {
-    const [newComment] = await tx
-      .insert(comments)
-      .values({
-        projectId: project.id,
-        authorUserId: session.user.id,
-        parentCommentId: parentCommentId || null,
-        depth,
-        body: commentBody,
-      })
-      .returning();
-
-    await tx
-      .update(projects)
-      .set({ commentCount: sql`${projects.commentCount} + 1` })
-      .where(eq(projects.id, project.id));
-
-    return [newComment];
-  });
-
-  return c.json({
-    comment: {
-      ...comment,
-      author: {
-        id: session.user.id,
-        name: session.user.name,
-        image: session.user.image,
-        devVerified: session.user.devVerified,
-      },
-    },
-  }, 201);
-});
 
 // Edit comment
 commentRoutes.patch("/:id", requireAuth(), async (c) => {
@@ -142,8 +13,10 @@ commentRoutes.patch("/:id", requireAuth(), async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
 
-  if (!body.body || typeof body.body !== "string" || body.body.length < 1 || body.body.length > 10000) {
-    return c.json({ error: "Body must be 1-10000 characters" }, 400);
+  // Validate
+  const parsed = updateCommentSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json({ error: "Validation failed", details: parsed.error.issues }, 400);
   }
 
   // Find comment
@@ -164,7 +37,7 @@ commentRoutes.patch("/:id", requireAuth(), async (c) => {
   // Update
   const [updated] = await db
     .update(comments)
-    .set({ body: body.body, updatedAt: new Date() })
+    .set({ body: parsed.data.body, updatedAt: new Date() })
     .where(eq(comments.id, id))
     .returning();
 

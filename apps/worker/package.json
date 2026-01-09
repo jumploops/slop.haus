@@ -1,0 +1,21 @@
+{
+  "name": "@slop/worker",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "dotenv -e ../../.env -- node dist/index.js"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.41.0",
+    "@slop/db": "workspace:*",
+    "@slop/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "dotenv-cli": "^8.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

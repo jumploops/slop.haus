@@ -9,6 +9,7 @@ import {
   jsonb,
   boolean,
   primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 import { user } from "./users";
 
@@ -39,35 +40,43 @@ export const enrichmentStatusEnum = pgEnum("enrichment_status", [
   "failed",
 ]);
 
-export const projects = pgTable("projects", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  slug: varchar("slug", { length: 255 }).unique().notNull(),
-  authorUserId: text("author_user_id")
-    .references(() => user.id)
-    .notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  tagline: varchar("tagline", { length: 500 }).notNull(),
-  description: text("description"),
-  mainUrl: text("main_url"),
-  repoUrl: text("repo_url"),
-  vibeMode: vibeModeEnum("vibe_mode").notNull(),
-  vibePercent: integer("vibe_percent").notNull(),
-  vibeDetailsJson: jsonb("vibe_details_json"),
-  normalUp: integer("normal_up").default(0).notNull(),
-  normalDown: integer("normal_down").default(0).notNull(),
-  normalScore: integer("normal_score").default(0).notNull(),
-  devUp: integer("dev_up").default(0).notNull(),
-  devDown: integer("dev_down").default(0).notNull(),
-  devScore: integer("dev_score").default(0).notNull(),
-  commentCount: integer("comment_count").default(0).notNull(),
-  status: projectStatusEnum("status").default("published").notNull(),
-  enrichmentStatus: enrichmentStatusEnum("enrichment_status")
-    .default("pending")
-    .notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  lastEditedAt: timestamp("last_edited_at"),
-});
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: varchar("slug", { length: 255 }).unique().notNull(),
+    authorUserId: text("author_user_id")
+      .references(() => user.id)
+      .notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    tagline: varchar("tagline", { length: 500 }).notNull(),
+    description: text("description"),
+    mainUrl: text("main_url"),
+    repoUrl: text("repo_url"),
+    vibeMode: vibeModeEnum("vibe_mode").notNull(),
+    vibePercent: integer("vibe_percent").notNull(),
+    vibeDetailsJson: jsonb("vibe_details_json"),
+    normalUp: integer("normal_up").default(0).notNull(),
+    normalDown: integer("normal_down").default(0).notNull(),
+    normalScore: integer("normal_score").default(0).notNull(),
+    devUp: integer("dev_up").default(0).notNull(),
+    devDown: integer("dev_down").default(0).notNull(),
+    devScore: integer("dev_score").default(0).notNull(),
+    commentCount: integer("comment_count").default(0).notNull(),
+    status: projectStatusEnum("status").default("published").notNull(),
+    enrichmentStatus: enrichmentStatusEnum("enrichment_status")
+      .default("pending")
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    lastEditedAt: timestamp("last_edited_at"),
+  },
+  (table) => [
+    index("projects_author_user_id_idx").on(table.authorUserId),
+    index("projects_status_idx").on(table.status),
+    index("projects_created_at_idx").on(table.createdAt),
+  ]
+);
 
 export const projectRevisions = pgTable("project_revisions", {
   id: uuid("id").primaryKey().defaultRandom(),
