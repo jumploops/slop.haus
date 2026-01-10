@@ -44,12 +44,22 @@ export async function handleEnrichScreenshot(payload: unknown): Promise<void> {
     timeout: 60000, // 60 seconds for complex pages
   });
 
-  if (!result.success || !result.data?.screenshot) {
+  // Firecrawl v2 returns screenshot as a URL in data.screenshot
+  const screenshotUrl = result.data?.screenshot;
+
+  if (!result.success || !screenshotUrl) {
     throw new Error(`Failed to capture screenshot: ${result.error || "No screenshot returned"}`);
   }
 
-  // Convert base64 to buffer
-  const screenshotBuffer = Buffer.from(result.data.screenshot, "base64");
+  console.log(`Firecrawl returned screenshot URL: ${screenshotUrl}`);
+
+  // Fetch the screenshot image from the URL
+  const imageResponse = await fetch(screenshotUrl);
+  if (!imageResponse.ok) {
+    throw new Error(`Failed to fetch screenshot image: ${imageResponse.status}`);
+  }
+
+  const screenshotBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
   // Upload to storage
   const storage = getStorage();

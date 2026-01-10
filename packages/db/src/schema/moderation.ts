@@ -19,7 +19,16 @@ export const moderationTargetTypeEnum = pgEnum("moderation_target_type", [
 export const moderationDecisionEnum = pgEnum("moderation_decision", [
   "approved",
   "flagged",
+  "hidden",
   "rejected",
+]);
+
+export const confidenceLevelEnum = pgEnum("confidence_level", [
+  "none",
+  "low",
+  "medium",
+  "high",
+  "absolute",
 ]);
 
 export const flagTargetTypeEnum = pgEnum("flag_target_type", [
@@ -32,7 +41,8 @@ export const moderationEvents = pgTable("moderation_events", {
   targetType: moderationTargetTypeEnum("target_type").notNull(),
   targetId: uuid("target_id").notNull(),
   model: varchar("model", { length: 100 }).notNull(),
-  labels: jsonb("labels"),
+  labels: jsonb("labels").notNull(), // Array of { label, confidence }
+  confidenceLevel: confidenceLevelEnum("confidence_level").default("none").notNull(),
   decision: moderationDecisionEnum("decision").notNull(),
   reason: text("reason"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

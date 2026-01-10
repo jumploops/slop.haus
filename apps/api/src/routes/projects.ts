@@ -294,7 +294,7 @@ projectRoutes.post("/", requireGitHub(), async (c) => {
     }
   }
 
-  // Run synchronous moderation
+  // Run synchronous moderation with confidence scoring
   const modResult = await moderateProject({
     id: project.id,
     title: data.title,
@@ -304,8 +304,29 @@ projectRoutes.post("/", requireGitHub(), async (c) => {
     repoUrl: data.repoUrl,
   });
 
-  // If moderation fails, hide the project
-  if (!modResult.approved) {
+  // Handle moderation decision
+  if (modResult.decision === "rejected") {
+    // Absolute confidence on serious label - remove immediately
+    await db
+      .update(projects)
+      .set({ status: "removed", updatedAt: new Date() })
+      .where(eq(projects.id, project.id));
+
+    return c.json(
+      {
+        project: { ...project, status: "removed" },
+        moderation: {
+          approved: false,
+          decision: modResult.decision,
+          reason: modResult.reason || "Content rejected",
+        },
+      },
+      201
+    );
+  }
+
+  if (modResult.decision === "hidden") {
+    // High confidence on serious label - hide for review
     await db
       .update(projects)
       .set({ status: "hidden", updatedAt: new Date() })
@@ -316,7 +337,8 @@ projectRoutes.post("/", requireGitHub(), async (c) => {
         project: { ...project, status: "hidden" },
         moderation: {
           approved: false,
-          reason: modResult.reason || "Content flagged for review",
+          decision: modResult.decision,
+          reason: modResult.reason || "Content pending review",
         },
       },
       201
@@ -337,7 +359,16 @@ projectRoutes.post("/", requireGitHub(), async (c) => {
     });
   }
 
-  return c.json({ project }, 201);
+  // For "approved" and "flagged" - project is published
+  // "flagged" means it's published but queued for human review
+  return c.json({
+    project,
+    moderation: modResult.decision === "flagged" ? {
+      approved: true,
+      decision: modResult.decision,
+      reason: modResult.reason || "Content flagged for review",
+    } : undefined,
+  }, 201);
 });
 
 // Update project (creates revision for moderation)

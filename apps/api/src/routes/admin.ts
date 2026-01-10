@@ -294,6 +294,8 @@ adminRoutes.post("/projects/:id/remove", requireAdmin(), async (c) => {
     targetType: "project",
     targetId: projectId,
     model: "manual",
+    labels: [],
+    confidenceLevel: "absolute",
     decision: "rejected",
     reason,
   });

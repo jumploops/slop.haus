@@ -30,7 +30,7 @@ export interface FirecrawlScrapeResult {
   success: boolean;
   data?: {
     markdown?: string;
-    screenshot?: string; // Base64 encoded image
+    screenshot?: string; // URL to screenshot image (not base64)
     links?: string[];
     html?: string;
     rawHtml?: string;
@@ -38,6 +38,8 @@ export interface FirecrawlScrapeResult {
       title?: string;
       description?: string;
       ogImage?: string;
+      sourceURL?: string;
+      statusCode?: number;
     };
   };
   error?: string;
