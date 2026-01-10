@@ -27,15 +27,21 @@ export async function handleEnrichScreenshot(payload: unknown): Promise<void> {
 
   console.log(`Enriching screenshot for project ${project.slug} (${project.mainUrl})`);
 
-  // Call Firecrawl
+  // Call Firecrawl v2
   const result = await scrape({
     url: project.mainUrl,
-    formats: ["screenshot"],
-    screenshotOptions: {
-      fullPage: false,
-      width: 1280,
-      height: 800,
-    },
+    formats: [
+      {
+        type: "screenshot",
+        fullPage: false,
+        viewport: {
+          width: 1280,
+          height: 800,
+        },
+      },
+    ],
+    maxAge: 0, // Always fetch fresh for new projects
+    timeout: 60000, // 60 seconds for complex pages
   });
 
   if (!result.success || !result.data?.screenshot) {

@@ -68,10 +68,11 @@ export async function handleEnrichReadme(payload: unknown): Promise<void> {
 
   console.log(`Enriching README for project ${project.slug} (${project.repoUrl})`);
 
-  // Call Firecrawl on the repo URL
+  // Call Firecrawl v2 on the repo URL
   const result = await scrape({
     url: project.repoUrl,
     formats: ["markdown"],
+    timeout: 30000, // 30 seconds
   });
 
   if (!result.success || !result.data?.markdown) {

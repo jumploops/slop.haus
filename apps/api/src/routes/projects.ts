@@ -323,15 +323,14 @@ projectRoutes.post("/", requireGitHub(), async (c) => {
     );
   }
 
-  // Create enrichment job
+  // Create enrichment jobs for both URLs if they exist
   if (data.mainUrl) {
-    // If mainUrl exists, enrich with screenshot
     await db.insert(jobs).values({
       type: "enrich_screenshot",
       payload: { projectId: project.id },
     });
-  } else if (data.repoUrl) {
-    // Otherwise if repoUrl exists, enrich with README
+  }
+  if (data.repoUrl) {
     await db.insert(jobs).values({
       type: "enrich_readme",
       payload: { projectId: project.id },
@@ -545,18 +544,23 @@ projectRoutes.post("/:slug/refresh", requireAuth(), async (c) => {
     );
   }
 
-  // Create new enrichment job
+  // Create enrichment jobs for both URLs if they exist
+  let jobsQueued = 0;
   if (existing.mainUrl) {
     await db.insert(jobs).values({
       type: "enrich_screenshot",
       payload: { projectId: existing.id },
     });
-  } else if (existing.repoUrl) {
+    jobsQueued++;
+  }
+  if (existing.repoUrl) {
     await db.insert(jobs).values({
       type: "enrich_readme",
       payload: { projectId: existing.id },
     });
-  } else {
+    jobsQueued++;
+  }
+  if (jobsQueued === 0) {
     return c.json({ error: "Project has no URL to enrich" }, 400);
   }
 

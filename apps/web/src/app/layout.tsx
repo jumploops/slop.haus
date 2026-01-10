@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
-import { AuthButtons } from "@/components/AuthButtons";
+import { Providers } from "./providers";
+import { Header } from "@/components/layout/Header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "slop.haus - Vibecoded App Showcase",
-  description: "Showcase and rate vibecoded apps",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  title: {
+    template: "%s | slop.haus",
+    default: "slop.haus - Vibecoded App Showcase",
+  },
+  description: "Showcase and rate vibecoded apps built with AI",
+  openGraph: {
+    type: "website",
+    siteName: "slop.haus",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
@@ -15,21 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="header">
-          <div className="container">
-            <a href="/" className="logo">
-              slop.haus
-            </a>
-            <nav className="nav">
-              <a href="/">Feed</a>
-              <a href="/submit">Submit</a>
-            </nav>
-            <AuthButtons />
-          </div>
-        </header>
-        <main className="main">
-          <div className="container">{children}</div>
-        </main>
+        <Providers>
+          <Header />
+          <main className="main">
+            <div className="container">{children}</div>
+          </main>
+        </Providers>
       </body>
     </html>
   );
