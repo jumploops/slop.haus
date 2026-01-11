@@ -5,6 +5,7 @@ node_modules/
 dist/
 .next/
 out/
+*.tsbuildinfo
 
 # Environment
 .env
@@ -34,3 +35,4 @@ packages/db/drizzle/
 
 # Local file store
 uploads/
+

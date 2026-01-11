@@ -70,7 +70,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           )}
           {session?.user && (session.user.role === "admin" || session.user.role === "mod") && (
             <Link
-              href="/admin/mod-queue"
+              href="/admin"
               className={cn("mobile-nav-link", pathname.startsWith("/admin") && "active")}
             >
               Admin

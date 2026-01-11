@@ -23,7 +23,7 @@ export function Header() {
           {session?.user && <Link href="/favorites">Favorites</Link>}
           {session?.user && <Link href="/settings/profile">Settings</Link>}
           {session?.user && (session.user.role === "admin" || session.user.role === "mod") && (
-            <Link href="/admin/mod-queue">Admin</Link>
+            <Link href="/admin">Admin</Link>
           )}
         </nav>
 

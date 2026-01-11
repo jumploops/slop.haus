@@ -95,7 +95,7 @@ export default function ModQueuePage() {
           { id: "comment", label: "Comments" },
         ]}
         activeTab={filter}
-        onTabChange={(id) => setFilter(id as typeof filter)}
+        onChange={(id) => setFilter(id as typeof filter)}
       />
 
       {isLoading && (

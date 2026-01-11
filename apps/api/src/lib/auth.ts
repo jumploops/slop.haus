@@ -4,6 +4,7 @@ import { db } from "@slop/db";
 import * as schema from "@slop/db/schema";
 
 export const auth = betterAuth({
+  baseURL: process.env.API_URL || "http://localhost:3001",
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -37,6 +38,22 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 60 * 5, // 5 minutes
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "user",
+        input: false, // Cannot be set by client
+      },
+      devVerified: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
     },
   },
   trustedOrigins: [process.env.APP_URL || "http://localhost:3000"],
