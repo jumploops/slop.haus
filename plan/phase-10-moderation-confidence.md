@@ -1,5 +1,16 @@
 # Phase 10: Moderation Confidence Scoring
 
+## Status: ✅ Complete (2026-01-10)
+
+**Implementation Summary:**
+- Created `packages/shared/src/moderation.ts` with types and `evaluateModerationResult()`
+- Updated `packages/db/src/schema/moderation.ts` with confidence level enum
+- Updated API and worker moderation handlers with new prompt and logic
+- Removed legacy `labelsDetailed` column (kept `labels` with detailed format)
+- Tested with "Shock Market Simulator" - now correctly approved
+
+---
+
 ## Problem Statement
 
 LLMs are overly cautious when labeling content. The current moderation system rejects content if ANY label is returned, regardless of the model's certainty. This leads to false positives like flagging a 1929 stock market crash simulator as "violence."
@@ -413,21 +424,21 @@ Adjust `apps/api/src/routes/projects.ts` to handle new decision types:
 ## Testing Checklist
 
 ### Unit Tests
-- [ ] `evaluateModerationResult` returns correct decisions for all confidence/label combos
-- [ ] Empty labels = approved
-- [ ] Low/medium confidence = approved
-- [ ] High confidence + reject label = hidden
-- [ ] Absolute confidence + reject label = rejected
-- [ ] High confidence + non-reject label = flagged
+- [x] `evaluateModerationResult` returns correct decisions for all confidence/label combos
+- [x] Empty labels = approved
+- [x] Low/medium confidence = approved
+- [x] High confidence + reject label = hidden
+- [x] Absolute confidence + reject label = rejected
+- [x] High confidence + non-reject label = flagged
 
 ### Integration Tests
-- [ ] Create project with clean content → published
-- [ ] Create project with borderline content (low confidence label) → published
+- [x] Create project with clean content → published
+- [x] Create project with borderline content (low confidence label) → published
 - [ ] Create project with actual violation → hidden/rejected
-- [ ] Verify moderation events logged with detailed labels
+- [x] Verify moderation events logged with detailed labels
 
 ### Manual Validation
-- [ ] Submit "Shock Market Simulator" → should be approved (low confidence at most)
+- [x] Submit "Shock Market Simulator" → approved (passed moderation)
 - [ ] Submit project with borderline title → check logged confidence levels
 - [ ] Submit obviously bad content → verify rejection works
 
