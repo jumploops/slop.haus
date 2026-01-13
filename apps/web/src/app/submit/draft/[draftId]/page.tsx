@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { RequireGitHub } from "@/components/auth/RequireGitHub";
-import { DraftReview } from "@/components/submit/DraftReview";
+import { EditableProjectPreview } from "@/components/submit/EditableProjectPreview";
 import { getDraft, updateDraft, submitDraft, deleteDraft } from "@/lib/api/drafts";
 import { Button } from "@/components/ui/Button";
 
@@ -181,17 +181,13 @@ function DraftReviewContent({ draftId }: { draftId: string }) {
   if (!draft) return null;
 
   return (
-    <div className="draft-review-page">
-      <div className="draft-review-container">
-        <DraftReview
-          draft={draft}
-          onUpdate={handleUpdate}
-          onSubmit={handleSubmit}
-          onStartOver={handleStartOver}
-          isSubmitting={submitting}
-          error={error}
-        />
-      </div>
-    </div>
+    <EditableProjectPreview
+      draft={draft}
+      onFieldChange={handleUpdate}
+      onSubmit={handleSubmit}
+      onStartOver={handleStartOver}
+      isSubmitting={submitting}
+      error={error}
+    />
   );
 }

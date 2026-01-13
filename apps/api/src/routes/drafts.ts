@@ -5,6 +5,7 @@ import {
   enrichmentDrafts,
   projects,
   projectTools,
+  projectMedia,
   tools,
   jobs,
 } from "@slop/db/schema";
@@ -356,6 +357,17 @@ draftRoutes.post("/:draftId/submit", requireGitHub(), async (c) => {
       enrichmentStatus: draft.screenshotUrl ? "completed" : "pending",
     })
     .returning();
+
+  // Insert screenshot into projectMedia if we have one
+  if (draft.screenshotUrl) {
+    await db.insert(projectMedia).values({
+      projectId: project.id,
+      type: "screenshot",
+      url: draft.screenshotUrl,
+      source: "firecrawl",
+      isPrimary: true,
+    });
+  }
 
   // Link tools
   if (toolSlugs.length > 0) {

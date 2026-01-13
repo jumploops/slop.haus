@@ -1,5 +1,5 @@
 import { db } from "@slop/db";
-import { enrichmentDrafts } from "@slop/db/schema";
+import { enrichmentDrafts, jobs } from "@slop/db/schema";
 import { eq } from "drizzle-orm";
 import { buildExtractionPrompt } from "../lib/extraction-prompt";
 import { matchToolsToDatabase } from "../lib/tool-matching";
@@ -126,11 +126,21 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
       suggestedMainUrl = suggestedMainUrl || draft.inputUrl;
     }
 
-    // 7. Update draft with extracted data
+    // 7. Check if we need to capture a screenshot from the mainUrl
+    // For GitHub/GitLab repos, we didn't capture a screenshot during scraping
+    // If LLM found a mainUrl (live site), we should capture a screenshot from it
+    const needsScreenshot =
+      (draft.detectedUrlType === "github" || draft.detectedUrlType === "gitlab") &&
+      suggestedMainUrl &&
+      suggestedMainUrl !== draft.inputUrl &&
+      !draft.screenshotUrl;
+
+    // 8. Update draft with extracted data
     await db
       .update(enrichmentDrafts)
       .set({
-        status: "ready",
+        // Keep status as "analyzing" if we need to capture screenshot, otherwise "ready"
+        status: needsScreenshot ? "analyzing" : "ready",
         suggestedTitle: extraction.title?.slice(0, 255) || null,
         suggestedTagline: extraction.tagline?.slice(0, 500) || null,
         suggestedDescription: extraction.description?.slice(0, 10000) || null,
@@ -145,9 +155,23 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
       })
       .where(eq(enrichmentDrafts.id, draftId));
 
-    console.log(
-      `Analysis complete for draft ${draftId}: "${extraction.title}" with ${matchedTools.length} tools`
-    );
+    // 9. Queue screenshot capture if needed
+    if (needsScreenshot) {
+      await db.insert(jobs).values({
+        type: "scrape_screenshot",
+        payload: {
+          draftId,
+          url: suggestedMainUrl,
+        },
+      });
+      console.log(
+        `Analysis complete for draft ${draftId}: "${extraction.title}" - queued screenshot capture from ${suggestedMainUrl}`
+      );
+    } else {
+      console.log(
+        `Analysis complete for draft ${draftId}: "${extraction.title}" with ${matchedTools.length} tools`
+      );
+    }
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
