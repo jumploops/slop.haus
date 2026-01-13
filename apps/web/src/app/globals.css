@@ -5,6 +5,7 @@
 }
 
 :root {
+  /* Colors */
   --bg: #0a0a0a;
   --bg-secondary: #111;
   --fg: #ededed;
@@ -15,6 +16,25 @@
   --danger: #ff4444;
   --warning: #ffaa00;
   --success: #00ff88;
+
+  /* Spacing scale */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 2rem;
+  --spacing-8: 2.5rem;
+
+  /* Border radius */
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-lg: 0.75rem;
+
+  /* Aliases */
+  --background: var(--bg);
+  --foreground: var(--fg);
 }
 
 body {
@@ -2364,4 +2384,426 @@ h3 {
     background: white;
     color: black;
   }
+}
+
+/* ==========================================
+   URL-First Onboarding Styles
+   ========================================== */
+
+/* URL Input */
+.url-input-form {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--spacing-6) var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-6);
+}
+
+.url-input-header {
+  text-align: center;
+}
+
+.url-input-header h1 {
+  font-size: 1.75rem;
+  margin-bottom: var(--spacing-3);
+}
+
+.url-input-header p {
+  font-size: 1rem;
+}
+
+.url-input-field {
+  width: 100%;
+}
+
+.url-input-field input {
+  width: 100%;
+  padding: var(--spacing-4);
+  font-size: 1.1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  transition: border-color 0.2s;
+}
+
+.url-input-field input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.url-input-field input.input-error {
+  border-color: var(--danger);
+}
+
+.url-input-field .error-message {
+  display: block;
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: var(--spacing-2);
+}
+
+.url-input-hints {
+  text-align: center;
+}
+
+.url-input-form .btn-large {
+  padding: var(--spacing-3) var(--spacing-8);
+  font-size: 1rem;
+  min-width: 200px;
+}
+
+/* Analysis Progress */
+.analysis-progress {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: var(--spacing-8) var(--spacing-4);
+  text-align: center;
+}
+
+.analysis-progress-header {
+  margin-bottom: var(--spacing-4);
+}
+
+.analysis-progress-header h2 {
+  margin-bottom: var(--spacing-2);
+}
+
+.analysis-progress-type {
+  margin-bottom: var(--spacing-6);
+}
+
+.analysis-progress-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-6);
+  text-align: left;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  background: var(--card);
+  border-radius: var(--radius);
+}
+
+.progress-step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.progress-step-completed .progress-step-icon {
+  color: var(--success);
+}
+
+.progress-step-in_progress .progress-step-icon {
+  color: var(--accent);
+}
+
+.progress-step-pending .progress-step-icon {
+  color: var(--muted);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.analysis-progress-status {
+  margin-bottom: var(--spacing-4);
+}
+
+.analysis-progress-error {
+  margin-top: var(--spacing-4);
+}
+
+.analysis-progress-error .error-message {
+  color: var(--danger);
+  margin-bottom: var(--spacing-4);
+}
+
+/* Analysis Error Component */
+.analysis-error {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: var(--spacing-6);
+  text-align: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.analysis-error-icon {
+  color: var(--warning);
+  margin-bottom: var(--spacing-4);
+}
+
+.analysis-error-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.analysis-error-content {
+  margin-bottom: var(--spacing-6);
+}
+
+.analysis-error-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-2);
+}
+
+.analysis-error-message {
+  color: var(--fg);
+  margin-bottom: var(--spacing-2);
+}
+
+.analysis-error-hint {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.analysis-error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.analysis-error-actions button {
+  width: 100%;
+}
+
+/* Submit page layout */
+.submit-container {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.submit-manual-link {
+  text-align: center;
+  margin-top: var(--spacing-6);
+}
+
+/* Draft Review Page */
+.draft-review-page {
+  padding: var(--spacing-6) var(--spacing-4);
+}
+
+.draft-review-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.draft-review-header {
+  margin-bottom: var(--spacing-6);
+}
+
+.draft-review-header h1 {
+  margin-bottom: var(--spacing-2);
+}
+
+.draft-review-section {
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.draft-review-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-3);
+}
+
+/* Form fields */
+.form-field {
+  margin-bottom: var(--spacing-4);
+}
+
+.form-field:last-child {
+  margin-bottom: 0;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  padding: var(--spacing-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: var(--muted);
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.draft-review-error {
+  margin-bottom: var(--spacing-4);
+}
+
+.draft-review-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.draft-review-loading {
+  text-align: center;
+  padding: var(--spacing-8);
+}
+
+/* Screenshot Preview */
+.screenshot-preview {
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--card);
+}
+
+.screenshot-preview-image {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+
+.screenshot-preview-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Tag Editor */
+.tag-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.tag-editor-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  min-height: 36px;
+  align-items: center;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--card);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0 var(--spacing-1);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.tag-remove:hover {
+  color: var(--danger);
+}
+
+.tag-editor-input {
+  position: relative;
+}
+
+.tag-editor-input input {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.tag-editor-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: var(--spacing-1);
+}
+
+.tag-editor-option {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--foreground);
+}
+
+.tag-editor-option:hover {
+  background: var(--card);
+}
+
+.tag-editor-empty {
+  display: block;
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+/* Error state */
+.error-state {
+  text-align: center;
+  padding: var(--spacing-8);
+}
+
+.error-state h2 {
+  margin-bottom: var(--spacing-2);
+}
+
+.error-state p {
+  margin-bottom: var(--spacing-4);
 }

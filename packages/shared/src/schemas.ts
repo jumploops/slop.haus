@@ -74,6 +74,26 @@ export const feedQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(20),
 });
 
+// Draft schemas
+export const analyzeUrlSchema = z.object({
+  url: z.string().url(),
+});
+
+export const updateDraftSchema = z.object({
+  title: z.string().max(255).optional(),
+  tagline: z.string().max(500).optional(),
+  description: z.string().max(10000).optional(),
+  tools: z.array(z.string()).max(10).optional(),
+  vibePercent: z.number().min(0).max(100).optional(),
+  mainUrl: z.string().url().optional().nullable(),
+  repoUrl: z.string().url().optional().nullable(),
+});
+
+export const submitDraftSchema = z.object({
+  vibeMode: z.enum(["overview", "detailed"]),
+  vibeDetails: z.record(z.string(), z.number()).optional(),
+});
+
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type VoteInput = z.infer<typeof voteSchema>;
@@ -81,3 +101,6 @@ export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
 export type CreateFlagInput = z.infer<typeof createFlagSchema>;
 export type FeedQuery = z.infer<typeof feedQuerySchema>;
+export type AnalyzeUrlInput = z.infer<typeof analyzeUrlSchema>;
+export type UpdateDraftInput = z.infer<typeof updateDraftSchema>;
+export type SubmitDraftInput = z.infer<typeof submitDraftSchema>;

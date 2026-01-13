@@ -6,22 +6,22 @@ This plan implements a simplified project submission flow where users enter a UR
 
 **Design Doc:** `design/url-first-onboarding.md`
 
-## Current Status: Not Started
+## Current Status: In Progress
 
-**Last Updated:** 2026-01-10
+**Last Updated:** 2026-01-11
 
 ## Phase Summary
 
 | Phase | Name | Status | Description |
 |-------|------|--------|-------------|
-| 1 | [Database & Types](./phase-1-database.md) | Not Started | Schema for drafts, shared types |
-| 2 | [URL Scraping](./phase-2-url-scraping.md) | Not Started | URL detection, Firecrawl integration |
-| 3 | [LLM Analysis](./phase-3-llm-analysis.md) | Not Started | Claude Haiku field extraction |
-| 4 | [Draft API](./phase-4-draft-api.md) | Not Started | REST endpoints for drafts |
-| 5 | [Real-time Progress](./phase-5-realtime-progress.md) | Not Started | SSE for live updates |
-| 6 | [Frontend: Input](./phase-6-frontend-input.md) | Not Started | URL input & progress UI |
-| 7 | [Frontend: Review](./phase-7-frontend-review.md) | Not Started | Draft review & edit UI |
-| 8 | [Polish](./phase-8-polish.md) | Not Started | Error handling, cleanup, fallbacks |
+| 1 | [Database & Types](./phase-1-database.md) | ✅ Complete | Schema for drafts, shared types |
+| 2 | [URL Scraping](./phase-2-url-scraping.md) | ✅ Complete | URL detection, Firecrawl integration |
+| 3 | [LLM Analysis](./phase-3-llm-analysis.md) | ✅ Complete | Claude Haiku field extraction |
+| 4 | [Draft API](./phase-4-draft-api.md) | ✅ Complete | REST endpoints for drafts |
+| 5 | [Real-time Progress](./phase-5-realtime-progress.md) | ✅ Complete | SSE for live updates |
+| 6 | [Frontend: Input](./phase-6-frontend-input.md) | ✅ Complete | URL input & progress UI |
+| 7 | [Frontend: Review](./phase-7-frontend-review.md) | ✅ Complete | Draft review & edit UI |
+| 8 | [Polish](./phase-8-polish.md) | ✅ Complete | Error handling, cleanup, fallbacks |
 
 ## Dependencies
 

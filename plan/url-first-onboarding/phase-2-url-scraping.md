@@ -1,6 +1,15 @@
 # Phase 2: URL Scraping
 
-## Status: Not Started
+## Status: ✅ Complete (2026-01-11)
+
+**Implementation Notes:**
+- Created `getScrapeConfig()` for URL type-specific Firecrawl configs
+- Created `scrape_url` job handler that:
+  - Fetches page content via Firecrawl
+  - Downloads and saves screenshots to storage
+  - Stores scraped content/metadata in draft
+  - Queues `analyze_content` job on completion
+- Registered handler in worker
 
 ## Goal
 

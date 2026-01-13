@@ -3,6 +3,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { secureHeaders } from "hono/secure-headers";
 import { auth } from "./lib/auth";
 import { authRoutes } from "./routes/auth";
 import { projectRoutes } from "./routes/projects";
@@ -14,6 +15,7 @@ import { favoriteRoutes } from "./routes/favorites";
 import { userRoutes } from "./routes/users";
 import { adminRoutes } from "./routes/admin";
 import { flagRoutes } from "./routes/flags";
+import { draftRoutes } from "./routes/drafts";
 import type { AuthSession } from "./middleware/auth";
 
 // Extend Hono context with session
@@ -34,6 +36,9 @@ app.use(
     credentials: true,
   })
 );
+
+// Security headers for API routes only (not static uploads)
+app.use("/api/*", secureHeaders());
 
 // Health check
 app.get("/health", (c) => {
@@ -66,6 +71,7 @@ app.route("/api/v1/users", userRoutes); // User routes
 app.route("/api/v1/admin", adminRoutes); // Admin routes
 app.route("/api/v1/flags", flagRoutes); // Flagging routes
 app.route("/api/v1/tools", toolRoutes);
+app.route("/api/v1/drafts", draftRoutes); // Draft submission routes
 
 // API info
 app.get("/api/v1", (c) => {

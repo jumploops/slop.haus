@@ -1,6 +1,6 @@
 # Phase 8: Polish & Production Readiness
 
-## Status: Not Started
+## Status: Complete
 
 ## Goal
 
@@ -434,33 +434,33 @@ export const securityHeaders: MiddlewareHandler = async (c, next) => {
 ## Verification Checklist
 
 ### Error Handling
-- [ ] Scrape failures show user-friendly message
-- [ ] Analysis failures offer retry option
-- [ ] Rate limit errors show wait time
-- [ ] Network errors handled gracefully
-- [ ] Timeout errors trigger cleanup
+- [x] Scrape failures show user-friendly message
+- [x] Analysis failures offer retry option
+- [x] Rate limit errors show wait time
+- [x] Network errors handled gracefully
+- [x] Timeout errors trigger cleanup
 
 ### Fallbacks
-- [ ] Manual entry available at /submit/manual
-- [ ] Failed analysis links to manual entry
-- [ ] SSE failure falls back to polling
+- [x] Manual entry available at /submit/manual
+- [x] Failed analysis links to manual entry
+- [x] SSE failure falls back to polling
 
 ### Cleanup
-- [ ] Expired drafts soft-deleted automatically (deletedAt set)
-- [ ] Stale drafts marked as failed (but not deleted, user can retry)
-- [ ] Cleanup runs on schedule
-- [ ] Manual discard soft-deletes immediately
+- [x] Expired drafts soft-deleted automatically (deletedAt set)
+- [x] Stale drafts marked as failed (but not deleted, user can retry)
+- [x] Cleanup runs on schedule
+- [x] Manual discard soft-deletes immediately
 
 ### Security
-- [ ] Internal IPs blocked
-- [ ] URL shorteners blocked
-- [ ] Rate limiting enforced
-- [ ] Security headers set
+- [x] Internal IPs blocked (via validateUrl in url-detection.ts)
+- [ ] URL shorteners blocked (deferred - basic validation sufficient for MVP)
+- [x] Rate limiting enforced (in-memory, 5/hour)
+- [x] Security headers set (via Hono secureHeaders middleware)
 
 ### Monitoring
-- [ ] Analysis timing logged
-- [ ] Error codes tracked
-- [ ] Edit rates measurable
+- [x] Analysis timing logged (console.log)
+- [x] Error codes tracked (via SSE events)
+- [ ] Edit rates measurable (deferred for production)
 
 ## Files Changed
 

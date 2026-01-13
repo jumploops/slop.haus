@@ -1,6 +1,14 @@
 # Phase 4: Draft API
 
-## Status: Not Started
+## Status: ✅ Complete (2026-01-11)
+
+**Implementation Notes:**
+- Created `draftRoutes` with all 6 endpoints
+- Added validation schemas to `@slop/shared/schemas.ts`
+- Rate limiting (5/hour) uses in-memory Map
+- All endpoints filter soft-deleted drafts (`deletedAt IS NULL`)
+- Submit endpoint creates project, links tools, runs moderation
+- Mounted routes at `/api/v1/drafts`
 
 ## Goal
 

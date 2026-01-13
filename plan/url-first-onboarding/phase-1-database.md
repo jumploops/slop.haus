@@ -1,6 +1,13 @@
 # Phase 1: Database & Types
 
-## Status: Not Started
+## Status: ✅ Complete (2026-01-11)
+
+**Implementation Notes:**
+- Created `enrichment_drafts` table with soft delete support (`deleted_at`)
+- Created `draft_status` and `url_type` enums
+- Added URL detection (`detectUrlType`) and validation (`validateUrl`) functions
+- Added comprehensive TypeScript types for drafts and API responses
+- Schema pushed successfully with `pnpm db:push`
 
 ## Goal
 

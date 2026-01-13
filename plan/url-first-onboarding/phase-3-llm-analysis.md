@@ -1,6 +1,18 @@
 # Phase 3: LLM Analysis
 
-## Status: Not Started
+## Status: ✅ Complete (2026-01-11)
+
+**Implementation Notes:**
+- Created `buildExtractionPrompt()` for structured metadata extraction
+- Created `matchToolsToDatabase()` with alias support for common tool names
+- Created `handleAnalyzeContent` job handler that:
+  - Calls Claude 3.5 Haiku with scraped content
+  - Parses JSON response with markdown wrapper handling
+  - Matches detected tools to database entries
+  - Sets appropriate mainUrl/repoUrl based on input URL type
+  - Transitions draft status to "ready" on success
+- Used native fetch (consistent with moderation.ts) instead of @anthropic-ai/sdk
+- Registered handler in worker
 
 ## Goal
 

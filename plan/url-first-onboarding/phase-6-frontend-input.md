@@ -1,6 +1,14 @@
 # Phase 6: Frontend - URL Input & Progress
 
-## Status: Not Started
+## Status: ✅ Complete (2026-01-11)
+
+**Implementation Notes:**
+- Created `drafts.ts` API client with all CRUD operations
+- Created `UrlInput` component with URL validation
+- Created `AnalysisProgress` component with SSE integration
+- Refactored `/submit` page to URL-first flow
+- Moved old form to `/submit/manual` for fallback
+- Added CSS styles for all new components
 
 ## Goal
 

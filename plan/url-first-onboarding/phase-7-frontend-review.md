@@ -1,6 +1,15 @@
 # Phase 7: Frontend - Draft Review & Edit
 
-## Status: Not Started
+## Status: ✅ Complete (2026-01-11)
+
+**Implementation Notes:**
+- Created `/submit/draft/[draftId]/page.tsx` for draft review
+- Created `DraftReview` component with editable fields
+- Created `ScreenshotPreview` component (uses Next.js Image with unoptimized)
+- Created `TagEditor` component with search/autocomplete
+- Integrated existing `VibeInput` component
+- Configured Next.js for remote image patterns
+- Fields auto-save on blur
 
 ## Goal
 

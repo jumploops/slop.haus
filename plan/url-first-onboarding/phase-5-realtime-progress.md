@@ -1,6 +1,13 @@
 # Phase 5: Real-time Progress
 
-## Status: Not Started
+## Status: ✅ Complete (2026-01-11)
+
+**Implementation Notes:**
+- Added SSE endpoint at `GET /api/v1/drafts/:draftId/events`
+- Uses polling-based approach (1 poll/second, 2 min timeout)
+- Sends status, progress, complete, error, and heartbeat events
+- Created `useDraftProgress` hook for client-side consumption
+- Heartbeats sent every 15 seconds to prevent proxy timeouts
 
 ## Goal
 
