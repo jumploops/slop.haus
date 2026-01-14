@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ScoreWidget } from "./ScoreWidget";
 import { useFavorite } from "@/hooks/useFavorite";
+import { useSession } from "@/lib/auth-client";
 import { formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import type { ProjectDetail } from "@/lib/api/projects";
 
@@ -14,8 +15,10 @@ interface ProjectDetailsProps {
 }
 
 export function ProjectDetails({ project }: ProjectDetailsProps) {
+  const { data: session } = useSession();
   const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavorite(project.slug);
 
+  const isAuthor = session?.user?.id === project.author.id;
   const primaryMedia = project.media.find((m) => m.isPrimary) || project.media[0];
   const imageUrl = primaryMedia?.url || getPlaceholderImage(project.title);
 
@@ -71,6 +74,11 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
             >
               <HeartIcon filled={isFavorited} /> {isFavorited ? "Favorited" : "Favorite"}
             </Button>
+            {isAuthor && (
+              <Link href={`/p/${project.slug}/edit`} className="btn btn-secondary">
+                <PencilIcon /> Edit
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -142,6 +150,14 @@ function HeartIcon({ filled }: { filled: boolean }) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M8 13.5l-1.2-1.1C3.4 9.4 1.5 7.6 1.5 5.4 1.5 3.6 2.9 2 4.6 2c1 0 2 .5 2.6 1.2h.6C8.4 2.5 9.4 2 10.4 2c1.7 0 3.1 1.6 3.1 3.4 0 2.2-1.9 4-5.3 7L8 13.5z" />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M11.85 2.15a.5.5 0 0 1 .7 0l1.3 1.3a.5.5 0 0 1 0 .7l-8.5 8.5a.5.5 0 0 1-.2.12l-2.5.75a.5.5 0 0 1-.62-.62l.75-2.5a.5.5 0 0 1 .12-.2l8.5-8.5zm.35 1.4L11 2.35 3.5 9.85l-.45 1.5 1.5-.45L12.2 3.55z" />
     </svg>
   );
 }

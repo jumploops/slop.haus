@@ -8,6 +8,7 @@ import {
   tools,
   user,
   jobs,
+  moderationEvents,
 } from "@slop/db/schema";
 import { eq, desc, and, gte, sql, inArray, like } from "drizzle-orm";
 import { requireAuth, requireGitHub, getSession } from "../middleware/auth";
@@ -18,6 +19,7 @@ import {
 } from "@slop/shared";
 import { slugify, generateUniqueSlug } from "@slop/shared";
 import { moderateProject } from "../lib/moderation";
+import { getStorage, generateStorageKey } from "../lib/storage";
 
 const projectRoutes = new Hono();
 
@@ -604,6 +606,79 @@ projectRoutes.post("/:slug/refresh", requireAuth(), async (c) => {
   return c.json({ success: true, message: "Enrichment job queued" });
 });
 
+// Upload custom screenshot
+projectRoutes.post("/:slug/screenshot", requireAuth(), async (c) => {
+  const session = c.get("session");
+  const slug = c.req.param("slug");
+
+  // Find project
+  const [existing] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.slug, slug));
+
+  if (!existing) {
+    return c.json({ error: "Project not found" }, 404);
+  }
+
+  // Check ownership
+  if (existing.authorUserId !== session.user.id && session.user.role !== "admin") {
+    return c.json({ error: "Forbidden" }, 403);
+  }
+
+  // Parse multipart form
+  const formData = await c.req.formData();
+  const file = formData.get("file") as File | null;
+
+  if (!file) {
+    return c.json({ error: "No file provided" }, 400);
+  }
+
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    return c.json({ error: "File too large (max 5MB)" }, 400);
+  }
+
+  // Validate file type
+  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    return c.json({ error: "Invalid file type. Allowed: PNG, JPEG, WebP" }, 400);
+  }
+
+  // Get file extension from mime type
+  const extensions: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/webp": "webp",
+  };
+  const ext = extensions[file.type] || "png";
+
+  // Upload to storage
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const storage = getStorage();
+  const key = generateStorageKey("project-screenshots", ext);
+  const url = await storage.upload(key, buffer, file.type);
+
+  // Update projectMedia - set old screenshots as not primary
+  await db
+    .update(projectMedia)
+    .set({ isPrimary: false })
+    .where(
+      and(eq(projectMedia.projectId, existing.id), eq(projectMedia.type, "screenshot"))
+    );
+
+  // Insert new screenshot as primary
+  await db.insert(projectMedia).values({
+    projectId: existing.id,
+    type: "screenshot",
+    url,
+    source: "user_upload",
+    isPrimary: true,
+  });
+
+  return c.json({ url });
+});
+
 // Get project revision history (author only)
 projectRoutes.get("/:slug/revisions", requireAuth(), async (c) => {
   const session = c.get("session");
@@ -624,10 +699,32 @@ projectRoutes.get("/:slug/revisions", requireAuth(), async (c) => {
     return c.json({ error: "Forbidden" }, 403);
   }
 
-  // Get revisions
+  // Get revisions with moderation reasons
   const revisions = await db
-    .select()
+    .select({
+      id: projectRevisions.id,
+      projectId: projectRevisions.projectId,
+      status: projectRevisions.status,
+      title: projectRevisions.title,
+      tagline: projectRevisions.tagline,
+      description: projectRevisions.description,
+      mainUrl: projectRevisions.mainUrl,
+      repoUrl: projectRevisions.repoUrl,
+      vibeMode: projectRevisions.vibeMode,
+      vibePercent: projectRevisions.vibePercent,
+      vibeDetailsJson: projectRevisions.vibeDetailsJson,
+      submittedAt: projectRevisions.submittedAt,
+      reviewedAt: projectRevisions.reviewedAt,
+      reason: moderationEvents.reason,
+    })
     .from(projectRevisions)
+    .leftJoin(
+      moderationEvents,
+      and(
+        eq(moderationEvents.targetType, "revision"),
+        eq(moderationEvents.targetId, projectRevisions.id)
+      )
+    )
     .where(eq(projectRevisions.projectId, project.id))
     .orderBy(desc(projectRevisions.submittedAt));
 

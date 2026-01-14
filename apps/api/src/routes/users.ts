@@ -89,4 +89,68 @@ userRoutes.get("/me/favorites", requireAuth(), async (c) => {
   return c.json({ favorites: result });
 });
 
+// Get current user's projects
+userRoutes.get("/me/projects", requireAuth(), async (c) => {
+  const session = c.get("session");
+
+  // Get user's projects (all statuses)
+  const projectList = await db
+    .select({
+      id: projects.id,
+      slug: projects.slug,
+      title: projects.title,
+      tagline: projects.tagline,
+      mainUrl: projects.mainUrl,
+      repoUrl: projects.repoUrl,
+      vibePercent: projects.vibePercent,
+      normalUp: projects.normalUp,
+      normalDown: projects.normalDown,
+      normalScore: projects.normalScore,
+      devUp: projects.devUp,
+      devDown: projects.devDown,
+      devScore: projects.devScore,
+      commentCount: projects.commentCount,
+      status: projects.status,
+      createdAt: projects.createdAt,
+      updatedAt: projects.updatedAt,
+      lastEditedAt: projects.lastEditedAt,
+      author: {
+        id: user.id,
+        name: user.name,
+        image: user.image,
+        devVerified: user.devVerified,
+      },
+    })
+    .from(projects)
+    .leftJoin(user, eq(projects.authorUserId, user.id))
+    .where(eq(projects.authorUserId, session.user.id))
+    .orderBy(desc(projects.createdAt));
+
+  if (projectList.length === 0) {
+    return c.json({ projects: [] });
+  }
+
+  const projectIds = projectList.map((p) => p.id);
+
+  // Get primary media
+  const media = await db
+    .select()
+    .from(projectMedia)
+    .where(
+      and(
+        inArray(projectMedia.projectId, projectIds),
+        eq(projectMedia.isPrimary, true)
+      )
+    );
+
+  const mediaByProject = new Map(media.map((m) => [m.projectId, m]));
+
+  const result = projectList.map((p) => ({
+    ...p,
+    primaryMedia: mediaByProject.get(p.id) || null,
+  }));
+
+  return c.json({ projects: result });
+});
+
 export { userRoutes };

@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from "../api";
+import { apiGet, apiPost, apiPatch, apiDelete, apiPostFormData } from "../api";
 import type { FeedQuery, CreateProjectInput, UpdateProjectInput } from "@slop/shared";
 
 export interface ProjectMedia {
@@ -40,6 +40,12 @@ export interface ProjectListItem {
   createdAt: string;
   author: ProjectAuthor;
   primaryMedia: ProjectMedia | null;
+}
+
+export interface MyProjectListItem extends ProjectListItem {
+  status: "published" | "hidden" | "removed";
+  updatedAt: string;
+  lastEditedAt: string | null;
 }
 
 export interface ProjectDetail {
@@ -95,6 +101,7 @@ export interface ProjectRevision {
   status: "pending" | "approved" | "rejected";
   submittedAt: string;
   reviewedAt: string | null;
+  reason?: string | null;
 }
 
 export async function fetchFeed(query: Partial<FeedQuery> = {}): Promise<FeedResponse> {
@@ -137,4 +144,28 @@ export async function refreshProject(slug: string): Promise<void> {
 export async function fetchProjectRevisions(slug: string): Promise<ProjectRevision[]> {
   const response = await apiGet<{ revisions: ProjectRevision[] }>(`/projects/${slug}/revisions`);
   return response.revisions;
+}
+
+export async function uploadScreenshot(slug: string, file: File): Promise<string> {
+  // Client-side validation
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (file.size > maxSize) {
+    throw new Error("File too large. Maximum size is 5MB.");
+  }
+
+  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Invalid file type. Allowed: PNG, JPEG, WebP.");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await apiPostFormData<{ url: string }>(`/projects/${slug}/screenshot`, formData);
+  return response.url;
+}
+
+export async function fetchMyProjects(): Promise<MyProjectListItem[]> {
+  const response = await apiGet<{ projects: MyProjectListItem[] }>("/users/me/projects");
+  return response.projects;
 }

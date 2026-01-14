@@ -1,0 +1,46 @@
+"use client";
+
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
+
+interface DeleteProjectModalProps {
+  projectTitle: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}
+
+export function DeleteProjectModal({
+  projectTitle,
+  isOpen,
+  onClose,
+  onConfirm,
+  isDeleting,
+}: DeleteProjectModalProps) {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={`Delete "${projectTitle}"?`}>
+      <div className="delete-modal-content">
+        <p>
+          This will hide your project from public view. Comments and votes will be preserved.
+        </p>
+        <p className="text-muted text-small">
+          If you need to restore a deleted project, please contact support.
+        </p>
+        <div className="delete-modal-actions">
+          <Button variant="secondary" onClick={onClose} disabled={isDeleting}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="btn-danger"
+          >
+            {isDeleting ? "Deleting..." : "Delete Project"}
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}

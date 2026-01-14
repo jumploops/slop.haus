@@ -86,5 +86,15 @@ export async function apiDelete<T>(path: string): Promise<T> {
   return handleResponse<T>(response);
 }
 
+export async function apiPostFormData<T>(path: string, formData: FormData): Promise<T> {
+  const response = await fetch(`${API_BASE}/api/v1${path}`, {
+    method: "POST",
+    credentials: "include",
+    // Note: Don't set Content-Type for FormData, browser sets it with boundary
+    body: formData,
+  });
+  return handleResponse<T>(response);
+}
+
 // Default fetcher for SWR
 export const fetcher = <T>(path: string): Promise<T> => apiGet<T>(path);

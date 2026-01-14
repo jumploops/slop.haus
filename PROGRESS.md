@@ -257,3 +257,103 @@ Transformed the draft review page (`/submit/draft/[draftId]`) from a form-based 
 - `apps/worker/src/handlers/analyze-content.ts` (modified)
 - `apps/worker/src/handlers/index.ts` (registered new handler)
 - `apps/api/src/routes/drafts.ts` (insert screenshot into projectMedia)
+
+---
+
+## User Project Editing Feature
+
+**Status:** Complete (All 4 Phases)
+**Last Updated:** 2026-01-14
+**Spec Doc:** `plan/user-project-editing.md`
+
+### Overview
+
+Enable users to edit and delete their own published projects. The backend API already existed with full moderation integration - Phase 1 focused on the frontend UI.
+
+**Edit Flow:**
+1. Author sees "Edit" button on their project page
+2. Click navigates to `/p/[slug]/edit`
+3. Inline editing for title, tagline, description, tools, vibe, URLs
+4. Changes auto-save on blur via `PATCH /api/v1/projects/:slug`
+5. Moderation runs on each edit - approved instantly or held for review
+6. Delete button opens confirmation modal, soft-deletes project
+
+### Phase 1: Core Editing ✅
+
+- Edit page route with auth check (`/p/[slug]/edit`)
+- EditableProject component (reuses InlineEditText, InlineEditTextarea, TagEditor, VibeInput)
+- Edit button on ProjectDetails (author only)
+- Delete confirmation modal
+- CSS styles for edit header, danger buttons, modal
+
+**Files Created:**
+- `apps/web/src/app/p/[slug]/edit/page.tsx`
+- `apps/web/src/components/project/EditableProject.tsx`
+- `apps/web/src/components/project/DeleteProjectModal.tsx`
+
+**Files Modified:**
+- `apps/web/src/components/project/ProjectDetails.tsx`
+- `apps/web/src/app/globals.css`
+
+### Phase 2: Screenshot Management ✅
+
+- Screenshot upload endpoint (`POST /api/v1/projects/:slug/screenshot`)
+- ScreenshotEditor component with upload and refresh buttons
+- Client-side image validation (size, type)
+- URL change confirmation modal (rescrape prompt)
+- Integration with existing refresh endpoint (1-hour cooldown)
+
+**Files Created:**
+- `apps/api/src/lib/storage.ts`
+- `apps/web/src/components/project/ScreenshotEditor.tsx`
+- `apps/web/src/components/project/UrlChangeModal.tsx`
+
+**Files Modified:**
+- `apps/api/src/routes/projects.ts`
+- `apps/web/src/lib/api.ts`
+- `apps/web/src/lib/api/projects.ts`
+- `apps/web/src/components/project/EditableProject.tsx`
+- `apps/web/src/app/p/[slug]/edit/page.tsx`
+- `apps/web/src/app/globals.css`
+
+### Phase 3: Moderation Feedback ✅
+
+- RevisionStatusBanner component with pending/rejected states
+- Fetch revisions with moderation reasons on edit page load
+- Yellow banner for pending edits, red for rejected
+- Expandable details showing changed fields and rejection reason
+- Auto-refresh after successful edits
+
+**Files Created:**
+- `apps/web/src/components/project/RevisionStatusBanner.tsx`
+
+**Files Modified:**
+- `apps/api/src/routes/projects.ts` (joined moderation_events for reasons)
+- `apps/web/src/lib/api/projects.ts`
+- `apps/web/src/components/project/EditableProject.tsx`
+- `apps/web/src/app/p/[slug]/edit/page.tsx`
+- `apps/web/src/app/globals.css`
+
+### Completed Phases
+
+| Phase | Name | Status |
+|-------|------|--------|
+| 1 | Core Editing (edit page, inline editing, delete) | Complete |
+| 2 | Screenshot Management (upload, refresh, URL modal) | Complete |
+| 3 | Moderation Feedback (revision status banners) | Complete |
+| 4 | My Projects & Polish (project list, nav links) | Complete |
+
+### Phase 4 Details
+
+- My Projects page at `/my/projects`
+- API endpoint: `GET /api/v1/users/me/projects`
+- Status badges: "Pending Review" (hidden), "Removed" (removed)
+- Quick actions: Edit, Delete with confirmation modal
+- Navigation links in Header and MobileNav
+
+### Technical Notes
+
+- **Auth:** Client-side only via `useSession()` hook (better-auth)
+- **Data Fetching:** SWR for edit page (not shared layout - simpler)
+- **Moderation:** Edits auto-approved or held as pending revision
+- **Soft Delete:** Sets `status='removed'`, preserves comments/votes

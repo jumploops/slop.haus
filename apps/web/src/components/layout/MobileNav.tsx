@@ -62,6 +62,14 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           )}
           {session?.user && (
             <Link
+              href="/my/projects"
+              className={cn("mobile-nav-link", pathname.startsWith("/my/projects") && "active")}
+            >
+              My Projects
+            </Link>
+          )}
+          {session?.user && (
+            <Link
               href="/settings/profile"
               className={cn("mobile-nav-link", pathname.startsWith("/settings") && "active")}
             >

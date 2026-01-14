@@ -21,6 +21,7 @@ export function Header() {
           <Link href="/">Feed</Link>
           <Link href="/submit">Submit</Link>
           {session?.user && <Link href="/favorites">Favorites</Link>}
+          {session?.user && <Link href="/my/projects">My Projects</Link>}
           {session?.user && <Link href="/settings/profile">Settings</Link>}
           {session?.user && (session.user.role === "admin" || session.user.role === "mod") && (
             <Link href="/admin">Admin</Link>
