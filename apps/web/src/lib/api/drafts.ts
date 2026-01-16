@@ -66,3 +66,7 @@ export async function submitDraft(
 export async function deleteDraft(draftId: string): Promise<{ success: boolean }> {
   return apiDelete<{ success: boolean }>(`/drafts/${draftId}`);
 }
+
+export async function retryDraft(draftId: string): Promise<{ success: boolean; draftId: string }> {
+  return apiPost<{ success: boolean; draftId: string }>(`/drafts/${draftId}/retry`, {});
+}

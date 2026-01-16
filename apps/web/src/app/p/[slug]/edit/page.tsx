@@ -66,11 +66,11 @@ export default function EditProjectPage({ params }: Props) {
     return null;
   }
 
-  // Field change handler
-  const handleFieldChange = async (field: string, value: unknown) => {
+  // Submit all changes at once
+  const handleSubmit = async (changes: Record<string, unknown>) => {
     setSaveError(null);
     try {
-      const result = await updateProject(slug, { [field]: value });
+      const result = await updateProject(slug, changes);
       // Update local cache with new data
       mutate(result.project, false);
       // Revalidate revisions to reflect new revision status
@@ -102,7 +102,7 @@ export default function EditProjectPage({ params }: Props) {
     <RequireAuth>
       <EditableProject
         project={project}
-        onFieldChange={handleFieldChange}
+        onSubmit={handleSubmit}
         onScreenshotChange={handleScreenshotChange}
         onDelete={() => setShowDeleteModal(true)}
         onDone={() => router.push(`/p/${slug}`)}

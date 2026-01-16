@@ -580,6 +580,7 @@ h3 {
   padding: 0;
   max-width: 500px;
   width: 90%;
+  margin: auto;
 }
 
 .modal::backdrop {
@@ -2646,6 +2647,27 @@ h3 {
   font-size: 0.875rem;
 }
 
+/* Save indicator */
+.save-indicator {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-left: var(--spacing-2);
+  font-weight: 400;
+}
+
+/* Character count */
+.char-count {
+  display: block;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: var(--spacing-1);
+}
+
+.char-count.warning {
+  color: var(--warning);
+}
+
 .form-field input,
 .form-field textarea {
   width: 100%;
@@ -2946,8 +2968,12 @@ h3 {
   font-weight: bold;
 }
 
+.project-details.preview-mode .project-details-tagline {
+  margin-bottom: var(--spacing-4);
+}
+
 .project-details.preview-mode .project-details-tagline .editable-field,
-.project-details.preview-mode .project-details-tagline .inline-edit-input input {
+.project-details.preview-mode .project-details-tagline .inline-edit-textarea textarea {
   font-size: 1.125rem;
   color: var(--muted);
 }
@@ -3052,9 +3078,20 @@ h3 {
   color: var(--text-primary);
 }
 
-.edit-project-actions {
+.edit-header-left {
   display: flex;
+  align-items: center;
+}
+
+.edit-header-right {
+  display: flex;
+  align-items: center;
   gap: var(--spacing-3);
+}
+
+.edit-header-right .btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Danger button variant */

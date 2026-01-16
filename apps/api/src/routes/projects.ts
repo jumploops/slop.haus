@@ -23,6 +23,69 @@ import { getStorage, generateStorageKey } from "../lib/storage";
 
 const projectRoutes = new Hono();
 
+// Helper: fetch complete project with author, media, and tools
+async function fetchCompleteProject(projectId: string) {
+  const [project] = await db
+    .select({
+      id: projects.id,
+      slug: projects.slug,
+      title: projects.title,
+      tagline: projects.tagline,
+      description: projects.description,
+      mainUrl: projects.mainUrl,
+      repoUrl: projects.repoUrl,
+      vibeMode: projects.vibeMode,
+      vibePercent: projects.vibePercent,
+      vibeDetailsJson: projects.vibeDetailsJson,
+      normalUp: projects.normalUp,
+      normalDown: projects.normalDown,
+      normalScore: projects.normalScore,
+      devUp: projects.devUp,
+      devDown: projects.devDown,
+      devScore: projects.devScore,
+      commentCount: projects.commentCount,
+      status: projects.status,
+      createdAt: projects.createdAt,
+      updatedAt: projects.updatedAt,
+      lastEditedAt: projects.lastEditedAt,
+      authorUserId: projects.authorUserId,
+      author: {
+        id: user.id,
+        name: user.name,
+        image: user.image,
+        devVerified: user.devVerified,
+      },
+    })
+    .from(projects)
+    .leftJoin(user, eq(projects.authorUserId, user.id))
+    .where(eq(projects.id, projectId));
+
+  if (!project) return null;
+
+  // Get media
+  const media = await db
+    .select()
+    .from(projectMedia)
+    .where(eq(projectMedia.projectId, project.id));
+
+  // Get tools
+  const projectToolsList = await db
+    .select({
+      id: tools.id,
+      name: tools.name,
+      slug: tools.slug,
+    })
+    .from(projectTools)
+    .innerJoin(tools, eq(projectTools.toolId, tools.id))
+    .where(eq(projectTools.projectId, project.id));
+
+  return {
+    ...project,
+    media,
+    tools: projectToolsList,
+  };
+}
+
 // Helper: compute hot score
 function computeHotScore(score: number, createdAt: Date): number {
   const ageHours = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60);
@@ -420,6 +483,18 @@ projectRoutes.patch("/:slug", requireAuth(), async (c) => {
     );
   }
 
+  // Determine which fields were actually changed (sent in the request)
+  const changedFields: string[] = [];
+  if (data.title !== undefined) changedFields.push("title");
+  if (data.tagline !== undefined) changedFields.push("tagline");
+  if (data.description !== undefined) changedFields.push("description");
+  if (data.mainUrl !== undefined) changedFields.push("mainUrl");
+  if (data.repoUrl !== undefined) changedFields.push("repoUrl");
+  if (data.vibeMode !== undefined) changedFields.push("vibeMode");
+  if (data.vibePercent !== undefined) changedFields.push("vibePercent");
+  if (data.vibeDetails !== undefined) changedFields.push("vibeDetails");
+  if (data.tools !== undefined) changedFields.push("tools");
+
   // Create revision
   const [revision] = await db
     .insert(projectRevisions)
@@ -433,6 +508,7 @@ projectRoutes.patch("/:slug", requireAuth(), async (c) => {
       vibeMode: data.vibeMode,
       vibePercent: data.vibePercent,
       vibeDetailsJson: data.vibeDetails,
+      changedFields,
     })
     .returning();
 
@@ -443,7 +519,11 @@ projectRoutes.patch("/:slug", requireAuth(), async (c) => {
     data.description,
   ].filter(Boolean).join("\n\n");
 
+  // Determine if we should auto-approve
+  let shouldApprove = false;
+
   if (textContent) {
+    // Text content changed - run moderation
     const modResult = await moderateProject({
       id: revision.id,
       title: data.title || existing.title,
@@ -452,60 +532,67 @@ projectRoutes.patch("/:slug", requireAuth(), async (c) => {
       mainUrl: data.mainUrl,
       repoUrl: data.repoUrl,
     });
-
-    if (modResult.approved) {
-      // Auto-approve: apply changes immediately
-      const updates: Record<string, any> = {
-        updatedAt: new Date(),
-        lastEditedAt: new Date(),
-      };
-
-      if (data.title !== undefined) updates.title = data.title;
-      if (data.tagline !== undefined) updates.tagline = data.tagline;
-      if (data.description !== undefined) updates.description = data.description;
-      if (data.mainUrl !== undefined) updates.mainUrl = data.mainUrl;
-      if (data.repoUrl !== undefined) updates.repoUrl = data.repoUrl;
-      if (data.vibeMode !== undefined) updates.vibeMode = data.vibeMode;
-      if (data.vibePercent !== undefined) updates.vibePercent = data.vibePercent;
-      if (data.vibeDetails !== undefined) updates.vibeDetailsJson = data.vibeDetails;
-
-      const [updated] = await db
-        .update(projects)
-        .set(updates)
-        .where(eq(projects.id, existing.id))
-        .returning();
-
-      // Mark revision as approved
-      await db
-        .update(projectRevisions)
-        .set({ status: "approved", reviewedAt: new Date() })
-        .where(eq(projectRevisions.id, revision.id));
-
-      // Handle tools update
-      if (data.tools !== undefined) {
-        await db.delete(projectTools).where(eq(projectTools.projectId, existing.id));
-        if (data.tools.length > 0) {
-          const toolRecords = await db
-            .select()
-            .from(tools)
-            .where(inArray(tools.slug, data.tools));
-          if (toolRecords.length > 0) {
-            await db.insert(projectTools).values(
-              toolRecords.map((t) => ({ projectId: existing.id, toolId: t.id }))
-            );
-          }
-        }
-      }
-
-      return c.json({ project: updated, revision: { ...revision, status: "approved" } });
-    }
+    shouldApprove = modResult.approved;
+  } else {
+    // No text content changed (only tools, vibe, URLs, etc.)
+    // Auto-approve since there's nothing to moderate
+    shouldApprove = true;
   }
 
-  // Moderation flagged or no text changes - revision stays pending
+  if (shouldApprove) {
+    // Apply changes immediately
+    const updates: Record<string, any> = {
+      updatedAt: new Date(),
+      lastEditedAt: new Date(),
+    };
+
+    if (data.title !== undefined) updates.title = data.title;
+    if (data.tagline !== undefined) updates.tagline = data.tagline;
+    if (data.description !== undefined) updates.description = data.description;
+    if (data.mainUrl !== undefined) updates.mainUrl = data.mainUrl;
+    if (data.repoUrl !== undefined) updates.repoUrl = data.repoUrl;
+    if (data.vibeMode !== undefined) updates.vibeMode = data.vibeMode;
+    if (data.vibePercent !== undefined) updates.vibePercent = data.vibePercent;
+    if (data.vibeDetails !== undefined) updates.vibeDetailsJson = data.vibeDetails;
+
+    await db
+      .update(projects)
+      .set(updates)
+      .where(eq(projects.id, existing.id));
+
+    // Mark revision as approved
+    await db
+      .update(projectRevisions)
+      .set({ status: "approved", reviewedAt: new Date() })
+      .where(eq(projectRevisions.id, revision.id));
+
+    // Handle tools update
+    if (data.tools !== undefined) {
+      await db.delete(projectTools).where(eq(projectTools.projectId, existing.id));
+      if (data.tools.length > 0) {
+        const toolRecords = await db
+          .select()
+          .from(tools)
+          .where(inArray(tools.slug, data.tools));
+        if (toolRecords.length > 0) {
+          await db.insert(projectTools).values(
+            toolRecords.map((t) => ({ projectId: existing.id, toolId: t.id }))
+          );
+        }
+      }
+    }
+
+    // Fetch complete project with author, media, tools for response
+    const completeProject = await fetchCompleteProject(existing.id);
+    return c.json({ project: completeProject, revision: { ...revision, status: "approved" } });
+  }
+
+  // Moderation flagged - revision stays pending for human review
+  const completeProject = await fetchCompleteProject(existing.id);
   return c.json({
     message: "Revision submitted for review",
     revision,
-    project: existing,
+    project: completeProject,
   });
 });
 
@@ -713,6 +800,7 @@ projectRoutes.get("/:slug/revisions", requireAuth(), async (c) => {
       vibeMode: projectRevisions.vibeMode,
       vibePercent: projectRevisions.vibePercent,
       vibeDetailsJson: projectRevisions.vibeDetailsJson,
+      changedFields: projectRevisions.changedFields,
       submittedAt: projectRevisions.submittedAt,
       reviewedAt: projectRevisions.reviewedAt,
       reason: moderationEvents.reason,

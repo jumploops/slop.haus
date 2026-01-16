@@ -18,13 +18,24 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
   const isPending = revision.status === "pending";
   const isRejected = revision.status === "rejected";
 
-  // Get the list of fields that were changed in this revision
-  const changedFields: string[] = [];
-  if (revision.title) changedFields.push("title");
-  if (revision.tagline) changedFields.push("tagline");
-  if (revision.description) changedFields.push("description");
-  if (revision.mainUrl !== undefined) changedFields.push("main URL");
-  if (revision.repoUrl !== undefined) changedFields.push("repository URL");
+  // Map field names to display labels
+  const fieldLabels: Record<string, string> = {
+    title: "title",
+    tagline: "tagline",
+    description: "description",
+    mainUrl: "main URL",
+    repoUrl: "repository URL",
+    vibeMode: "vibe mode",
+    vibePercent: "vibe score",
+    vibeDetails: "vibe details",
+    tools: "tools",
+  };
+
+  // Use the explicit changedFields array from the revision
+  // This solves the NULL ambiguity - we know exactly what was changed
+  const changedFields = (revision.changedFields || []).map(
+    (field) => fieldLabels[field] || field
+  );
 
   return (
     <div className={`revision-banner ${isPending ? "revision-banner-pending" : "revision-banner-rejected"}`}>

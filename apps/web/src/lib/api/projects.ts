@@ -99,6 +99,8 @@ export interface ProjectRevision {
   mainUrl: string | null;
   repoUrl: string | null;
   status: "pending" | "approved" | "rejected";
+  // Explicit list of which fields were changed in this revision
+  changedFields: string[];
   submittedAt: string;
   reviewedAt: string | null;
   reason?: string | null;

@@ -1,5 +1,75 @@
 import { z } from "zod";
 
+// =============================================================================
+// Vibe Configuration - Centralized vibe categories and defaults
+// =============================================================================
+
+/**
+ * Vibe categories used for detailed vibe scoring.
+ * Update this array if adding/removing/renaming categories.
+ * Changes here will require updates to components using VIBE_CATEGORIES.
+ */
+export const VIBE_CATEGORIES = ["idea", "design", "code", "prompts", "vibe"] as const;
+
+export type VibeCategory = (typeof VIBE_CATEGORIES)[number];
+
+/**
+ * Type for vibe details object - maps each category to a score (0-100)
+ */
+export type VibeDetails = Record<VibeCategory, number>;
+
+/**
+ * Default vibe score for each category (used when no score is set)
+ */
+export const DEFAULT_VIBE_SCORE = 50;
+
+/**
+ * Default vibe details object - all categories set to DEFAULT_VIBE_SCORE
+ */
+export const DEFAULT_VIBE_DETAILS: VibeDetails = VIBE_CATEGORIES.reduce(
+  (acc, category) => ({ ...acc, [category]: DEFAULT_VIBE_SCORE }),
+  {} as VibeDetails
+);
+
+/**
+ * Get vibe details with defaults applied for any missing categories
+ */
+export function getVibeDetailsWithDefaults(
+  details: Record<string, number> | null | undefined
+): VibeDetails {
+  if (!details) return { ...DEFAULT_VIBE_DETAILS };
+
+  return VIBE_CATEGORIES.reduce(
+    (acc, category) => ({
+      ...acc,
+      [category]: details[category] ?? DEFAULT_VIBE_SCORE,
+    }),
+    {} as VibeDetails
+  );
+}
+
+/**
+ * Compare two vibe details objects for equality (order-independent)
+ * Handles null/undefined by using defaults
+ */
+export function isEqualVibeDetails(
+  a: Record<string, number> | null | undefined,
+  b: Record<string, number> | null | undefined
+): boolean {
+  const aNormalized = getVibeDetailsWithDefaults(a);
+  const bNormalized = getVibeDetailsWithDefaults(b);
+
+  for (const category of VIBE_CATEGORIES) {
+    if (aNormalized[category] !== bNormalized[category]) return false;
+  }
+
+  return true;
+}
+
+// =============================================================================
+// Project Schemas
+// =============================================================================
+
 export const createProjectSchema = z
   .object({
     title: z.string().min(1).max(255),

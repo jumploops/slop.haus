@@ -1,10 +1,24 @@
 import { db } from "@slop/db";
 import { enrichmentDrafts, jobs } from "@slop/db/schema";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { buildExtractionPrompt } from "../lib/extraction-prompt";
 import { matchToolsToDatabase } from "../lib/tool-matching";
 
 const ANALYSIS_MODEL = "claude-3-5-haiku-latest";
+
+// Schema for LLM extraction response with defaults for robustness
+const extractionSchema = z.object({
+  title: z.string().max(255).default("Untitled"),
+  tagline: z.string().max(500).default(""),
+  description: z.string().max(10000).default(""),
+  detectedTools: z.array(z.string()).default([]),
+  suggestedVibePercent: z.number().min(0).max(100).default(50),
+  linkedUrls: z.object({
+    mainUrl: z.string().url().nullable().default(null),
+    repoUrl: z.string().url().nullable().default(null),
+  }).default({ mainUrl: null, repoUrl: null }),
+});
 
 export interface AnalyzeContentPayload {
   draftId: string;
@@ -92,7 +106,7 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
     const result = await response.json();
     const responseText = result.content?.[0]?.text || "";
 
-    // 4. Parse response
+    // 4. Parse response with zod validation
     let extraction: ExtractionResult;
     try {
       // Try to extract JSON from response (handle potential markdown wrapping)
@@ -100,9 +114,14 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
       if (!jsonMatch) {
         throw new Error("No JSON found in response");
       }
-      extraction = JSON.parse(jsonMatch[0]);
-    } catch (parseError) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      // Validate and apply defaults with zod schema
+      extraction = extractionSchema.parse(parsed);
+    } catch (parseError: unknown) {
       console.error("Failed to parse LLM response:", responseText);
+      if (parseError instanceof z.ZodError) {
+        console.error("Zod validation errors:", parseError.errors);
+      }
       throw new Error("Failed to parse extraction response");
     }
 

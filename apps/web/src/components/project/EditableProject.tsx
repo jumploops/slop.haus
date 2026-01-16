@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { DEFAULT_VIBE_DETAILS, isEqualVibeDetails } from "@slop/shared";
 import { InlineEditText } from "@/components/submit/InlineEditText";
 import { InlineEditTextarea } from "@/components/submit/InlineEditTextarea";
 import { TagEditor } from "@/components/submit/TagEditor";
@@ -18,7 +19,7 @@ import { refreshProject, type ProjectDetail, type ProjectRevision } from "@/lib/
 
 interface EditableProjectProps {
   project: ProjectDetail;
-  onFieldChange: (field: string, value: unknown) => Promise<void>;
+  onSubmit: (changes: Record<string, unknown>) => Promise<void>;
   onScreenshotChange: (url: string) => void;
   onDelete: () => void;
   onDone: () => void;
@@ -29,7 +30,7 @@ interface EditableProjectProps {
 
 export function EditableProject({
   project,
-  onFieldChange,
+  onSubmit,
   onScreenshotChange,
   onDelete,
   onDone,
@@ -47,131 +48,183 @@ export function EditableProject({
   const [vibeMode, setVibeMode] = useState<"overview" | "detailed">(project.vibeMode);
   const [vibePercent, setVibePercent] = useState(project.vibePercent);
   const [vibeDetails, setVibeDetails] = useState<Record<string, number>>(
-    project.vibeDetailsJson || {
-      idea: 50,
-      design: 50,
-      code: 50,
-      prompts: 50,
-      vibe: 50,
-    }
+    project.vibeDetailsJson || DEFAULT_VIBE_DETAILS
   );
-  const [saving, setSaving] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Screenshot state
   const primaryMedia = project.media.find((m) => m.isPrimary) || project.media[0];
   const [screenshotUrl, setScreenshotUrl] = useState(primaryMedia?.url || null);
 
-  // URL change modal state
+  // URL change modal state - now triggered on submit, not blur
   const [urlChangeModal, setUrlChangeModal] = useState<{
     isOpen: boolean;
-    urlType: "mainUrl" | "repoUrl";
-    newValue: string;
+    changes: Record<string, unknown>;
   }>({
     isOpen: false,
-    urlType: "mainUrl",
-    newValue: "",
+    changes: {},
   });
-  const [isUrlSaving, setIsUrlSaving] = useState(false);
 
-  // Field save handlers
-  const handleTitleSave = async (value: string) => {
+  // Compute dirty state - compare current values to original project
+  const isDirty = useMemo(() => {
+    if (title !== project.title) return true;
+    if (tagline !== project.tagline) return true;
+    if (description !== (project.description || "")) return true;
+    if (mainUrl !== (project.mainUrl || "")) return true;
+    if (repoUrl !== (project.repoUrl || "")) return true;
+    if (vibeMode !== project.vibeMode) return true;
+    if (vibePercent !== project.vibePercent) return true;
+    // Use order-independent comparison for vibeDetails (JSON key order can differ)
+    if (!isEqualVibeDetails(vibeDetails, project.vibeDetailsJson)) return true;
+
+    // Tools comparison (order-independent)
+    const originalTools = new Set(project.tools.map((t) => t.slug));
+    const currentTools = new Set(tools);
+    if (originalTools.size !== currentTools.size) return true;
+    for (const tool of currentTools) {
+      if (!originalTools.has(tool)) return true;
+    }
+
+    return false;
+  }, [title, tagline, description, mainUrl, repoUrl, vibeMode, vibePercent, vibeDetails, tools, project]);
+
+  // Get changed fields for submit payload
+  const getChangedFields = (): Record<string, unknown> => {
+    const changes: Record<string, unknown> = {};
+
+    if (title !== project.title) changes.title = title;
+    if (tagline !== project.tagline) changes.tagline = tagline;
+    if (description !== (project.description || "")) changes.description = description;
+    if (mainUrl !== (project.mainUrl || "")) changes.mainUrl = mainUrl || null;
+    if (repoUrl !== (project.repoUrl || "")) changes.repoUrl = repoUrl || null;
+    if (vibeMode !== project.vibeMode) changes.vibeMode = vibeMode;
+    if (vibePercent !== project.vibePercent) changes.vibePercent = vibePercent;
+    if (!isEqualVibeDetails(vibeDetails, project.vibeDetailsJson)) {
+      changes.vibeDetails = vibeDetails;
+    }
+
+    // Tools comparison
+    const originalTools = new Set(project.tools.map((t) => t.slug));
+    const currentTools = new Set(tools);
+    const toolsChanged =
+      originalTools.size !== currentTools.size ||
+      [...currentTools].some((t) => !originalTools.has(t)) ||
+      [...originalTools].some((t) => !currentTools.has(t));
+    if (toolsChanged) changes.tools = tools;
+
+    return changes;
+  };
+
+  // Navigation warning when dirty
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
+
+  // Submit all changes
+  const handleSubmit = async () => {
+    const changes = getChangedFields();
+    if (Object.keys(changes).length === 0) return;
+
+    // If mainUrl changed, show confirmation modal for screenshot refresh
+    if (changes.mainUrl !== undefined && changes.mainUrl !== project.mainUrl) {
+      setUrlChangeModal({ isOpen: true, changes });
+      return;
+    }
+
+    await submitChanges(changes);
+  };
+
+  const submitChanges = async (changes: Record<string, unknown>) => {
+    setIsSaving(true);
+    try {
+      await onSubmit(changes);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Discard all changes
+  const handleDiscard = () => {
+    setTitle(project.title);
+    setTagline(project.tagline);
+    setDescription(project.description || "");
+    setMainUrl(project.mainUrl || "");
+    setRepoUrl(project.repoUrl || "");
+    setTools(project.tools.map((t) => t.slug));
+    setVibeMode(project.vibeMode);
+    setVibePercent(project.vibePercent);
+    setVibeDetails(project.vibeDetailsJson || DEFAULT_VIBE_DETAILS);
+  };
+
+  // Handle "Done" with dirty check
+  const handleDone = () => {
+    if (isDirty) {
+      if (!window.confirm("You have unsaved changes. Discard and leave?")) {
+        return;
+      }
+    }
+    onDone();
+  };
+
+  // Field change handlers - only update local state, no API calls
+  const handleTitleChange = (value: string) => {
     setTitle(value);
-    setSaving("title");
-    try {
-      await onFieldChange("title", value);
-    } finally {
-      setSaving(null);
-    }
   };
 
-  const handleTaglineSave = async (value: string) => {
+  const handleTaglineChange = (value: string) => {
     setTagline(value);
-    setSaving("tagline");
-    try {
-      await onFieldChange("tagline", value);
-    } finally {
-      setSaving(null);
-    }
   };
 
-  const handleDescriptionSave = async (value: string) => {
+  const handleDescriptionChange = (value: string) => {
     setDescription(value);
-    setSaving("description");
-    try {
-      await onFieldChange("description", value);
-    } finally {
-      setSaving(null);
-    }
   };
 
-  const handleToolsChange = async (newTools: string[]) => {
+  const handleToolsChange = (newTools: string[]) => {
     setTools(newTools);
-    setSaving("tools");
-    try {
-      await onFieldChange("tools", newTools);
-    } finally {
-      setSaving(null);
-    }
   };
 
-  const handleMainUrlBlur = () => {
-    if (mainUrl !== (project.mainUrl || "")) {
-      // URL changed - show confirmation modal
-      setUrlChangeModal({
-        isOpen: true,
-        urlType: "mainUrl",
-        newValue: mainUrl,
-      });
-    }
+  const handleVibePercentChange = (value: number) => {
+    setVibePercent(value);
   };
 
-  const handleRepoUrlBlur = () => {
-    if (repoUrl !== (project.repoUrl || "")) {
-      // URL changed - show confirmation modal
-      setUrlChangeModal({
-        isOpen: true,
-        urlType: "repoUrl",
-        newValue: repoUrl,
-      });
-    }
+  const handleVibeModeChange = (mode: "overview" | "detailed") => {
+    setVibeMode(mode);
   };
 
+  const handleVibeDetailsChange = (details: Record<string, number>) => {
+    setVibeDetails(details);
+  };
+
+  // URL modal handlers
   const handleUrlSaveOnly = async () => {
-    setIsUrlSaving(true);
-    try {
-      await onFieldChange(urlChangeModal.urlType, urlChangeModal.newValue || null);
-      setUrlChangeModal({ ...urlChangeModal, isOpen: false });
-    } finally {
-      setIsUrlSaving(false);
-    }
+    setUrlChangeModal({ ...urlChangeModal, isOpen: false });
+    await submitChanges(urlChangeModal.changes);
   };
 
   const handleUrlSaveAndRescrape = async () => {
-    setIsUrlSaving(true);
+    setUrlChangeModal({ ...urlChangeModal, isOpen: false });
+    await submitChanges(urlChangeModal.changes);
+    // Trigger screenshot refresh after save
     try {
-      // First save the URL
-      await onFieldChange(urlChangeModal.urlType, urlChangeModal.newValue || null);
-      // Then trigger a refresh
       await refreshProject(project.slug);
-      setUrlChangeModal({ ...urlChangeModal, isOpen: false });
-    } catch (err) {
-      // URL saved but refresh failed - still close modal
-      setUrlChangeModal({ ...urlChangeModal, isOpen: false });
-    } finally {
-      setIsUrlSaving(false);
+    } catch {
+      // Refresh failed but changes were saved - that's ok
     }
   };
 
   const handleUrlModalClose = () => {
-    // Revert the URL input to original value
-    if (urlChangeModal.urlType === "mainUrl") {
-      setMainUrl(project.mainUrl || "");
-    } else {
-      setRepoUrl(project.repoUrl || "");
-    }
-    setUrlChangeModal({ ...urlChangeModal, isOpen: false });
+    setUrlChangeModal({ isOpen: false, changes: {} });
   };
 
+  // Screenshot handlers (these remain immediate - not part of batch save)
   const handleScreenshotUpload = (url: string) => {
     setScreenshotUrl(url);
     onScreenshotChange(url);
@@ -179,47 +232,36 @@ export function EditableProject({
 
   const handleScreenshotRefresh = () => {
     // Screenshot will be updated async - the user can refresh the page
-    // or we could poll for updates, but for now just notify
-  };
-
-  const handleVibePercentChange = async (value: number) => {
-    setVibePercent(value);
-  };
-
-  const handleVibeModeChange = async (mode: "overview" | "detailed") => {
-    setVibeMode(mode);
-    await onFieldChange("vibeMode", mode);
-  };
-
-  const handleVibeBlur = async () => {
-    if (vibePercent !== project.vibePercent) {
-      setSaving("vibePercent");
-      try {
-        await onFieldChange("vibePercent", vibePercent);
-      } finally {
-        setSaving(null);
-      }
-    }
-  };
-
-  const handleVibeDetailsChange = async (details: Record<string, number>) => {
-    setVibeDetails(details);
-    await onFieldChange("vibeDetails", details);
   };
 
   return (
     <div className="project-preview-container">
       {/* Edit mode header */}
       <div className="edit-project-header">
-        <Link href={`/p/${project.slug}`} className="back-link">
-          <ArrowLeftIcon /> Back to project
-        </Link>
-        <div className="edit-project-actions">
+        <div className="edit-header-left">
+          <Link href={`/p/${project.slug}`} className="back-link" onClick={(e) => {
+            if (isDirty && !window.confirm("You have unsaved changes. Discard and leave?")) {
+              e.preventDefault();
+            }
+          }}>
+            <ArrowLeftIcon /> Back to project
+          </Link>
+        </div>
+        <div className="edit-header-right">
           <Button variant="ghost" onClick={onDelete} className="btn-danger-ghost">
             Delete
           </Button>
-          <Button variant="primary" onClick={onDone}>
-            Done
+          {isDirty && (
+            <Button variant="ghost" onClick={handleDiscard}>
+              Discard
+            </Button>
+          )}
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={!isDirty || isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
@@ -258,21 +300,20 @@ export function EditableProject({
           <div className="project-details-info">
             <InlineEditText
               value={title}
-              onSave={handleTitleSave}
+              onSave={handleTitleChange}
               placeholder="Project Title"
               maxLength={255}
               required
               as="h1"
             />
 
-            <InlineEditText
+            <InlineEditTextarea
               value={tagline}
-              onSave={handleTaglineSave}
+              onSave={handleTaglineChange}
               placeholder="One-sentence description"
               maxLength={500}
-              required
               className="project-details-tagline"
-              as="p"
+              minRows={2}
             />
 
             {/* Author info (read-only) */}
@@ -327,7 +368,7 @@ export function EditableProject({
               <h3>About</h3>
               <InlineEditTextarea
                 value={description}
-                onSave={handleDescriptionSave}
+                onSave={handleDescriptionChange}
                 placeholder="Add a description..."
                 maxLength={10000}
               />
@@ -350,7 +391,7 @@ export function EditableProject({
                 <h4>Vibe Score</h4>
                 <div className="vibe-editor-preview">
                   <VibeMeter percent={vibePercent} showLabel />
-                  <div className="vibe-editor-inline" onBlur={handleVibeBlur}>
+                  <div className="vibe-editor-inline">
                     <VibeInput
                       mode={vibeMode}
                       onModeChange={handleVibeModeChange}
@@ -397,7 +438,6 @@ export function EditableProject({
             type="url"
             value={mainUrl}
             onChange={(e) => setMainUrl(e.target.value)}
-            onBlur={handleMainUrlBlur}
             placeholder="https://your-app.com"
           />
         </div>
@@ -408,20 +448,19 @@ export function EditableProject({
             type="url"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
-            onBlur={handleRepoUrlBlur}
             placeholder="https://github.com/user/repo"
           />
         </div>
       </div>
 
-      {/* URL change confirmation modal */}
+      {/* URL change confirmation modal - triggered on submit when mainUrl changed */}
       <UrlChangeModal
         isOpen={urlChangeModal.isOpen}
         onClose={handleUrlModalClose}
         onSaveOnly={handleUrlSaveOnly}
         onSaveAndRescrape={handleUrlSaveAndRescrape}
-        isSaving={isUrlSaving}
-        urlType={urlChangeModal.urlType}
+        isSaving={isSaving}
+        urlType="mainUrl"
       />
     </div>
   );

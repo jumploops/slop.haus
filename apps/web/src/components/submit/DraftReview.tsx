@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { DEFAULT_VIBE_DETAILS } from "@slop/shared";
 import { ScreenshotPreview } from "./ScreenshotPreview";
 import { TagEditor } from "./TagEditor";
 import { VibeInput } from "@/components/form/VibeInput";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 
 interface DraftData {
   draftId: string;
@@ -73,16 +75,20 @@ export function DraftReview({
   const [vibePercent, setVibePercent] = useState(
     getValue<number>("vibePercent") || 50
   );
-  const [vibeDetails, setVibeDetails] = useState<Record<string, number>>({
-    idea: 50,
-    design: 50,
-    code: 50,
-    prompts: 50,
-    vibe: 50,
-  });
+  const [vibeDetails, setVibeDetails] = useState<Record<string, number>>(
+    { ...DEFAULT_VIBE_DETAILS }
+  );
+  const [savingField, setSavingField] = useState<string | null>(null);
+  const [showDiscardModal, setShowDiscardModal] = useState(false);
 
-  const handleFieldBlur = (field: string, value: unknown) => {
-    onUpdate(field, value);
+  const handleFieldBlur = async (field: string, value: unknown) => {
+    setSavingField(field);
+    try {
+      await onUpdate(field, value);
+    } finally {
+      // Brief delay so user sees "Saved" feedback
+      setTimeout(() => setSavingField(null), 800);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -115,7 +121,10 @@ export function DraftReview({
         <h2>Basic Info</h2>
 
         <div className="form-field">
-          <label htmlFor="title">Title *</label>
+          <label htmlFor="title">
+            Title *
+            {savingField === "title" && <span className="save-indicator">Saving...</span>}
+          </label>
           <input
             id="title"
             type="text"
@@ -125,10 +134,16 @@ export function DraftReview({
             maxLength={255}
             required
           />
+          <span className={`char-count ${title.length > 230 ? "warning" : ""}`}>
+            {title.length}/255
+          </span>
         </div>
 
         <div className="form-field">
-          <label htmlFor="tagline">Tagline *</label>
+          <label htmlFor="tagline">
+            Tagline *
+            {savingField === "tagline" && <span className="save-indicator">Saving...</span>}
+          </label>
           <input
             id="tagline"
             type="text"
@@ -139,10 +154,16 @@ export function DraftReview({
             placeholder="One-sentence description"
             required
           />
+          <span className={`char-count ${tagline.length > 450 ? "warning" : ""}`}>
+            {tagline.length}/500
+          </span>
         </div>
 
         <div className="form-field">
-          <label htmlFor="description">Description</label>
+          <label htmlFor="description">
+            Description
+            {savingField === "description" && <span className="save-indicator">Saving...</span>}
+          </label>
           <textarea
             id="description"
             value={description}
@@ -152,6 +173,9 @@ export function DraftReview({
             rows={4}
             placeholder="Optional longer description"
           />
+          <span className={`char-count ${description.length > 9000 ? "warning" : ""}`}>
+            {description.length}/10000
+          </span>
         </div>
       </div>
 
@@ -238,13 +262,42 @@ export function DraftReview({
         </Button>
         <Button
           type="button"
-          onClick={onStartOver}
+          onClick={() => setShowDiscardModal(true)}
           disabled={isSubmitting}
           variant="ghost"
         >
           Start Over
         </Button>
       </div>
+
+      {/* Discard Confirmation Modal */}
+      <Modal
+        isOpen={showDiscardModal}
+        onClose={() => setShowDiscardModal(false)}
+        title="Discard draft?"
+      >
+        <div className="delete-modal-content">
+          <p>You&apos;ll lose all changes and need to re-analyze the URL.</p>
+          <p className="text-muted text-small">This action cannot be undone.</p>
+          <div className="delete-modal-actions">
+            <Button
+              variant="ghost"
+              onClick={() => setShowDiscardModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                setShowDiscardModal(false);
+                onStartOver();
+              }}
+            >
+              Discard Draft
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </form>
   );
 }

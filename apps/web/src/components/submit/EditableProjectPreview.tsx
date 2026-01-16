@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DEFAULT_VIBE_DETAILS } from "@slop/shared";
 import { useSession } from "@/lib/auth-client";
 import { InlineEditText } from "./InlineEditText";
 import { InlineEditTextarea } from "./InlineEditTextarea";
@@ -63,13 +64,9 @@ export function EditableProjectPreview({
   const [vibePercent, setVibePercent] = useState(
     getValue("vibePercent") ?? 50
   );
-  const [vibeDetails, setVibeDetails] = useState<Record<string, number>>({
-    idea: 50,
-    design: 50,
-    code: 50,
-    prompts: 50,
-    vibe: 50,
-  });
+  const [vibeDetails, setVibeDetails] = useState<Record<string, number>>(
+    { ...DEFAULT_VIBE_DETAILS }
+  );
 
   // Local state for fields (synced to parent on save)
   const [title, setTitle] = useState(getValue("title") || "");

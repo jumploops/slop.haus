@@ -65,7 +65,15 @@ export async function handleScrapeUrl(payload: unknown): Promise<void> {
     if (result.data?.screenshot) {
       try {
         // Firecrawl v2 returns URL, not base64
-        const imageResponse = await fetch(result.data.screenshot);
+        // Add 30s timeout to prevent hanging on slow/unresponsive URLs
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
+
+        const imageResponse = await fetch(result.data.screenshot, {
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
         if (imageResponse.ok) {
           const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
           const storage = getStorage();
@@ -75,7 +83,11 @@ export async function handleScrapeUrl(payload: unknown): Promise<void> {
         }
       } catch (screenshotError) {
         // Don't fail the whole job for screenshot errors
-        console.warn(`Failed to save screenshot for draft ${draftId}:`, screenshotError);
+        if (screenshotError instanceof Error && screenshotError.name === "AbortError") {
+          console.warn(`Screenshot fetch timed out for draft ${draftId}`);
+        } else {
+          console.warn(`Failed to save screenshot for draft ${draftId}:`, screenshotError);
+        }
       }
     }
 

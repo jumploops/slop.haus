@@ -10,11 +10,11 @@ interface Tab {
 interface TabsProps {
   tabs: Tab[];
   activeTab: string;
-  onChange: (tabId: string) => void;
+  onTabChange: (tabId: string) => void;
   className?: string;
 }
 
-export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
+export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
   return (
     <div className={cn("tabs", className)}>
       {tabs.map((tab) => (
@@ -22,7 +22,7 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
           key={tab.id}
           type="button"
           className={cn("tab", activeTab === tab.id && "active")}
-          onClick={() => onChange(tab.id)}
+          onClick={() => onTabChange(tab.id)}
         >
           {tab.label}
         </button>

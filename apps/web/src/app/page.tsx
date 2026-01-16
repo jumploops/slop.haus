@@ -67,7 +67,7 @@ export default function FeedPage() {
       <h1>Feed</h1>
 
       <div className="feed-controls">
-        <Tabs tabs={sortTabs} activeTab={sort} onChange={handleSortChange} />
+        <Tabs tabs={sortTabs} activeTab={sort} onTabChange={handleSortChange} />
 
         <div className="channel-toggle">
           <button

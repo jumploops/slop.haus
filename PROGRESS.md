@@ -357,3 +357,308 @@ Enable users to edit and delete their own published projects. The backend API al
 - **Data Fetching:** SWR for edit page (not shared layout - simpler)
 - **Moderation:** Edits auto-approved or held as pending revision
 - **Soft Delete:** Sets `status='removed'`, preserves comments/votes
+
+---
+
+## URL Onboarding Fixes
+
+**Status:** Complete (All 4 Phases)
+**Last Updated:** 2026-01-14
+**Plan Doc:** `plan/url-onboarding-fixes.md`
+
+### Overview
+
+Bug fixes, security hardening, UX polish, and performance improvements for the URL-first onboarding feature identified during code review.
+
+### Phase 1: Bug Fixes ✅
+
+| Fix | Description |
+|-----|-------------|
+| Rate limit memory cleanup | Added 1% probabilistic cleanup to prevent unbounded Map growth |
+| Tool matching false positives | Short terms (≤3 chars) now use exact match only (fixes "go" matching "django") |
+| SSE connection cleanup | Added `stream.aborted` check to stop polling when client disconnects |
+
+**Files:**
+- `apps/api/src/routes/drafts.ts`
+- `apps/worker/src/lib/tool-matching.ts`
+
+### Phase 2: Security Hardening ✅
+
+| Fix | Description |
+|-----|-------------|
+| Screenshot fetch timeout | Added 30s AbortController timeout to prevent hanging fetches |
+| Stricter LLM parsing | Added zod schema validation with defaults for missing fields |
+| URL blocklist expansion | Added 10 more URL shorteners (buff.ly, short.io, rebrand.ly, etc.) |
+
+**Files:**
+- `apps/worker/src/handlers/scrape-url.ts`
+- `apps/worker/src/handlers/analyze-content.ts`
+- `packages/shared/src/url-validation.ts`
+
+### Phase 3: UX Polish ✅
+
+| Fix | Description |
+|-----|-------------|
+| Field save indicator | Shows "Saving..." in label when auto-saving on blur |
+| Character counts | Displays count below title/tagline/description with warning at 90% |
+| Discard confirmation | Modal confirmation before discarding draft |
+| Retry failed drafts | New `POST /api/v1/drafts/:draftId/retry` endpoint to re-queue failed analyses |
+
+**Files:**
+- `apps/web/src/components/submit/DraftReview.tsx`
+- `apps/web/src/app/globals.css`
+- `apps/api/src/routes/drafts.ts`
+- `apps/web/src/lib/api/drafts.ts`
+- `apps/web/src/app/submit/page.tsx`
+
+### Phase 4: Performance ✅
+
+| Fix | Description |
+|-----|-------------|
+| Tool slug caching | In-memory cache with 5min TTL eliminates DB query per analysis |
+
+**Files:**
+- `apps/worker/src/lib/tool-matching.ts`
+
+### Technical Notes
+
+- **Rate limiting:** Probabilistic cleanup (1% chance per request) keeps memory bounded without per-request overhead
+- **Tool matching:** Cache stores ~45 tool slugs in a `Set<string>` for O(1) lookups
+- **Retry endpoint:** Respects rate limits and re-queues the original scrape job
+
+---
+
+## Project Edit Bug Fixes (2026-01-14)
+
+### Bug 1: Edit Page Crash - undefined author.id
+
+**Problem:** When editing a field on `/p/[slug]/edit`, the page crashed with `TypeError: Cannot read properties of undefined (reading 'id')`.
+
+**Root Cause:** The PATCH endpoint returned raw database rows without joined author/media/tools data. When the client updated SWR cache with this incomplete data, subsequent renders crashed trying to access `project.author.id`.
+
+**Fix:** Created `fetchCompleteProject()` helper function that fetches project with all joins. Both return paths in PATCH endpoint now use this helper.
+
+**Files:**
+- `apps/api/src/routes/projects.ts` - Added helper, updated PATCH returns
+- `debug/edit-project-undefined-author.md` - Debug documentation
+
+### Bug 2: Revision Banner Shows Wrong Changed Fields
+
+**Problem:** When editing only the description field, the revision status banner incorrectly showed "main URL" and "repository URL" as changed fields.
+
+**Root Cause:** The banner checked `revision.mainUrl !== undefined` to detect changes. But the database stores `undefined` as `NULL`, and `null !== undefined` is `true` in JavaScript. So every field with NULL appeared as "changed".
+
+**Fix:** Added explicit `changedFields` column to track which fields were actually changed.
+
+**Schema Change:**
+```typescript
+// packages/db/src/schema/projects.ts
+changedFields: text("changed_fields").array().default([]).notNull(),
+```
+
+**Files:**
+- `packages/db/src/schema/projects.ts` - Added `changedFields` column
+- `apps/api/src/routes/projects.ts` - Populate `changedFields` on revision create
+- `apps/web/src/lib/api/projects.ts` - Added type for `changedFields`
+- `apps/web/src/components/project/RevisionStatusBanner.tsx` - Use `changedFields` array
+- `debug/revision-banner-false-url-changes.md` - Debug documentation
+
+### Design Decision: changedFields Array
+
+The `changedFields` approach was chosen over simpler null-checking fixes because:
+
+1. **No ambiguity** - Explicit list vs inferring from NULL values
+2. **Future-proof** - Supports potential multi-edit merge scenarios
+3. **Backward compatible** - Old revisions default to empty array
+4. **Self-documenting** - Clear what the revision represents
+
+---
+
+## Edit Page: Explicit Submit Pattern
+
+**Status:** Complete
+**Last Updated:** 2026-01-15
+**Spec Doc:** `plan/edit-page-explicit-submit.md`
+**Debug Doc:** `debug/edit-page-moderation-ux.md`
+
+### Overview
+
+Replaced the auto-save-on-blur pattern with an explicit "Save Changes" button. This eliminates the UX issue where the first flagged edit blocked all subsequent changes.
+
+**Problem:** Each field saved on blur → each save triggered moderation → if moderation flagged content, user was blocked from making any more edits (409 Conflict: "revision pending").
+
+**Solution:** Collect all changes locally, submit all at once via single PATCH request. Single moderation check on combined content, single revision created.
+
+### Changes
+
+**EditableProject.tsx:**
+- Changed from `onFieldChange` to `onSubmit` prop pattern
+- Field handlers now only update local state (no API calls)
+- Added `isDirty` tracking via useMemo (compares current state to project prop)
+- Added `getChangedFields()` to collect dirty fields for submit
+- Added "Save Changes" button (disabled when not dirty)
+- Added "Discard" button (visible when dirty)
+- Navigation warning via `beforeunload` event
+- URL change modal now triggers on submit (not on blur)
+
+**Edit Page (page.tsx):**
+- Changed `handleFieldChange` to `handleSubmit`
+- Receives all changes as single object, sends single PATCH
+
+**CSS:**
+- Added `.edit-header-left` and `.edit-header-right` styles
+
+### User Experience
+
+| Before | After |
+|--------|-------|
+| Edit title → blur → API call → maybe blocked | Edit title → local state only |
+| Edit description → blur → API call → 409 error | Edit description → local state only |
+| Can't continue editing | Click "Save Changes" → single API call |
+| Multiple revisions for one edit session | Single revision with all changes |
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `apps/web/src/components/project/EditableProject.tsx` | Major refactor |
+| `apps/web/src/app/p/[slug]/edit/page.tsx` | Use `onSubmit` pattern |
+| `apps/web/src/app/globals.css` | Header layout styles |
+
+### Technical Notes
+
+- **Backend unchanged** - PATCH already supported multi-field updates
+- **Dirty detection** - Compares each field to original project prop
+- **Tools comparison** - Order-independent Set comparison
+- **Vibe details** - Order-independent comparison via `isEqualVibeDetails()` from shared package
+- **URL modal** - Only shown on submit when mainUrl changed (for screenshot refresh prompt)
+
+---
+
+## Centralized Vibe Configuration
+
+**Status:** Complete
+**Last Updated:** 2026-01-15
+
+### Overview
+
+Centralized vibe category definitions and defaults in `packages/shared` to ensure consistency across frontend, API, and worker. Previously, vibe defaults were duplicated in 4+ components.
+
+### What Was Added
+
+**`packages/shared/src/schemas.ts`:**
+```typescript
+export const VIBE_CATEGORIES = ["idea", "design", "code", "prompts", "vibe"] as const;
+export type VibeCategory = (typeof VIBE_CATEGORIES)[number];
+export type VibeDetails = Record<VibeCategory, number>;
+
+export const DEFAULT_VIBE_SCORE = 50;
+export const DEFAULT_VIBE_DETAILS: VibeDetails = { ... };
+
+export function getVibeDetailsWithDefaults(details): VibeDetails { ... }
+export function isEqualVibeDetails(a, b): boolean { ... }
+```
+
+### Benefits
+
+1. **Single source of truth** - Change categories in one place
+2. **Type safety** - TypeScript catches stale category references
+3. **Order-independent comparison** - `isEqualVibeDetails()` handles JSON key ordering differences between client/server
+4. **Consistent defaults** - All components use same initial values
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `packages/shared/src/schemas.ts` | Added vibe configuration |
+| `apps/web/src/components/project/EditableProject.tsx` | Import from shared |
+| `apps/web/src/components/submit/DraftReview.tsx` | Import from shared |
+| `apps/web/src/components/submit/EditableProjectPreview.tsx` | Import from shared |
+| `apps/web/src/app/submit/manual/page.tsx` | Import from shared |
+
+### Related Bug Fix
+
+**Dirty State After Save:** The explicit submit feature had a bug where `isDirty` remained true after saving. Root cause was `JSON.stringify` comparison failing due to PostgreSQL JSONB not preserving key order. Fixed by using `isEqualVibeDetails()` which compares values regardless of key order.
+
+---
+
+## Edit Page Polish & Bug Fixes (2026-01-15)
+
+### Tagline Field: Use Textarea
+
+Changed the tagline (short description) field on the edit page to use `InlineEditTextarea` instead of `InlineEditText`. This provides a better editing experience for longer content (up to 500 characters).
+
+**Files Modified:**
+- `apps/web/src/components/project/EditableProject.tsx` - Use `InlineEditTextarea` for tagline
+- `apps/web/src/app/globals.css` - Added preview mode styles for tagline textarea
+
+### Spacing Fix: Tagline/Author Collision
+
+Added spacing between the tagline field and author info section. The `.editable-field` negative margins were causing visual collision.
+
+**Fix:** Added `margin-bottom: var(--spacing-4)` to `.project-details-tagline` in preview mode.
+
+**File:** `apps/web/src/app/globals.css`
+
+---
+
+## Tabs Component: Rename onChange to onTabChange
+
+**Status:** Complete
+**Debug Doc:** `debug/vibe-tabs-onchange-error.md`
+
+### Problem
+
+Clicking the "Detailed" tab in the Vibe Score component threw `TypeError: onChange is not a function`. The `VibeInput` component was passing `onTabChange` but `Tabs` expected `onChange`.
+
+### Root Cause
+
+The `Tabs` component's prop name (`onChange`) was unintuitive for a domain-specific component. Developers naturally used `onTabChange` when consuming the component, causing this bug twice (admin page and VibeInput).
+
+### Fix
+
+Renamed the prop from `onChange` to `onTabChange` in the Tabs component for self-documenting clarity.
+
+**Files Modified:**
+
+| File | Change |
+|------|--------|
+| `apps/web/src/components/ui/Tabs.tsx` | Renamed `onChange` → `onTabChange` |
+| `apps/web/src/app/page.tsx` | Updated prop name |
+| `apps/web/src/app/admin/page.tsx` | Updated prop name |
+| `apps/web/src/components/form/VibeInput.tsx` | Already used `onTabChange` (no change needed) |
+
+---
+
+## Modal Centering Fix
+
+**Status:** Complete
+**Debug Doc:** `debug/modal-not-centered.md`
+
+### Problem
+
+All modals (DeleteProjectModal, UrlChangeModal, LoginModal) appeared in the top-left of the viewport instead of being centered.
+
+### Root Cause
+
+The global CSS reset `* { margin: 0; }` was overriding the native `<dialog>` element's `margin: auto` that browsers use for centering when `showModal()` is called.
+
+### Fix
+
+Added `margin: auto` to the `.modal` class to restore centering behavior.
+
+```css
+.modal {
+  /* ... existing styles ... */
+  margin: auto;
+}
+```
+
+**File:** `apps/web/src/app/globals.css`
+
+### Affected Components
+
+All modals use the same base `Modal` component, so all are now fixed:
+- `DeleteProjectModal`
+- `UrlChangeModal`
+- `LoginModal`

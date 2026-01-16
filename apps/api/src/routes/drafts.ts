@@ -31,6 +31,18 @@ function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const hourAgo = now - 60 * 60 * 1000;
 
+  // Clean up old entries periodically (1% chance per request)
+  if (Math.random() < 0.01) {
+    for (const [id, timestamps] of analysisLimits.entries()) {
+      const recent = timestamps.filter((t) => t > hourAgo);
+      if (recent.length === 0) {
+        analysisLimits.delete(id);
+      } else {
+        analysisLimits.set(id, recent);
+      }
+    }
+  }
+
   const timestamps = analysisLimits.get(userId) || [];
   const recent = timestamps.filter((t) => t > hourAgo);
 
@@ -501,6 +513,12 @@ draftRoutes.get("/:draftId/events", requireAuth(), async (c) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       pollCount++;
 
+      // Check if client disconnected
+      if (stream.aborted) {
+        console.log(`SSE client disconnected for draft ${draftId}`);
+        break;
+      }
+
       const [currentDraft] = await db
         .select()
         .from(enrichmentDrafts)
@@ -580,6 +598,57 @@ draftRoutes.get("/:draftId/events", requireAuth(), async (c) => {
       });
     }
   });
+});
+
+// POST /api/v1/drafts/:draftId/retry - Retry a failed draft
+draftRoutes.post("/:draftId/retry", requireAuth(), async (c) => {
+  const session = c.get("session");
+  const draftId = c.req.param("draftId");
+
+  const [draft] = await db
+    .select()
+    .from(enrichmentDrafts)
+    .where(
+      and(
+        eq(enrichmentDrafts.id, draftId),
+        eq(enrichmentDrafts.userId, session.user.id),
+        eq(enrichmentDrafts.status, "failed"),
+        isNull(enrichmentDrafts.deletedAt)
+      )
+    );
+
+  if (!draft) {
+    return c.json({ error: "Draft not found or not in failed state" }, 404);
+  }
+
+  // Rate limit check for retry
+  if (!checkRateLimit(session.user.id)) {
+    return c.json(
+      { error: "Rate limit exceeded. Max 5 analyses per hour." },
+      429
+    );
+  }
+
+  // Reset draft and re-queue scrape job
+  await db
+    .update(enrichmentDrafts)
+    .set({
+      status: "pending",
+      error: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(enrichmentDrafts.id, draftId));
+
+  await db.insert(jobs).values({
+    type: "scrape_url",
+    payload: {
+      draftId: draft.id,
+      url: draft.inputUrl,
+      urlType: draft.detectedUrlType,
+    },
+  });
+
+  return c.json({ success: true, draftId: draft.id }, 202);
 });
 
 // DELETE /api/v1/drafts/:draftId - Soft delete a draft (discard)

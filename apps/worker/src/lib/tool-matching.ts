@@ -1,6 +1,28 @@
 import { db } from "@slop/db";
 import { tools } from "@slop/db/schema";
-import { ilike, or } from "drizzle-orm";
+
+// Tool slug cache - avoids DB query on every analysis
+let toolSlugCache: Set<string> | null = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Get cached tool slugs, refreshing if stale
+ */
+async function getToolSlugs(): Promise<Set<string>> {
+  const now = Date.now();
+  if (toolSlugCache && now - cacheTimestamp < CACHE_TTL_MS) {
+    return toolSlugCache;
+  }
+
+  console.log("Refreshing tool slug cache...");
+  const allTools = await db.select({ slug: tools.slug }).from(tools);
+  toolSlugCache = new Set(allTools.map((t) => t.slug));
+  cacheTimestamp = now;
+  console.log(`Tool cache loaded: ${toolSlugCache.size} tools`);
+
+  return toolSlugCache;
+}
 
 // Common aliases for tool names
 const TOOL_ALIASES: Record<string, string[]> = {
@@ -48,10 +70,13 @@ export async function matchToolsToDatabase(
 ): Promise<string[]> {
   if (detectedTools.length === 0) return [];
 
+  // Get cached tool slugs
+  const allSlugs = await getToolSlugs();
+
   // Normalize detected tools
   const normalizedDetected = detectedTools.map((t) => t.toLowerCase().trim());
 
-  // Build search conditions
+  // Build search terms including aliases
   const searchTerms = new Set<string>();
   for (const detected of normalizedDetected) {
     searchTerms.add(detected);
@@ -63,19 +88,29 @@ export async function matchToolsToDatabase(
     }
   }
 
-  // Query database for matching tools
-  const conditions = Array.from(searchTerms).map((term) =>
-    ilike(tools.slug, `%${term}%`)
-  );
+  // Match against cached slugs (in-memory, no DB query!)
+  const matched = new Set<string>();
 
-  if (conditions.length === 0) return [];
-
-  const matchedTools = await db
-    .select({ slug: tools.slug })
-    .from(tools)
-    .where(or(...conditions));
+  for (const term of searchTerms) {
+    if (term.length <= 3) {
+      // Short terms: exact match only
+      if (allSlugs.has(term)) {
+        matched.add(term);
+      }
+    } else {
+      // Longer terms: exact match or compound slug match
+      for (const slug of allSlugs) {
+        if (
+          slug === term ||
+          slug.startsWith(`${term}-`) ||
+          slug.endsWith(`-${term}`)
+        ) {
+          matched.add(slug);
+        }
+      }
+    }
+  }
 
   // Return unique slugs, max 10
-  const slugs = [...new Set(matchedTools.map((t) => t.slug))];
-  return slugs.slice(0, 10);
+  return [...matched].slice(0, 10);
 }

@@ -11,7 +11,11 @@ import { VibeInput } from "@/components/form/VibeInput";
 import { ToolsSelector } from "@/components/form/ToolsSelector";
 import { createProject } from "@/lib/api/projects";
 import { useToast } from "@/components/ui/Toast";
-import { createProjectSchema, type CreateProjectInput } from "@slop/shared";
+import {
+  createProjectSchema,
+  DEFAULT_VIBE_DETAILS,
+  type CreateProjectInput,
+} from "@slop/shared";
 
 export default function ManualSubmitPage() {
   return (
@@ -37,13 +41,9 @@ function SubmitForm() {
   const [repoUrl, setRepoUrl] = useState("");
   const [vibeMode, setVibeMode] = useState<"overview" | "detailed">("overview");
   const [vibePercent, setVibePercent] = useState(50);
-  const [vibeDetails, setVibeDetails] = useState<Record<string, number>>({
-    idea: 50,
-    design: 50,
-    code: 50,
-    prompts: 50,
-    vibe: 50,
-  });
+  const [vibeDetails, setVibeDetails] = useState<Record<string, number>>(
+    { ...DEFAULT_VIBE_DETAILS }
+  );
   const [tools, setTools] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {

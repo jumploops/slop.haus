@@ -8,7 +8,7 @@ import { RequireGitHub } from "@/components/auth/RequireGitHub";
 import { UrlInput } from "@/components/submit/UrlInput";
 import { AnalysisProgress } from "@/components/submit/AnalysisProgress";
 import { AnalysisError } from "@/components/submit/AnalysisError";
-import { analyzeUrl, deleteDraft } from "@/lib/api/drafts";
+import { analyzeUrl, deleteDraft, retryDraft } from "@/lib/api/drafts";
 import type { UrlType } from "@slop/shared";
 
 type SubmitStep = "input" | "analyzing" | "error";
@@ -72,9 +72,28 @@ function SubmitFlow() {
     setStep("error");
   }, []);
 
-  const handleRetry = () => {
-    setError(null);
-    setStep("input");
+  const handleRetry = async () => {
+    // If we have a failed draft, try to retry it
+    if (analysis?.draftId) {
+      setIsLoading(true);
+      try {
+        await retryDraft(analysis.draftId);
+        setError(null);
+        setStep("analyzing");
+      } catch (err) {
+        // If retry fails (e.g., rate limit), show error and go back to input
+        const message = err instanceof Error ? err.message : "Failed to retry analysis";
+        setError({ message });
+        setStep("input");
+        setAnalysis(null);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // No draft to retry, just go back to input
+      setError(null);
+      setStep("input");
+    }
   };
 
   const handleManualEntry = () => {

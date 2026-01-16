@@ -14,6 +14,16 @@ const BLOCKED_DOMAINS = [
   "goo.gl",
   "ow.ly",
   "is.gd",
+  "buff.ly",
+  "short.io",
+  "rebrand.ly",
+  "cutt.ly",
+  "rb.gy",
+  "shorturl.at",
+  "tiny.cc",
+  "snip.ly",
+  "bl.ink",
+  "lnkd.in",
 ];
 
 export interface UrlValidationResult {

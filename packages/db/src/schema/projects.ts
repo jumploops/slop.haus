@@ -92,6 +92,9 @@ export const projectRevisions = pgTable("project_revisions", {
   vibeMode: vibeModeEnum("vibe_mode"),
   vibePercent: integer("vibe_percent"),
   vibeDetailsJson: jsonb("vibe_details_json"),
+  // Explicit list of which fields were changed in this revision
+  // Solves NULL ambiguity: we can distinguish "not changed" from "set to null"
+  changedFields: text("changed_fields").array().default([]).notNull(),
   submittedAt: timestamp("submitted_at").defaultNow().notNull(),
   reviewedAt: timestamp("reviewed_at"),
   reviewerUserId: text("reviewer_user_id").references(() => user.id),
