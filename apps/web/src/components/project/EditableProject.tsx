@@ -13,7 +13,7 @@ import { UrlChangeModal } from "@/components/project/UrlChangeModal";
 import { RevisionStatusBanner } from "@/components/project/RevisionStatusBanner";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { formatRelativeTime } from "@/lib/utils";
 import { refreshProject, type ProjectDetail, type ProjectRevision } from "@/lib/api/projects";
 
@@ -248,7 +248,7 @@ export function EditableProject({
           </Link>
         </div>
         <div className="edit-header-right">
-          <Button variant="ghost" onClick={onDelete} className="btn-danger-ghost">
+          <Button variant="ghost" onClick={onDelete} className="text-danger hover:bg-danger/10">
             Delete
           </Button>
           {isDirty && (
@@ -342,7 +342,7 @@ export function EditableProject({
                   href={mainUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary"
+                  className={buttonVariants({ variant: "primary" })}
                 >
                   <ExternalLinkIcon /> Visit Site
                 </a>
@@ -352,7 +352,7 @@ export function EditableProject({
                   href={repoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-secondary"
+                  className={buttonVariants({ variant: "secondary" })}
                 >
                   <GithubIcon /> View Repo
                 </a>

@@ -50,10 +50,10 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
 
   if (comment.status === "removed") {
     return (
-      <div className="comment">
-        <p className="comment-removed">[removed]</p>
+      <div className="py-3">
+        <p className="text-muted italic">[removed]</p>
         {comment.children.length > 0 && (
-          <div className="comment-replies">
+          <div className="ml-6 mt-3 border-l-2 border-border pl-4">
             {comment.children.map((child) => (
               <CommentItem
                 key={child.id}
@@ -69,22 +69,25 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
   }
 
   return (
-    <div className="comment">
-      <div className="comment-header">
+    <div className="py-4">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-2">
         <Avatar src={comment.author.image} alt={comment.author.name} size="sm" />
-        <span className="comment-author">{comment.author.name}</span>
+        <span className="font-medium text-sm">{comment.author.name}</span>
         {comment.author.devVerified && <Badge variant="dev">Dev</Badge>}
-        <span className="comment-time">{formatRelativeTime(comment.createdAt)}</span>
+        <span className="text-muted text-xs">{formatRelativeTime(comment.createdAt)}</span>
       </div>
 
-      <div className="comment-body">{comment.body}</div>
+      {/* Body */}
+      <p className="text-sm leading-relaxed mb-2 whitespace-pre-wrap">{comment.body}</p>
 
-      <div className="comment-actions">
+      {/* Actions */}
+      <div className="flex gap-4">
         {session?.user && comment.depth < 10 && (
           <button
             type="button"
-            className="comment-action"
             onClick={() => setIsReplying(!isReplying)}
+            className="text-xs text-muted hover:text-fg bg-transparent border-none cursor-pointer transition-colors"
           >
             Reply
           </button>
@@ -92,17 +95,18 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
         {canDelete && (
           <button
             type="button"
-            className="comment-action"
             onClick={handleDelete}
             disabled={isDeleting}
+            className="text-xs text-muted hover:text-danger bg-transparent border-none cursor-pointer transition-colors disabled:opacity-50"
           >
             {isDeleting ? "Deleting..." : "Delete"}
           </button>
         )}
       </div>
 
+      {/* Reply form */}
       {isReplying && (
-        <div className="comment-reply-form">
+        <div className="mt-4">
           <CommentForm
             projectSlug={projectSlug}
             parentCommentId={comment.id}
@@ -113,8 +117,9 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
         </div>
       )}
 
+      {/* Nested replies */}
       {comment.children.length > 0 && (
-        <div className="comment-replies">
+        <div className="ml-6 mt-3 border-l-2 border-border pl-4">
           {comment.children.map((child) => (
             <CommentItem
               key={child.id}

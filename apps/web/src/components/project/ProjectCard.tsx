@@ -36,26 +36,33 @@ export function ProjectCard({
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
 
   return (
-    <article className="project-card">
-      <div className="project-card-header">
-        <Link href={`/p/${project.slug}`}>
+    <article className="border border-border rounded-lg p-6 mb-4 bg-bg hover:border-accent-dim transition-colors">
+      {/* Header: Thumbnail + Content */}
+      <div className="flex gap-4 mb-4">
+        <Link href={`/p/${project.slug}`} className="flex-shrink-0">
           <img
             src={thumbnailUrl}
             alt={project.title}
-            className="project-card-thumbnail"
+            className="w-[120px] h-[80px] rounded object-cover bg-bg-secondary"
           />
         </Link>
-        <div className="project-card-content">
-          <h3>
-            <Link href={`/p/${project.slug}`}>{project.title}</Link>
+        <div className="flex-1 min-w-0">
+          <h3 className="mb-1">
+            <Link
+              href={`/p/${project.slug}`}
+              className="text-fg hover:text-accent hover:no-underline font-semibold"
+            >
+              {project.title}
+            </Link>
           </h3>
-          <p className="tagline">{project.tagline}</p>
+          <p className="text-muted text-sm mb-2 line-clamp-2">{project.tagline}</p>
           <VibeMeter percent={project.vibePercent} size="sm" />
         </div>
       </div>
 
-      <div className="project-card-footer">
-        <div className="meta">
+      {/* Footer: Meta + Actions */}
+      <div className="flex items-center justify-between pt-4 border-t border-border flex-wrap gap-4">
+        <div className="flex gap-4 text-sm text-muted flex-wrap items-center">
           <span className="flex items-center gap-2">
             <Avatar
               src={project.author.image}
@@ -68,13 +75,13 @@ export function ProjectCard({
           <span>{formatRelativeTime(project.createdAt)}</span>
           <span>{project.commentCount} comments</span>
         </div>
-        <div className="project-card-actions">
+        <div className="flex items-center gap-2">
           {showFavoriteButton && (
             <Button
               variant={isFavorited ? "secondary" : "ghost"}
+              size="sm"
               onClick={toggleFavorite}
               disabled={favoriteLoading}
-              className="favorite-btn"
               aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
             >
               <HeartIcon filled={isFavorited} />

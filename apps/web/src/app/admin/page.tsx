@@ -82,9 +82,9 @@ export default function ModQueuePage() {
   };
 
   return (
-    <div className="admin-page">
-      <h1>Mod Queue</h1>
-      <p className="admin-page-description">
+    <div>
+      <h1 className="text-2xl font-bold mb-2">Mod Queue</h1>
+      <p className="text-muted mb-6">
         Review flagged and hidden content awaiting moderation.
       </p>
 
@@ -98,123 +98,134 @@ export default function ModQueuePage() {
         onTabChange={(id) => setFilter(id as typeof filter)}
       />
 
-      {isLoading && (
-        <div className="mod-queue-list">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="mod-queue-item">
-              <Skeleton className="skeleton-text" style={{ width: "60%" }} />
-              <Skeleton className="skeleton-text" style={{ width: "100%", marginTop: "0.5rem" }} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {error && (
-        <div className="empty-state">
-          <p>Failed to load mod queue</p>
-        </div>
-      )}
-
-      {!isLoading && !error && items?.length === 0 && (
-        <div className="empty-state">
-          <CheckIcon />
-          <h3>Queue is empty</h3>
-          <p>No items awaiting moderation.</p>
-        </div>
-      )}
-
-      {!isLoading && !error && items && items.length > 0 && (
-        <div className="mod-queue-list">
-          {items.map((item) => (
-            <div key={item.id} className="mod-queue-item">
-              <div className="mod-queue-item-header">
-                <div className="mod-queue-item-info">
-                  <Badge variant={item.type === "project" ? "default" : "secondary"}>
-                    {item.type}
-                  </Badge>
-                  <Badge variant="warning">{item.status}</Badge>
-                  {item.flagCount > 0 && (
-                    <Badge variant="danger">{item.flagCount} flags</Badge>
-                  )}
-                </div>
-                <span className="mod-queue-item-time">
-                  {formatRelativeTime(item.createdAt)}
-                </span>
+      <div className="mt-6">
+        {isLoading && (
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="p-4 border border-border rounded-lg">
+                <Skeleton variant="text" className="w-3/5" />
+                <Skeleton variant="text" className="w-full mt-2" />
               </div>
+            ))}
+          </div>
+        )}
 
-              <div className="mod-queue-item-content">
-                {item.type === "project" && (
-                  <>
-                    <h3>
+        {error && (
+          <div className="py-12 text-center">
+            <p className="text-muted">Failed to load mod queue</p>
+          </div>
+        )}
+
+        {!isLoading && !error && items?.length === 0 && (
+          <div className="py-12 text-center">
+            <CheckIcon />
+            <h3 className="text-lg font-semibold mt-4 mb-1">Queue is empty</h3>
+            <p className="text-muted">No items awaiting moderation.</p>
+          </div>
+        )}
+
+        {!isLoading && !error && items && items.length > 0 && (
+          <div className="space-y-4">
+            {items.map((item) => (
+              <div key={item.id} className="p-4 border border-border rounded-lg bg-bg-secondary">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant={item.type === "project" ? "default" : "secondary"}>
+                      {item.type}
+                    </Badge>
+                    <Badge variant="warning">{item.status}</Badge>
+                    {item.flagCount > 0 && (
+                      <Badge variant="danger">{item.flagCount} flags</Badge>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted">
+                    {formatRelativeTime(item.createdAt)}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="mb-3">
+                  {item.type === "project" && (
+                    <h3 className="font-semibold">
                       {item.slug ? (
-                        <Link href={`/p/${item.slug}`}>{item.title}</Link>
+                        <Link href={`/p/${item.slug}`} className="hover:text-accent">
+                          {item.title}
+                        </Link>
                       ) : (
                         item.title
                       )}
                     </h3>
-                  </>
-                )}
-                {item.type === "comment" && (
-                  <p className="mod-queue-comment-body">{item.body}</p>
-                )}
-              </div>
+                  )}
+                  {item.type === "comment" && (
+                    <p className="text-sm text-fg line-clamp-3">{item.body}</p>
+                  )}
+                </div>
 
-              <div className="mod-queue-item-author">
-                <Avatar src={item.author.image} alt={item.author.name} size="sm" />
-                <span>{item.author.name}</span>
-              </div>
+                {/* Author */}
+                <div className="flex items-center gap-2 mb-4">
+                  <Avatar src={item.author.image} alt={item.author.name} size="sm" />
+                  <span className="text-sm text-muted">{item.author.name}</span>
+                </div>
 
-              <div className="mod-queue-item-actions">
-                {item.type === "project" && (
-                  <>
-                    <Button
-                      variant="primary"
-                      onClick={() => handleApproveProject(item)}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => handleHideProject(item)}
-                    >
-                      Hide
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleRemoveProject(item)}
-                    >
-                      Remove
-                    </Button>
-                  </>
-                )}
-                {item.type === "comment" && (
-                  <>
-                    <Button
-                      variant="primary"
-                      onClick={() => handleApproveComment(item)}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleRemoveComment(item)}
-                    >
-                      Remove
-                    </Button>
-                  </>
-                )}
+                {/* Actions */}
+                <div className="flex gap-2">
+                  {item.type === "project" && (
+                    <>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleApproveProject(item)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleHideProject(item)}
+                      >
+                        Hide
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveProject(item)}
+                      >
+                        Remove
+                      </Button>
+                    </>
+                  )}
+                  {item.type === "comment" && (
+                    <>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleApproveComment(item)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveComment(item)}
+                      >
+                        Remove
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 function CheckIcon() {
   return (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto text-accent">
       <path d="M20 6L9 17l-5-5" />
     </svg>
   );

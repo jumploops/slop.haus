@@ -69,33 +69,39 @@ export default function ConnectionsPage() {
   };
 
   return (
-    <div className="settings-page">
-      <h1>Connections</h1>
-      <p className="settings-page-description">
+    <div>
+      <h1 className="text-2xl font-bold mb-2">Connections</h1>
+      <p className="text-muted mb-6">
         Manage your linked accounts. You need at least one account to sign in.
       </p>
 
-      <div className="connections-list">
+      <div className="space-y-4">
         {PROVIDERS.map((provider) => {
           const isLinked = linkedProviders.has(provider.id);
           const Icon = provider.icon;
 
           return (
-            <div key={provider.id} className="connection-item">
-              <div className="connection-info">
-                <Icon />
+            <div
+              key={provider.id}
+              className="flex items-center justify-between p-4 rounded-lg border border-border bg-bg-secondary"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 flex items-center justify-center text-fg">
+                  <Icon />
+                </div>
                 <div>
-                  <h3>{provider.name}</h3>
-                  <p>{provider.description}</p>
+                  <h3 className="font-medium">{provider.name}</h3>
+                  <p className="text-sm text-muted">{provider.description}</p>
                 </div>
               </div>
 
-              <div className="connection-actions">
+              <div className="flex items-center gap-3">
                 {isLinked ? (
                   <>
                     <Badge variant="success">Connected</Badge>
                     <Button
                       variant="ghost"
+                      size="sm"
                       onClick={() => handleUnlink(provider.id)}
                       disabled={!canUnlink || isUnlinking === provider.id}
                     >
@@ -105,6 +111,7 @@ export default function ConnectionsPage() {
                 ) : (
                   <Button
                     variant="secondary"
+                    size="sm"
                     onClick={() => handleLink(provider.id)}
                     disabled={isLinking === provider.id}
                   >
@@ -118,9 +125,11 @@ export default function ConnectionsPage() {
       </div>
 
       {!user?.hasGitHub && (
-        <div className="settings-notice">
-          <strong>Note:</strong> A GitHub account is required to submit projects.
-          Link your GitHub account to enable project submissions.
+        <div className="mt-6 p-4 rounded-lg border border-warning bg-warning/10">
+          <p className="text-sm">
+            <strong>Note:</strong> A GitHub account is required to submit projects.
+            Link your GitHub account to enable project submissions.
+          </p>
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -8,33 +9,40 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
 }
 
-export function Input({
-  label,
-  error,
-  helperText,
-  className,
-  id,
-  ...props
-}: InputProps) {
-  const inputId = id || props.name;
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, helperText, className, id, ...props }, ref) => {
+    const inputId = id || props.name;
 
-  return (
-    <div className="input-wrapper">
-      {label && (
-        <label htmlFor={inputId} className="input-label">
-          {label}
-        </label>
-      )}
-      <input
-        id={inputId}
-        className={cn("input", error && "input-error", className)}
-        {...props}
-      />
-      {error && <p className="input-error-text">{error}</p>}
-      {helperText && !error && <p className="input-helper">{helperText}</p>}
-    </div>
-  );
-}
+    return (
+      <div className="flex flex-col gap-2">
+        {label && (
+          <label htmlFor={inputId} className="text-sm font-medium text-fg">
+            {label}
+          </label>
+        )}
+        <input
+          ref={ref}
+          id={inputId}
+          className={cn(
+            "px-3 py-2.5 rounded-md",
+            "bg-bg-secondary text-fg text-sm",
+            "border border-border",
+            "transition-colors duration-200",
+            "placeholder:text-muted",
+            "focus:outline-none focus:border-accent",
+            error && "border-danger",
+            className
+          )}
+          {...props}
+        />
+        {error && <p className="text-xs text-danger">{error}</p>}
+        {helperText && !error && <p className="text-xs text-muted">{helperText}</p>}
+      </div>
+    );
+  }
+);
+
+Input.displayName = "Input";
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -42,30 +50,37 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   helperText?: string;
 }
 
-export function Textarea({
-  label,
-  error,
-  helperText,
-  className,
-  id,
-  ...props
-}: TextareaProps) {
-  const inputId = id || props.name;
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ label, error, helperText, className, id, ...props }, ref) => {
+    const inputId = id || props.name;
 
-  return (
-    <div className="input-wrapper">
-      {label && (
-        <label htmlFor={inputId} className="input-label">
-          {label}
-        </label>
-      )}
-      <textarea
-        id={inputId}
-        className={cn("input textarea", error && "input-error", className)}
-        {...props}
-      />
-      {error && <p className="input-error-text">{error}</p>}
-      {helperText && !error && <p className="input-helper">{helperText}</p>}
-    </div>
-  );
-}
+    return (
+      <div className="flex flex-col gap-2">
+        {label && (
+          <label htmlFor={inputId} className="text-sm font-medium text-fg">
+            {label}
+          </label>
+        )}
+        <textarea
+          ref={ref}
+          id={inputId}
+          className={cn(
+            "px-3 py-2.5 rounded-md min-h-[100px] resize-y",
+            "bg-bg-secondary text-fg text-sm",
+            "border border-border",
+            "transition-colors duration-200",
+            "placeholder:text-muted",
+            "focus:outline-none focus:border-accent",
+            error && "border-danger",
+            className
+          )}
+          {...props}
+        />
+        {error && <p className="text-xs text-danger">{error}</p>}
+        {helperText && !error && <p className="text-xs text-muted">{helperText}</p>}
+      </div>
+    );
+  }
+);
+
+Textarea.displayName = "Textarea";

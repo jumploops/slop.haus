@@ -60,18 +60,25 @@ function ToastContainer({
   if (toasts.length === 0) return null;
 
   return (
-    <div className="toast-container">
+    <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-[1000]">
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={cn("toast", `toast-${toast.type}`)}
+          className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-lg",
+            "bg-bg-secondary border text-fg text-sm",
+            "animate-slide-in",
+            toast.type === "success" && "border-accent",
+            toast.type === "error" && "border-danger",
+            toast.type === "info" && "border-border"
+          )}
           role="alert"
         >
           <span>{toast.message}</span>
           <button
             type="button"
-            className="toast-dismiss"
             onClick={() => onDismiss(toast.id)}
+            className="text-muted hover:text-fg text-lg leading-none bg-transparent border-none cursor-pointer"
             aria-label="Dismiss"
           >
             &times;

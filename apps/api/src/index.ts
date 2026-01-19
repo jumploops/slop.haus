@@ -16,6 +16,7 @@ import { userRoutes } from "./routes/users";
 import { adminRoutes } from "./routes/admin";
 import { flagRoutes } from "./routes/flags";
 import { draftRoutes } from "./routes/drafts";
+import { themesRoutes } from "./routes/themes";
 import type { AuthSession } from "./middleware/auth";
 
 // Extend Hono context with session
@@ -72,6 +73,7 @@ app.route("/api/v1/admin", adminRoutes); // Admin routes
 app.route("/api/v1/flags", flagRoutes); // Flagging routes
 app.route("/api/v1/tools", toolRoutes);
 app.route("/api/v1/drafts", draftRoutes); // Draft submission routes
+app.route("/api/v1/themes", themesRoutes); // Theme generation routes
 
 // API info
 app.get("/api/v1", (c) => {

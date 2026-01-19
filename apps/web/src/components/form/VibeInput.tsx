@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Tabs } from "@/components/ui/Tabs";
+import { cn } from "@/lib/utils";
 
 interface VibeInputProps {
   mode: "overview" | "detailed";
@@ -42,10 +42,10 @@ export function VibeInput({
       : 0;
 
   return (
-    <div className="vibe-input">
-      <div className="vibe-input-header">
-        <label className="form-label">Vibe Score</label>
-        <p className="form-hint">
+    <div className="mb-6">
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Vibe Score</label>
+        <p className="text-sm text-muted">
           How much of this project was "vibecoded" (AI-assisted)?
         </p>
       </div>
@@ -59,54 +59,56 @@ export function VibeInput({
         onTabChange={(id) => onModeChange(id as "overview" | "detailed")}
       />
 
-      {mode === "overview" ? (
-        <div className="vibe-input-overview">
-          <div className="vibe-slider-container">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={vibePercent}
-              onChange={(e) => onVibePercentChange(Number(e.target.value))}
-              className="vibe-slider"
-            />
-            <div className="vibe-slider-labels">
-              <span>0% Human</span>
-              <span className="vibe-slider-value">{vibePercent}%</span>
-              <span>100% AI</span>
-            </div>
-          </div>
-          <VibeScale percent={vibePercent} />
-        </div>
-      ) : (
-        <div className="vibe-input-detailed">
-          {VIBE_CATEGORIES.map((category) => (
-            <div key={category.key} className="vibe-category">
-              <div className="vibe-category-header">
-                <label>{category.label}</label>
-                <span className="vibe-category-value">
-                  {vibeDetails[category.key] ?? 50}%
-                </span>
-              </div>
-              <p className="vibe-category-description">{category.description}</p>
+      <div className="mt-4">
+        {mode === "overview" ? (
+          <div>
+            <div className="mb-4">
               <input
                 type="range"
                 min="0"
                 max="100"
-                value={vibeDetails[category.key] ?? 50}
-                onChange={(e) =>
-                  handleDetailChange(category.key, Number(e.target.value))
-                }
-                className="vibe-slider"
+                value={vibePercent}
+                onChange={(e) => onVibePercentChange(Number(e.target.value))}
+                className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-accent"
               />
+              <div className="flex justify-between text-xs text-muted mt-2">
+                <span>0% Human</span>
+                <span className="font-medium text-fg">{vibePercent}%</span>
+                <span>100% AI</span>
+              </div>
             </div>
-          ))}
-          <div className="vibe-detailed-summary">
-            <span>Average: {detailedAverage}%</span>
-            <VibeScale percent={detailedAverage} size="sm" />
+            <VibeScale percent={vibePercent} />
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="space-y-6">
+            {VIBE_CATEGORIES.map((category) => (
+              <div key={category.key}>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-sm font-medium">{category.label}</label>
+                  <span className="text-sm text-muted">
+                    {vibeDetails[category.key] ?? 50}%
+                  </span>
+                </div>
+                <p className="text-xs text-muted mb-2">{category.description}</p>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={vibeDetails[category.key] ?? 50}
+                  onChange={(e) =>
+                    handleDetailChange(category.key, Number(e.target.value))
+                  }
+                  className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-accent"
+                />
+              </div>
+            ))}
+            <div className="pt-4 border-t border-border flex items-center justify-between">
+              <span className="text-sm text-muted">Average: {detailedAverage}%</span>
+              <VibeScale percent={detailedAverage} size="sm" />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -121,14 +123,19 @@ function VibeScale({ percent, size = "md" }: { percent: number; size?: "sm" | "m
   };
 
   return (
-    <div className={`vibe-scale vibe-scale-${size}`}>
-      <div className="vibe-scale-bar">
+    <div className={cn("flex items-center gap-3", size === "sm" && "text-sm")}>
+      <div
+        className={cn(
+          "flex-1 bg-border rounded-full overflow-hidden",
+          size === "sm" ? "h-1.5" : "h-2"
+        )}
+      >
         <div
-          className="vibe-scale-fill"
+          className="h-full bg-gradient-to-r from-accent-dim to-accent rounded-full transition-[width] duration-300"
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="vibe-scale-label">{getVibeLabel(percent)}</span>
+      <span className="text-sm text-muted whitespace-nowrap">{getVibeLabel(percent)}</span>
     </div>
   );
 }

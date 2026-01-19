@@ -108,7 +108,7 @@ export function InlineEditTextarea({
 
   if (isEditing) {
     return (
-      <div className={cn("inline-edit-textarea", className)}>
+      <div className={className}>
         <textarea
           ref={textareaRef}
           value={editValue}
@@ -119,16 +119,19 @@ export function InlineEditTextarea({
           placeholder={placeholder}
           rows={minRows}
           aria-label={placeholder}
+          className="w-full px-3 py-2 rounded-md border border-border bg-bg-secondary text-fg resize-none focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
         />
-        <div className="inline-edit-textarea-hint">
-          <span className="text-muted text-small">
+        <div className="flex justify-between mt-1">
+          <span className="text-xs text-muted">
             Press Escape to cancel, Cmd+Enter to save
           </span>
           {maxLength && (
-            <span className={cn(
-              "text-small",
-              editValue.length > maxLength * 0.9 ? "text-warning" : "text-muted"
-            )}>
+            <span
+              className={cn(
+                "text-xs",
+                editValue.length > maxLength * 0.9 ? "text-warning" : "text-muted"
+              )}
+            >
               {editValue.length}/{maxLength}
             </span>
           )}
@@ -141,7 +144,12 @@ export function InlineEditTextarea({
 
   return (
     <div
-      className={cn("editable-field editable-textarea", className, isEmpty && "empty")}
+      className={cn(
+        "px-3 py-2 rounded-md border border-border bg-bg-secondary cursor-pointer transition-colors",
+        "hover:border-accent hover:bg-bg",
+        isEmpty && "text-muted italic",
+        className
+      )}
       onClick={handleClick}
       onKeyDown={handleDisplayKeyDown}
       tabIndex={0}

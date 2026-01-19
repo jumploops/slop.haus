@@ -16,16 +16,22 @@ export function VibeMeter({
   const clampedPercent = Math.max(0, Math.min(100, percent));
 
   return (
-    <div className={cn("vibe-meter-wrapper", className)}>
-      <div className={cn("vibe-meter", size === "sm" && "vibe-meter-sm")}>
+    <div className={className}>
+      <div
+        className={cn(
+          "w-full bg-border rounded-full overflow-hidden",
+          size === "sm" ? "h-1.5" : "h-2"
+        )}
+      >
         <div
-          className="vibe-meter-fill"
+          className="h-full bg-gradient-to-r from-accent-dim to-accent rounded-full transition-[width] duration-300"
           style={{ width: `${clampedPercent}%` }}
         />
       </div>
       {showLabel && (
-        <div className="vibe-meter-label">
-          <span>{clampedPercent}% vibe</span>
+        <div className="flex justify-between text-xs text-muted mt-1">
+          <span>Vibe</span>
+          <span>{clampedPercent}%</span>
         </div>
       )}
     </div>

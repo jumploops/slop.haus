@@ -51,45 +51,49 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="settings-page">
-      <h1>Profile</h1>
+    <div>
+      <h1 className="text-2xl font-bold mb-6">Profile</h1>
 
-      <div className="settings-section">
-        <div className="profile-header">
+      {/* Profile Header */}
+      <section className="mb-8 p-6 rounded-lg border border-border bg-bg-secondary">
+        <div className="flex items-center gap-4">
           <Avatar src={user.image} alt={user.name} size="lg" />
-          <div className="profile-info">
-            <h2>{user.name}</h2>
-            <p className="profile-email">{user.email}</p>
-            <div className="profile-badges">
+          <div>
+            <h2 className="text-xl font-semibold">{user.name}</h2>
+            <p className="text-muted text-sm">{user.email}</p>
+            <div className="flex gap-2 mt-2">
               {user.devVerified && <Badge variant="dev">Verified Dev</Badge>}
               {user.role === "admin" && <Badge variant="admin">Admin</Badge>}
               {user.role === "mod" && <Badge variant="mod">Moderator</Badge>}
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="settings-section">
-        <h3>Display Name</h3>
-        <p className="settings-description">
+      {/* Display Name Section */}
+      <section className="mb-8">
+        <h3 className="text-lg font-semibold mb-2">Display Name</h3>
+        <p className="text-sm text-muted mb-4">
           This is the name displayed on your comments and submissions.
         </p>
 
         {isEditing ? (
-          <div className="profile-edit-form">
+          <div>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your display name"
               maxLength={100}
+              className="mb-3"
             />
-            <div className="profile-edit-actions">
+            <div className="flex gap-2">
               <Button
                 variant="primary"
                 onClick={handleSave}
                 disabled={isSaving}
+                loading={isSaving}
               >
-                {isSaving ? "Saving..." : "Save"}
+                Save
               </Button>
               <Button variant="ghost" onClick={handleCancel}>
                 Cancel
@@ -97,22 +101,25 @@ export default function ProfilePage() {
             </div>
           </div>
         ) : (
-          <div className="profile-display">
-            <span className="profile-name-display">{user.name}</span>
+          <div className="flex items-center gap-4">
+            <span className="px-3 py-2 bg-bg-secondary border border-border rounded-md">
+              {user.name}
+            </span>
             <Button variant="secondary" onClick={handleEdit}>
               Edit
             </Button>
           </div>
         )}
-      </div>
+      </section>
 
-      <div className="settings-section">
-        <h3>Avatar</h3>
-        <p className="settings-description">
+      {/* Avatar Section */}
+      <section className="mb-8">
+        <h3 className="text-lg font-semibold mb-2">Avatar</h3>
+        <p className="text-sm text-muted">
           Your avatar is imported from your OAuth provider (GitHub or Google).
           To change it, update your profile picture on the connected service.
         </p>
-      </div>
+      </section>
     </div>
   );
 }

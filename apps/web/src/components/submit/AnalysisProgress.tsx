@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useDraftProgress } from "@/hooks/useDraftProgress";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
 import type { UrlType } from "@slop/shared";
 
 interface AnalysisProgressProps {
@@ -53,17 +54,17 @@ export function AnalysisProgress({
   };
 
   return (
-    <div className="analysis-progress">
-      <div className="analysis-progress-header">
-        <h2>Analyzing your project</h2>
-        <p className="text-muted">{inputUrl}</p>
+    <div className="max-w-md mx-auto text-center">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-2">Analyzing your project</h2>
+        <p className="text-muted text-sm break-all">{inputUrl}</p>
       </div>
 
-      <div className="analysis-progress-type">
+      <div className="mb-6">
         <Badge variant="default">{getTypeLabel(detectedType)}</Badge>
       </div>
 
-      <div className="analysis-progress-steps">
+      <div className="space-y-3 mb-6">
         <ProgressStep
           label="Fetching page content"
           status={steps.scraping}
@@ -74,13 +75,13 @@ export function AnalysisProgress({
         />
       </div>
 
-      <div className="analysis-progress-status">
-        <span className="status-message">{message}</span>
+      <div className="mb-6">
+        <p className="text-sm text-muted animate-pulse">{message}</p>
       </div>
 
       {error && (
-        <div className="analysis-progress-error">
-          <p className="error-message">{error}</p>
+        <div className="mb-6">
+          <p className="text-sm text-danger mb-4">{error}</p>
           <Button onClick={onCancel} variant="secondary">
             Try Again
           </Button>
@@ -103,13 +104,29 @@ interface ProgressStepProps {
 
 function ProgressStep({ label, status }: ProgressStepProps) {
   return (
-    <div className={`progress-step progress-step-${status}`}>
-      <span className="progress-step-icon">
+    <div className="flex items-center gap-3">
+      <span
+        className={cn(
+          "flex items-center justify-center w-6 h-6",
+          status === "completed" && "text-accent",
+          status === "in_progress" && "text-accent",
+          status === "pending" && "text-muted"
+        )}
+      >
         {status === "completed" && <CheckIcon />}
         {status === "in_progress" && <SpinnerIcon />}
         {status === "pending" && <CircleIcon />}
       </span>
-      <span className="progress-step-label">{label}</span>
+      <span
+        className={cn(
+          "text-sm",
+          status === "completed" && "text-fg",
+          status === "in_progress" && "text-fg",
+          status === "pending" && "text-muted"
+        )}
+      >
+        {label}
+      </span>
     </div>
   );
 }
@@ -130,7 +147,7 @@ function SpinnerIcon() {
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      className="spinner"
+      className="animate-spin"
     >
       <circle cx="8" cy="8" r="6" strokeWidth="2" opacity="0.3" />
       <path d="M8 2a6 6 0 016 6" strokeWidth="2" strokeLinecap="round" />

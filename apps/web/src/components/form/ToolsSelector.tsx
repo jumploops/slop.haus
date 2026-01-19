@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import useSWR from "swr";
 import { fetchTools, Tool } from "@/lib/api/tools";
 import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
 
 interface ToolsSelectorProps {
   selectedTools: string[];
@@ -71,24 +72,29 @@ export function ToolsSelector({
   }, []);
 
   return (
-    <div className="tools-selector" ref={containerRef}>
-      <label className="form-label">Tools & Technologies</label>
-      <p className="form-hint">What was used to build this project?</p>
+    <div className="mb-6 relative" ref={containerRef}>
+      <label className="block text-sm font-medium mb-1">Tools & Technologies</label>
+      <p className="text-sm text-muted mb-2">What was used to build this project?</p>
 
       <div
-        className={`tools-selector-input ${isOpen ? "tools-selector-input-focused" : ""}`}
+        className={cn(
+          "flex flex-wrap gap-2 p-3 min-h-[48px] rounded-md border border-border bg-bg-secondary cursor-text",
+          "focus-within:border-accent focus-within:ring-1 focus-within:ring-accent",
+          isOpen && "border-accent ring-1 ring-accent"
+        )}
         onClick={() => inputRef.current?.focus()}
       >
         {selectedTools.map((tool) => (
-          <Badge key={tool} variant="default" className="tools-selector-tag">
+          <Badge key={tool} variant="default" className="flex items-center gap-1 pr-1">
             {tool}
             <button
               type="button"
-              className="tools-selector-tag-remove"
               onClick={(e) => {
                 e.stopPropagation();
                 handleRemove(tool);
               }}
+              className="ml-1 p-0.5 rounded hover:bg-black/20 transition-colors"
+              aria-label={`Remove ${tool}`}
             >
               <CloseIcon />
             </button>
@@ -104,23 +110,23 @@ export function ToolsSelector({
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder={
-            selectedTools.length === 0 ? "Search tools..." : ""
-          }
-          className="tools-selector-search"
+          placeholder={selectedTools.length === 0 ? "Search tools..." : ""}
+          className="flex-1 min-w-[120px] bg-transparent border-none outline-none text-fg placeholder:text-muted"
           disabled={selectedTools.length >= maxTools}
         />
       </div>
 
       {selectedTools.length >= maxTools && (
-        <p className="form-error">Maximum {maxTools} tools allowed</p>
+        <p className="text-sm text-danger mt-1">Maximum {maxTools} tools allowed</p>
       )}
 
       {isOpen && (search || availableTools?.length) && (
-        <div className="tools-selector-dropdown">
-          {isLoading && <div className="tools-selector-loading">Loading...</div>}
+        <div className="absolute z-50 w-full mt-1 bg-bg border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+          {isLoading && (
+            <div className="px-4 py-3 text-sm text-muted">Loading...</div>
+          )}
           {!isLoading && availableTools?.length === 0 && search && (
-            <div className="tools-selector-empty">
+            <div className="px-4 py-3 text-sm text-muted">
               No tools found for "{search}"
             </div>
           )}
@@ -129,8 +135,8 @@ export function ToolsSelector({
               <button
                 key={tool.id}
                 type="button"
-                className="tools-selector-option"
                 onClick={() => handleSelect(tool)}
+                className="w-full px-4 py-2 text-left text-sm text-fg hover:bg-border transition-colors"
               >
                 {tool.name}
               </button>

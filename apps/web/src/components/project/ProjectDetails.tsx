@@ -23,36 +23,46 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   const imageUrl = primaryMedia?.url || getPlaceholderImage(project.title);
 
   return (
-    <div className="project-details">
-      <div className="project-details-header">
-        <div className="project-details-media">
-          <img src={imageUrl} alt={project.title} className="project-details-image" />
+    <div>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row gap-6 mb-8">
+        {/* Media */}
+        <div className="md:w-[400px] flex-shrink-0">
+          <img
+            src={imageUrl}
+            alt={project.title}
+            className="w-full rounded-lg object-cover bg-bg-secondary aspect-video"
+          />
         </div>
 
-        <div className="project-details-info">
-          <h1>{project.title}</h1>
-          <p className="project-details-tagline">{project.tagline}</p>
+        {/* Info */}
+        <div className="flex-1">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">{project.title}</h1>
+          <p className="text-lg text-muted mb-4">{project.tagline}</p>
 
-          <div className="project-details-author">
+          {/* Author */}
+          <div className="flex items-center gap-3 mb-4">
             <Avatar src={project.author.image} alt={project.author.name} size="md" />
-            <span>{project.author.name}</span>
+            <span className="font-medium">{project.author.name}</span>
             {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
           </div>
 
-          <div className="project-details-meta">
+          {/* Meta */}
+          <div className="flex flex-wrap gap-4 text-sm text-muted mb-6">
             <span>Submitted {formatRelativeTime(project.createdAt)}</span>
             {project.lastEditedAt && (
               <span>Last edited {formatRelativeTime(project.lastEditedAt)}</span>
             )}
           </div>
 
-          <div className="project-details-links">
+          {/* Action Links */}
+          <div className="flex flex-wrap gap-3">
             {project.mainUrl && (
               <a
                 href={project.mainUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-accent text-accent-foreground font-medium hover:opacity-90 hover:no-underline transition-opacity"
               >
                 <ExternalLinkIcon /> Visit Site
               </a>
@@ -62,7 +72,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                 href={project.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-secondary"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-fg hover:bg-border hover:no-underline transition-colors"
               >
                 <GithubIcon /> View Repo
               </a>
@@ -75,7 +85,10 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               <HeartIcon filled={isFavorited} /> {isFavorited ? "Favorited" : "Favorite"}
             </Button>
             {isAuthor && (
-              <Link href={`/p/${project.slug}/edit`} className="btn btn-secondary">
+              <Link
+                href={`/p/${project.slug}/edit`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-fg hover:bg-border hover:no-underline transition-colors"
+              >
                 <PencilIcon /> Edit
               </Link>
             )}
@@ -83,30 +96,33 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
         </div>
       </div>
 
-      <div className="project-details-body">
-        <div className="project-details-main">
+      {/* Body Section */}
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
+        {/* Main content */}
+        <div>
           {project.description && (
-            <div className="project-details-description">
-              <h3>About</h3>
-              <p>{project.description}</p>
-            </div>
+            <section className="mb-8">
+              <h3 className="text-lg font-semibold mb-3">About</h3>
+              <p className="text-fg leading-relaxed whitespace-pre-wrap">{project.description}</p>
+            </section>
           )}
 
           {project.tools.length > 0 && (
-            <div className="project-details-tools">
-              <h3>Built with</h3>
-              <div className="tools-list">
+            <section className="mb-8">
+              <h3 className="text-lg font-semibold mb-3">Built with</h3>
+              <div className="flex flex-wrap gap-2">
                 {project.tools.map((tool) => (
                   <Badge key={tool.id} variant="default">
                     {tool.name}
                   </Badge>
                 ))}
               </div>
-            </div>
+            </section>
           )}
         </div>
 
-        <div className="project-details-sidebar">
+        {/* Sidebar */}
+        <aside>
           <ScoreWidget
             projectSlug={project.slug}
             normalUp={project.normalUp}
@@ -117,7 +133,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
             devScore={project.devScore}
             vibePercent={project.vibePercent}
           />
-        </div>
+        </aside>
       </div>
     </div>
   );

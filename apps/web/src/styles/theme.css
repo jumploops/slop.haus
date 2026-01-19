@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* ============================================
+   BASE VARIABLES
+
+   These are the "source of truth" values that:
+   1. Define the default theme
+   2. Can be overridden by presets (via [data-theme="..."])
+   3. Can be overridden by user themes (via runtime CSS injection)
+
+   Using OKLCH color space for better perceptual uniformity.
+   ============================================ */
+
+:root {
+  /* Backgrounds */
+  --background: oklch(0.07 0 0);           /* #0a0a0a equivalent */
+  --background-secondary: oklch(0.11 0 0); /* #111111 equivalent */
+
+  /* Foreground (text) */
+  --foreground: oklch(0.93 0 0);           /* #ededed equivalent */
+  --muted: oklch(0.55 0 0);                /* #888888 equivalent */
+
+  /* Borders & dividers */
+  --border: oklch(0.25 0 0);               /* #333333 equivalent */
+
+  /* Brand / Accent - bright green */
+  --accent: oklch(0.85 0.2 155);           /* #00ff88 equivalent */
+  --accent-dim: oklch(0.7 0.18 155);       /* #00cc6a equivalent */
+  --accent-foreground: oklch(0.07 0 0);    /* Text on accent bg */
+
+  /* Semantic status colors */
+  --danger: oklch(0.65 0.25 25);           /* #ff4444 equivalent */
+  --warning: oklch(0.8 0.18 75);           /* #ffaa00 equivalent */
+  --success: oklch(0.85 0.2 155);          /* Same as accent */
+
+  /* Border radius base */
+  --radius: 0.5rem;
+}
+
+/* ============================================
+   TAILWIND THEME MAPPING
+
+   @theme inline creates utilities that reference
+   the base variables above. This is what enables
+   theme switching at runtime.
+   ============================================ */
+
+@theme inline {
+  /* === COLORS === */
+  --color-bg: var(--background);
+  --color-bg-secondary: var(--background-secondary);
+  --color-fg: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+
+  /* === TYPOGRAPHY === */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* === SPACING === */
+  /* Tailwind v4 derives utilities from --spacing base */
+  --spacing: 0.25rem;
+
+  /* === BORDER RADIUS === */
+  --radius-xs: 0.125rem;
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.25rem);
+  --radius-xl: calc(var(--radius) + 0.5rem);
+  --radius-full: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px oklch(0 0 0 / 0.35);
+  --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.4);
+}
+
+/* ============================================
+   LEGACY ALIASES (Migration Compatibility)
+
+   These allow existing code using var(--bg) etc.
+   to continue working during migration.
+   Remove in Phase 9 after full migration.
+   ============================================ */
+
+:root {
+  --bg: var(--background);
+  --bg-secondary: var(--background-secondary);
+  --fg: var(--foreground);
+  /* --muted already matches */
+  /* --border already matches */
+  /* --accent already matches */
+  /* --accent-dim already matches */
+  /* --danger already matches */
+  /* --warning already matches */
+  /* --success already matches */
+
+  /* Spacing scale (legacy) */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 2rem;
+  --spacing-8: 2.5rem;
+
+  /* Radius aliases */
+  --radius-sm: 0.25rem;
+  --radius-lg: 0.75rem;
+}
+
+/* ============================================
+   APP-SPECIFIC VARIABLES
+
+   Layout/structural values that don't need
+   Tailwind utility generation.
+   ============================================ */
+
+:root {
+  --app-container-max: 1200px;
+  --app-header-height: 60px;
+  --app-sidebar-width: 200px;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-bg text-fg;
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+
+  /* Global link styles */
+  a {
+    @apply text-accent;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}

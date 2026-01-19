@@ -32,10 +32,9 @@ export function DeleteProjectModal({
             Cancel
           </Button>
           <Button
-            variant="primary"
+            variant="danger"
             onClick={onConfirm}
             disabled={isDeleting}
-            className="btn-danger"
           >
             {isDeleting ? "Deleting..." : "Delete Project"}
           </Button>

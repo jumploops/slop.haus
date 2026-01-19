@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
 const adminNav = [
   { href: "/admin", label: "Mod Queue" },
@@ -20,12 +22,12 @@ export default function AdminLayout({
 
   if (isPending) {
     return (
-      <div className="admin-layout">
-        <aside className="admin-sidebar">
-          <Skeleton className="skeleton-text" style={{ width: "100px", height: "24px" }} />
+      <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 min-h-[calc(100vh-200px)]">
+        <aside className="md:border-r md:border-border md:pr-8">
+          <Skeleton variant="text" className="w-24 h-6" />
         </aside>
-        <div className="admin-content">
-          <Skeleton className="skeleton-text" style={{ width: "200px", height: "32px" }} />
+        <div>
+          <Skeleton variant="title" className="w-48" />
         </div>
       </div>
     );
@@ -37,23 +39,23 @@ export default function AdminLayout({
 
   if (!hasAccess) {
     return (
-      <div className="admin-unauthorized">
-        <h1>Unauthorized</h1>
-        <p>You don't have permission to access this page.</p>
-        <Link href="/" className="btn btn-primary">
-          Go Home
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <h1 className="text-2xl font-bold mb-2">Unauthorized</h1>
+        <p className="text-muted mb-6">You don't have permission to access this page.</p>
+        <Link href="/">
+          <Button variant="primary">Go Home</Button>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <h2>Admin</h2>
+    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 min-h-[calc(100vh-200px)]">
+      <aside className="md:border-r md:border-border md:pr-8">
+        <h2 className="text-xl font-semibold mb-4 text-danger">Admin</h2>
         <AdminNav isAdmin={isAdmin} />
       </aside>
-      <div className="admin-content">{children}</div>
+      <div>{children}</div>
     </div>
   );
 }
@@ -65,12 +67,17 @@ function AdminNav({ isAdmin }: { isAdmin: boolean }) {
   const nav = isAdmin ? adminNav : adminNav.slice(0, 1);
 
   return (
-    <nav className="admin-nav">
+    <nav className="flex flex-row md:flex-col gap-1">
       {nav.map((item) => (
         <Link
           key={item.href}
           href={item.href}
-          className={`admin-nav-item ${pathname === item.href ? "active" : ""}`}
+          className={cn(
+            "px-3 py-2 rounded-md text-sm transition-colors hover:no-underline",
+            pathname === item.href
+              ? "bg-border text-fg"
+              : "text-muted hover:text-fg hover:bg-bg-secondary"
+          )}
         >
           {item.label}
         </Link>

@@ -10,7 +10,7 @@ import { VibeInput } from "@/components/form/VibeInput";
 import { VibeMeter } from "@/components/project/VibeMeter";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { cn, getPlaceholderImage } from "@/lib/utils";
 
 interface DraftData {
@@ -186,7 +186,7 @@ export function EditableProjectPreview({
                   href={mainUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary"
+                  className={buttonVariants({ variant: "primary" })}
                   onClick={(e) => e.preventDefault()}
                 >
                   <ExternalLinkIcon /> Visit Site
@@ -197,7 +197,7 @@ export function EditableProjectPreview({
                   href={repoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-secondary"
+                  className={buttonVariants({ variant: "secondary" })}
                   onClick={(e) => e.preventDefault()}
                 >
                   <GithubIcon /> View Repo

@@ -1,39 +1,40 @@
 "use client";
 
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
+import { buttonVariants, type ButtonVariantProps } from "./button-variants";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+// Re-export for convenience
+export { buttonVariants } from "./button-variants";
+
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    ButtonVariantProps {
   loading?: boolean;
 }
 
-export function Button({
-  children,
-  variant = "primary",
-  size = "md",
-  loading = false,
-  disabled,
-  className,
-  ...props
-}: ButtonProps) {
-  return (
-    <button
-      className={cn(
-        "btn",
-        variant === "primary" && "btn-primary",
-        variant === "secondary" && "btn-secondary",
-        variant === "ghost" && "btn-ghost",
-        variant === "danger" && "btn-danger",
-        size === "sm" && "btn-sm",
-        size === "lg" && "btn-lg",
-        loading && "btn-loading",
-        className
-      )}
-      disabled={disabled || loading}
-      {...props}
-    >
-      {loading ? <span className="btn-spinner" /> : children}
-    </button>
-  );
-}
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ children, variant, size, loading = false, disabled, className, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          buttonVariants({ variant, size }),
+          loading && "relative text-transparent",
+          className
+        )}
+        disabled={disabled || loading}
+        {...props}
+      >
+        {loading && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="h-4 w-4 border-2 border-transparent border-t-current rounded-full animate-spin" />
+          </span>
+        )}
+        {children}
+      </button>
+    );
+  }
+);
+
+Button.displayName = "Button";

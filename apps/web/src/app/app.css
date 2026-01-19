@@ -1,0 +1,11 @@
+/* Theme tokens (includes @import "tailwindcss") */
+@import "../styles/theme.css";
+
+/* Animations */
+@import "../styles/animations.css";
+
+/* Preset theme overrides */
+@import "../styles/presets.css";
+
+/* Keep existing globals.css during migration */
+@import "./globals.css";

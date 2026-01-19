@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -32,84 +33,91 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   return (
     <>
-      <div className="mobile-nav-overlay" onClick={onClose} />
-      <nav className="mobile-nav">
-        <div className="mobile-nav-header">
-          <span className="logo">slop.haus</span>
-          <button className="mobile-nav-close" onClick={onClose} aria-label="Close navigation">
+      {/* Overlay */}
+      <div
+        className={cn(
+          "fixed inset-0 bg-black/50 z-[100]",
+          "transition-opacity duration-200",
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Slide-out panel */}
+      <nav
+        className={cn(
+          "fixed top-0 right-0 bottom-0 w-[280px] max-w-full",
+          "bg-bg border-l border-border z-[101]",
+          "flex flex-col",
+          "transform transition-transform duration-200 ease-out",
+          isOpen ? "translate-x-0" : "translate-x-full"
+        )}
+        aria-label="Mobile navigation"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <span className="text-lg font-bold text-accent">slop.haus</span>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8 rounded text-muted hover:text-fg hover:bg-border transition-colors"
+            aria-label="Close navigation"
+          >
             <CloseIcon />
           </button>
         </div>
 
-        <div className="mobile-nav-links">
-          <Link href="/" className={cn("mobile-nav-link", pathname === "/" && "active")}>
+        {/* Navigation links */}
+        <div className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
+          <MobileNavLink href="/" active={pathname === "/"}>
             Feed
-          </Link>
-          <Link href="/submit" className={cn("mobile-nav-link", pathname === "/submit" && "active")}>
+          </MobileNavLink>
+          <MobileNavLink href="/submit" active={pathname === "/submit"}>
             Submit
-          </Link>
+          </MobileNavLink>
           {session?.user && (
-            <Link
-              href="/favorites"
-              className={cn("mobile-nav-link", pathname === "/favorites" && "active")}
-            >
+            <MobileNavLink href="/favorites" active={pathname === "/favorites"}>
               Favorites
-            </Link>
+            </MobileNavLink>
           )}
           {session?.user && (
-            <Link
-              href="/my/projects"
-              className={cn("mobile-nav-link", pathname.startsWith("/my/projects") && "active")}
-            >
+            <MobileNavLink href="/my/projects" active={pathname.startsWith("/my/projects")}>
               My Projects
-            </Link>
+            </MobileNavLink>
           )}
           {session?.user && (
-            <Link
-              href="/settings/profile"
-              className={cn("mobile-nav-link", pathname.startsWith("/settings") && "active")}
-            >
+            <MobileNavLink href="/settings/profile" active={pathname.startsWith("/settings")}>
               Settings
-            </Link>
+            </MobileNavLink>
           )}
           {session?.user && (session.user.role === "admin" || session.user.role === "mod") && (
-            <Link
-              href="/admin"
-              className={cn("mobile-nav-link", pathname.startsWith("/admin") && "active")}
-            >
+            <MobileNavLink href="/admin" active={pathname.startsWith("/admin")}>
               Admin
-            </Link>
+            </MobileNavLink>
           )}
         </div>
 
-        <div className="mobile-nav-auth">
+        {/* Auth section */}
+        <div className="p-4 border-t border-border flex flex-col gap-3">
           {isPending ? (
-            <span className="text-muted">Loading...</span>
+            <span className="text-muted text-sm">Loading...</span>
           ) : session?.user ? (
             <>
-              <span className="mobile-nav-user">{session.user.name}</span>
-              <button onClick={() => signOut()} className="btn btn-secondary">
+              <span className="text-sm text-muted truncate">{session.user.name}</span>
+              <Button variant="secondary" onClick={() => signOut()}>
                 Sign Out
-              </button>
+              </Button>
             </>
           ) : (
             <>
-              <button
-                onClick={() => signIn.social({ provider: "github" })}
-                className="btn btn-primary"
-              >
+              <Button variant="primary" onClick={() => signIn.social({ provider: "github" })}>
                 Sign in with GitHub
-              </button>
-              <button
-                onClick={() => signIn.social({ provider: "google" })}
-                className="btn btn-secondary"
-              >
+              </Button>
+              <Button variant="secondary" onClick={() => signIn.social({ provider: "google" })}>
                 Sign in with Google
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -118,9 +126,32 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   );
 }
 
+function MobileNavLink({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "block px-4 py-3 rounded-md transition-colors",
+        "hover:no-underline",
+        active ? "bg-border text-accent" : "text-fg hover:bg-border"
+      )}
+    >
+      {children}
+    </Link>
+  );
+}
+
 function CloseIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>

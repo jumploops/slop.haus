@@ -4,7 +4,7 @@ import useSWR from "swr";
 import Link from "next/link";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchMyProjects, deleteProject, type MyProjectListItem } from "@/lib/api/projects";
 import { formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import { useState } from "react";
@@ -52,7 +52,7 @@ function MyProjectsContent() {
             Manage your submitted projects
           </p>
         </div>
-        <Link href="/submit" className="btn btn-primary">
+        <Link href="/submit" className={buttonVariants({ variant: "primary" })}>
           <PlusIcon /> Submit New
         </Link>
       </div>
@@ -158,7 +158,7 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
             <Button variant="secondary" onClick={onEdit}>
               <PencilIcon /> Edit
             </Button>
-            <Button variant="ghost" onClick={onDelete} className="btn-danger-ghost">
+            <Button variant="ghost" onClick={onDelete} className="text-danger hover:bg-danger/10">
               <TrashIcon /> Delete
             </Button>
           </>

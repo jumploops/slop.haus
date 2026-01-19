@@ -22,40 +22,40 @@ export function CommentThread({ projectSlug }: CommentThreadProps) {
   const commentTree = comments ? buildCommentTree(comments) : [];
 
   return (
-    <div className="comment-section">
-      <h3>Comments ({comments?.length ?? 0})</h3>
+    <section className="mt-8">
+      <h3 className="text-xl font-semibold mb-4">Comments ({comments?.length ?? 0})</h3>
 
       <CommentForm projectSlug={projectSlug} onSuccess={() => mutate()} />
 
       {isLoading && (
-        <div className="comment-thread">
+        <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="comment">
-              <div className="comment-header">
-                <Skeleton className="skeleton-avatar" />
-                <Skeleton className="skeleton-text" style={{ width: "100px" }} />
+            <div key={i} className="py-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Skeleton variant="avatar" />
+                <Skeleton variant="text" className="w-24" />
               </div>
-              <Skeleton className="skeleton-text" style={{ marginTop: "0.5rem" }} />
-              <Skeleton className="skeleton-text" style={{ width: "80%", marginTop: "0.25rem" }} />
+              <Skeleton variant="text" className="mt-2" />
+              <Skeleton variant="text" className="w-4/5 mt-1" />
             </div>
           ))}
         </div>
       )}
 
       {error && (
-        <div className="empty-state">
-          <p>Failed to load comments</p>
+        <div className="py-8 text-center">
+          <p className="text-muted">Failed to load comments</p>
         </div>
       )}
 
       {!isLoading && !error && commentTree.length === 0 && (
-        <div className="empty-state">
-          <p>No comments yet. Be the first to comment!</p>
+        <div className="py-8 text-center">
+          <p className="text-muted">No comments yet. Be the first to comment!</p>
         </div>
       )}
 
       {!isLoading && !error && commentTree.length > 0 && (
-        <div className="comment-thread">
+        <div className="divide-y divide-border">
           {commentTree.map((comment) => (
             <CommentItem
               key={comment.id}
@@ -66,6 +66,6 @@ export function CommentThread({ projectSlug }: CommentThreadProps) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

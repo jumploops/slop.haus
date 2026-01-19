@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button-variants";
 
 export default function NotFound() {
   return (
@@ -9,7 +10,7 @@ export default function NotFound() {
         <p>
           The page you're looking for doesn't exist or has been moved.
         </p>
-        <Link href="/" className="btn btn-primary">
+        <Link href="/" className={buttonVariants({ variant: "primary" })}>
           Go Home
         </Link>
       </div>

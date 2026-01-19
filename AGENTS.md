@@ -167,26 +167,81 @@ export async function getFeature(): Promise<FeatureResponse> {
 }
 ```
 
-### CSS Variables
+### Theming System
 
-Global CSS uses variables defined in `:root`. Always use them:
+The frontend uses Tailwind CSS v4 with semantic color tokens. All colors are themeable via CSS variables.
 
-```css
-/* Spacing: --spacing-1 through --spacing-8 (0.25rem to 2.5rem) */
-padding: var(--spacing-4);
+**Use semantic Tailwind utilities:**
 
-/* Colors */
-background: var(--bg);
-color: var(--fg);
-border-color: var(--border);
+```tsx
+// DO - use semantic utilities
+<div className="bg-bg text-fg border border-border">
+  <span className="text-muted">Helper text</span>
+  <button className="bg-accent text-accent-foreground">Primary</button>
+</div>
 
-/* Border radius */
-border-radius: var(--radius);
+// DON'T - use palette classes
+<div className="bg-slate-900 text-gray-100">  // Bad!
+```
+
+**Available color utilities:**
+
+| Utility | Purpose |
+|---------|---------|
+| `bg-bg`, `text-fg` | Primary background/foreground |
+| `bg-bg-secondary` | Cards, inputs, elevated surfaces |
+| `text-muted` | Secondary text |
+| `border-border` | Borders and dividers |
+| `bg-accent`, `text-accent` | Brand/interactive color |
+| `bg-danger`, `text-danger` | Error states |
+| `bg-warning`, `text-warning` | Warning states |
+| `bg-success`, `text-success` | Success states |
+
+**Use UI components:**
+
+```tsx
+import { Button, buttonVariants } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Input, Textarea } from "@/components/ui/Input";
+
+// Button as element
+<Button variant="primary" size="md">Click me</Button>
+
+// Button styles on a Link
+<Link href="/foo" className={buttonVariants({ variant: "primary" })}>
+  Go somewhere
+</Link>
+
+// Badge
+<Badge variant="success">Published</Badge>
+```
+
+**Theme files:**
+
+| File | Purpose |
+|------|---------|
+| `src/styles/theme.css` | Tailwind `@theme` token definitions |
+| `src/styles/presets.css` | Preset theme overrides |
+| `src/app/globals.css` | Base variables + page layouts |
+| `src/styles/TOKEN-CONTRACT.md` | Full token documentation |
+
+**Class merging:**
+
+Always use `cn()` from `@/lib/utils` for conditional classes:
+
+```tsx
+import { cn } from "@/lib/utils";
+
+<div className={cn(
+  "p-4 rounded-md",
+  isActive && "bg-accent",
+  className
+)} />
 ```
 
 ## Things to Avoid
 
-1. **Don't use undefined CSS variables** - Check `:root` in globals.css before using `var(--name)`
+1. **Don't use Tailwind palette classes** - Use semantic tokens (`bg-bg`, `text-fg`) not raw colors (`bg-slate-900`)
 
 2. **Don't forget soft delete filters** - Always add `isNull(table.deletedAt)` to queries
 
@@ -197,6 +252,8 @@ border-radius: var(--radius);
 5. **Don't add dependencies without checking if functionality exists** - Check packages/shared first
 
 6. **Don't skip the planning phase** - Create plan docs for multi-file changes
+
+7. **Don't create raw CSS classes** - Use Tailwind utilities or existing UI components
 
 ## Type Checking
 

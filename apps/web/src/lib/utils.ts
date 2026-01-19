@@ -1,5 +1,16 @@
-export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(" ");
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+/**
+ * Combines class names with Tailwind-aware merging.
+ * Later classes override earlier conflicting classes.
+ *
+ * @example
+ * cn("p-2 bg-red-500", "p-4") // → "bg-red-500 p-4"
+ * cn("text-fg", condition && "text-accent") // → conditional class
+ */
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
 }
 
 export function formatRelativeTime(date: Date | string): string {

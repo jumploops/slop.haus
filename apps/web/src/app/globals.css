@@ -1,41 +1,6 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-:root {
-  /* Colors */
-  --bg: #0a0a0a;
-  --bg-secondary: #111;
-  --fg: #ededed;
-  --muted: #888;
-  --border: #333;
-  --accent: #00ff88;
-  --accent-dim: #00cc6a;
-  --danger: #ff4444;
-  --warning: #ffaa00;
-  --success: #00ff88;
-
-  /* Spacing scale */
-  --spacing-1: 0.25rem;
-  --spacing-2: 0.5rem;
-  --spacing-3: 0.75rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-7: 2rem;
-  --spacing-8: 2.5rem;
-
-  /* Border radius */
-  --radius: 0.5rem;
-  --radius-sm: 0.25rem;
-  --radius-lg: 0.75rem;
-
-  /* Aliases */
-  --background: var(--bg);
-  --foreground: var(--fg);
-}
+/* NOTE: CSS variables are now defined in theme.css with proper indirection
+   for theme switching. Do not define --bg, --fg, etc. here as it would
+   override the themeable values with hardcoded colors. */
 
 body {
   font-family:

@@ -10,17 +10,25 @@ interface AvatarProps {
 export function Avatar({ src, alt, size = "md", className }: AvatarProps) {
   const initials = alt
     .split(" ")
-    .map((w) => w[0])
+    .map((word) => word[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
 
   return (
-    <div className={cn("avatar", `avatar-${size}`, className)}>
+    <div
+      className={cn(
+        "inline-flex items-center justify-center rounded-full bg-border overflow-hidden flex-shrink-0",
+        size === "sm" && "w-6 h-6 text-[0.625rem]",
+        size === "md" && "w-8 h-8 text-xs",
+        size === "lg" && "w-12 h-12 text-base",
+        className
+      )}
+    >
       {src ? (
-        <img src={src} alt={alt} className="avatar-image" />
+        <img src={src} alt={alt} className="w-full h-full object-cover" />
       ) : (
-        <span className="avatar-initials">{initials}</span>
+        <span className="text-fg font-medium">{initials}</span>
       )}
     </div>
   );
