@@ -1,0 +1,91 @@
+@layer themes.slop-default {
+  :root[data-theme="slop-default"],
+  .theme-scope[data-theme="slop-default"] {
+    --background: oklch(0.07 0 0);
+    --background-secondary: oklch(0.11 0 0);
+    --foreground: oklch(0.93 0 0);
+    --muted: oklch(0.55 0 0);
+    --border: oklch(0.25 0 0);
+
+    --accent: oklch(0.85 0.2 155);
+    --accent-dim: oklch(0.7 0.18 155);
+    --accent-foreground: oklch(0.07 0 0);
+
+    --danger: oklch(0.65 0.25 25);
+    --warning: oklch(0.8 0.18 75);
+    --success: oklch(0.85 0.2 155);
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --spacing: 0.25rem;
+    --radius: 0.5rem;
+
+    --border-width: 1px;
+    --border-style: solid;
+
+    --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.2);
+    --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px oklch(0 0 0 / 0.35);
+    --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.4);
+
+    --app-container-max: 1200px;
+    --app-header-height: 60px;
+    --app-sidebar-width: 200px;
+    --app-card-pad: 16px;
+    --app-page-gutter: 16px;
+    --app-grid-cols: repeat(1, minmax(0, 1fr));
+  }
+
+  :root[data-theme="slop-default"] .btn,
+  .theme-scope[data-theme="slop-default"] .btn {
+    border-width: var(--border-width);
+    border-style: var(--border-style);
+    border-color: var(--border);
+    border-radius: var(--radius);
+  }
+
+  :root[data-theme="slop-default"] .btn-primary,
+  .theme-scope[data-theme="slop-default"] .btn-primary {
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  :root[data-theme="slop-default"] .btn-secondary,
+  .theme-scope[data-theme="slop-default"] .btn-secondary {
+    background: transparent;
+    color: var(--foreground);
+  }
+
+  :root[data-theme="slop-default"] .btn-ghost,
+  .theme-scope[data-theme="slop-default"] .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+  }
+
+  :root[data-theme="slop-default"] .card,
+  .theme-scope[data-theme="slop-default"] .card {
+    background: var(--background-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+
+  :root[data-theme="slop-default"] .input,
+  .theme-scope[data-theme="slop-default"] .input {
+    background: var(--background-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  :root[data-theme="slop-default"] a,
+  .theme-scope[data-theme="slop-default"] a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  :root[data-theme="slop-default"] a:hover,
+  .theme-scope[data-theme="slop-default"] a:hover {
+    text-decoration: underline;
+  }
+}

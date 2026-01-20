@@ -1,0 +1,135 @@
+@layer themes.retro-90s {
+  :root[data-theme="retro-90s"],
+  .theme-scope[data-theme="retro-90s"] {
+    --background: oklch(0.95 0.02 250);
+    --background-secondary: oklch(1 0 0);
+    --foreground: oklch(0.15 0.02 260);
+    --muted: oklch(0.45 0.02 260);
+    --border: oklch(0.7 0.05 260);
+
+    --accent: oklch(0.5 0.25 260);
+    --accent-dim: oklch(0.45 0.22 260);
+    --accent-foreground: oklch(0.98 0 0);
+
+    --danger: oklch(0.6 0.25 25);
+    --warning: oklch(0.85 0.15 85);
+    --success: oklch(0.65 0.25 145);
+
+    --font-sans: "Comic Sans MS", "Comic Sans", cursive;
+    --font-mono: "Courier New", Courier, monospace;
+
+    --spacing: 0.25rem;
+    --radius: 0px;
+
+    --border-width: 2px;
+    --border-style: outset;
+
+    --shadow-xs: 1px 1px 0 #000;
+    --shadow-sm: 2px 2px 0 #000;
+    --shadow-md: 3px 3px 0 #000;
+    --shadow-lg: 4px 4px 0 #000;
+
+    --app-container-max: 1000px;
+    --app-header-height: 56px;
+    --app-sidebar-width: 220px;
+    --app-card-pad: 12px;
+    --app-page-gutter: 12px;
+    --app-grid-cols: repeat(1, minmax(0, 1fr));
+  }
+
+  :root[data-theme="retro-90s"] body {
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.08'%3E%3Cpath d='M0 0h10v10H0zM10 10h10v10H10z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .theme-scope[data-theme="retro-90s"] {
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.08'%3E%3Cpath d='M0 0h10v10H0zM10 10h10v10H10z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  :root[data-theme="retro-90s"] a:not(.no-retro-link),
+  .theme-scope[data-theme="retro-90s"] a:not(.no-retro-link) {
+    text-decoration: underline;
+  }
+
+  :root[data-theme="retro-90s"] a:not(.no-retro-link):hover,
+  .theme-scope[data-theme="retro-90s"] a:not(.no-retro-link):hover {
+    color: oklch(0.6 0.25 25);
+  }
+
+  :root[data-theme="retro-90s"] .btn,
+  .theme-scope[data-theme="retro-90s"] .btn {
+    border-width: var(--border-width);
+    border-style: var(--border-style);
+    border-color: oklch(0.85 0 0);
+    border-radius: 0;
+    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080, 2px 2px 0 #000000;
+  }
+
+  :root[data-theme="retro-90s"] .btn:active,
+  .theme-scope[data-theme="retro-90s"] .btn:active {
+    border-style: inset;
+    box-shadow: inset -1px -1px 0 #ffffff, inset 1px 1px 0 #808080;
+  }
+
+  :root[data-theme="retro-90s"] .btn-primary,
+  .theme-scope[data-theme="retro-90s"] .btn-primary {
+    background: linear-gradient(180deg, #90ee90 0%, #32cd32 50%, #228b22 100%);
+    color: oklch(0.1 0 0);
+  }
+
+  :root[data-theme="retro-90s"] .card,
+  .theme-scope[data-theme="retro-90s"] .card {
+    border-width: 2px;
+    border-style: outset;
+    border-color: oklch(0.85 0 0);
+    border-radius: 0;
+    background: oklch(0.95 0 0);
+  }
+
+  :root[data-theme="retro-90s"] .input,
+  .theme-scope[data-theme="retro-90s"] .input {
+    border-width: 2px;
+    border-style: inset;
+    border-color: oklch(0.8 0 0);
+    border-radius: 0;
+    background: oklch(1 0 0);
+  }
+
+  :root[data-theme="retro-90s"] .badge,
+  .theme-scope[data-theme="retro-90s"] .badge {
+    border-width: 2px;
+    border-style: solid;
+    border-color: oklch(0.15 0 0);
+    border-radius: 0;
+    text-transform: uppercase;
+  }
+
+  @keyframes retro-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  @keyframes retro-wobble {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+  }
+
+  @keyframes retro-marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  :root[data-theme="retro-90s"] .blink,
+  .theme-scope[data-theme="retro-90s"] .blink {
+    animation: retro-blink 1s step-end infinite;
+  }
+
+  :root[data-theme="retro-90s"] .wobble,
+  .theme-scope[data-theme="retro-90s"] .wobble {
+    animation: retro-wobble 2s ease-in-out infinite;
+  }
+
+  :root[data-theme="retro-90s"] .marquee,
+  .theme-scope[data-theme="retro-90s"] .marquee {
+    animation: retro-marquee 15s linear infinite;
+  }
+}
