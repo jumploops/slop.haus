@@ -1,7 +1,7 @@
 # Debug: Content Left-Aligned Instead of Centered
 
 **Date:** 2026-01-18
-**Status:** Root Cause Identified
+**Status:** RESOLVED
 
 ## Problem Statement
 
@@ -172,6 +172,16 @@ Since we've migrated to Tailwind v4 with `theme.css`:
 | `apps/web/src/app/app.css` | Imports globals.css AFTER theme.css |
 | `apps/web/src/styles/theme.css` | Contains properly layered Tailwind setup |
 | `apps/web/.next/static/css/app/layout.css` | Generated CSS shows issue clearly |
+
+## Resolution
+
+**Fixed on 2026-01-18:**
+
+1. Removed the unlayered `* { margin: 0; }` reset from globals.css (Solution A)
+2. Subsequently removed the entire `:root` block with hardcoded CSS variables that were overriding theme.css
+3. As part of the broader globals.css cleanup (see `plan/remove-globals-css.md`), removed ~2,160 lines of dead code
+
+The centering now works correctly because Tailwind's `.mx-auto` utility (in `@layer utilities`) is no longer overridden by unlayered CSS.
 
 ## Related Debug
 

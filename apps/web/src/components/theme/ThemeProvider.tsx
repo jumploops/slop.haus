@@ -2,9 +2,9 @@
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-// Available preset themes - re-exported from useTheme for consistency
-export { PRESET_THEMES, type PresetThemeId } from "@/hooks/useTheme";
-import { PRESET_THEMES } from "@/hooks/useTheme";
+// Available preset themes
+export { PRESET_THEMES, type PresetThemeId } from "@/lib/theme-constants";
+import { PRESET_THEMES } from "@/lib/theme-constants";
 
 interface ThemeProviderProps {
   children: React.ReactNode;

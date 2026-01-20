@@ -26,8 +26,8 @@ export function AuthButtons() {
 
   if (isPending) {
     return (
-      <div className="auth-buttons">
-        <div className="auth-loading-placeholder" />
+      <div className="relative">
+        <div className="w-8 h-8" />
       </div>
     );
   }
@@ -38,27 +38,27 @@ export function AuthButtons() {
     const showAdminLink = isAdmin || isMod;
 
     return (
-      <div className="auth-buttons" ref={dropdownRef}>
+      <div className="relative" ref={dropdownRef}>
         <button
-          className="user-menu-trigger"
+          className="flex items-center gap-2 px-2 py-1 bg-transparent border border-transparent rounded-md text-fg cursor-pointer transition-all hover:bg-bg-secondary hover:border-border"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           aria-expanded={isDropdownOpen}
           aria-haspopup="true"
         >
           <Avatar
-            src={session.user.image}
-            alt={session.user.name}
+            src={session.user.image ?? null}
+            alt={session.user.name ?? "User"}
             size="sm"
           />
-          <span className="user-name">{session.user.name}</span>
+          <span>{session.user.name}</span>
           <ChevronIcon open={isDropdownOpen} />
         </button>
 
         {isDropdownOpen && (
-          <div className="user-dropdown">
+          <div className="absolute top-[calc(100%+0.5rem)] right-0 min-w-[180px] bg-bg-secondary border border-border rounded-lg shadow-lg z-[1000] overflow-hidden">
             <Link
               href="/favorites"
-              className="user-dropdown-item"
+              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg no-underline hover:bg-border"
               onClick={() => setIsDropdownOpen(false)}
             >
               <HeartIcon />
@@ -66,7 +66,7 @@ export function AuthButtons() {
             </Link>
             <Link
               href="/settings"
-              className="user-dropdown-item"
+              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg no-underline hover:bg-border"
               onClick={() => setIsDropdownOpen(false)}
             >
               <SettingsIcon />
@@ -75,16 +75,16 @@ export function AuthButtons() {
             {showAdminLink && (
               <Link
                 href="/admin"
-                className="user-dropdown-item"
+                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg no-underline hover:bg-border"
                 onClick={() => setIsDropdownOpen(false)}
               >
                 <ShieldIcon />
                 {isAdmin ? "Admin" : "Mod Queue"}
               </Link>
             )}
-            <div className="user-dropdown-divider" />
+            <div className="h-px bg-border my-1" />
             <button
-              className="user-dropdown-item"
+              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg bg-transparent border-none cursor-pointer hover:bg-border"
               onClick={() => {
                 setIsDropdownOpen(false);
                 signOut();
@@ -100,7 +100,7 @@ export function AuthButtons() {
   }
 
   return (
-    <div className="auth-buttons">
+    <div className="relative">
       <Button variant="primary" onClick={openLoginModal}>
         Sign In
       </Button>

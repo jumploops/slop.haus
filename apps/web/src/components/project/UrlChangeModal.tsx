@@ -24,25 +24,25 @@ export function UrlChangeModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="URL Changed">
-      <div className="url-change-modal-content">
-        <p>
+      <div className="max-w-[400px]">
+        <p className="mb-3 leading-relaxed">
           You&apos;ve updated the {isMainUrl ? "live site" : "repository"} URL.
           Would you like to refresh the project data from this URL?
         </p>
 
         {isMainUrl && (
-          <p className="text-muted text-small">
+          <p className="text-muted text-sm mb-3">
             This will capture a new screenshot from the updated URL.
           </p>
         )}
 
         {!isMainUrl && (
-          <p className="text-muted text-small">
+          <p className="text-muted text-sm mb-3">
             This will refresh the README and project metadata from the new repository.
           </p>
         )}
 
-        <div className="url-change-modal-actions">
+        <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-border">
           <Button
             variant="secondary"
             onClick={onSaveOnly}

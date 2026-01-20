@@ -235,11 +235,11 @@ export function EditableProject({
   };
 
   return (
-    <div className="project-preview-container">
+    <div className="max-w-[900px] mx-auto p-4">
       {/* Edit mode header */}
-      <div className="edit-project-header">
-        <div className="edit-header-left">
-          <Link href={`/p/${project.slug}`} className="back-link" onClick={(e) => {
+      <div className="flex justify-between items-center mb-4 pb-4 border-b border-border">
+        <div className="flex items-center">
+          <Link href={`/p/${project.slug}`} className="inline-flex items-center gap-2 text-muted hover:text-fg hover:no-underline" onClick={(e) => {
             if (isDirty && !window.confirm("You have unsaved changes. Discard and leave?")) {
               e.preventDefault();
             }
@@ -247,7 +247,7 @@ export function EditableProject({
             <ArrowLeftIcon /> Back to project
           </Link>
         </div>
-        <div className="edit-header-right">
+        <div className="flex items-center gap-3">
           <Button variant="ghost" onClick={onDelete} className="text-danger hover:bg-danger/10">
             Delete
           </Button>
@@ -276,16 +276,16 @@ export function EditableProject({
 
       {/* Error display */}
       {error && (
-        <div className="preview-error">
-          <p className="error-message">{error}</p>
+        <div className="my-4 p-3 bg-danger/10 border border-danger rounded-lg">
+          <p className="text-danger m-0">{error}</p>
         </div>
       )}
 
       {/* Project preview - mirrors ProjectDetails structure */}
-      <div className="project-details preview-mode">
-        <div className="project-details-header">
+      <div className="bg-bg-secondary border border-border rounded-xl p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Media section - editable screenshot */}
-          <div className="project-details-media">
+          <div className="w-full">
             <ScreenshotEditor
               slug={project.slug}
               currentUrl={screenshotUrl}
@@ -297,7 +297,7 @@ export function EditableProject({
           </div>
 
           {/* Info section */}
-          <div className="project-details-info">
+          <div>
             <InlineEditText
               value={title}
               onSave={handleTitleChange}
@@ -307,17 +307,18 @@ export function EditableProject({
               as="h1"
             />
 
-            <InlineEditTextarea
-              value={tagline}
-              onSave={handleTaglineChange}
-              placeholder="One-sentence description"
-              maxLength={500}
-              className="project-details-tagline"
-              minRows={2}
-            />
+            <div className="text-muted text-lg mb-4">
+              <InlineEditTextarea
+                value={tagline}
+                onSave={handleTaglineChange}
+                placeholder="One-sentence description"
+                maxLength={500}
+                minRows={2}
+              />
+            </div>
 
             {/* Author info (read-only) */}
-            <div className="project-details-author">
+            <div className="flex items-center gap-2 mb-3">
               <Avatar
                 src={project.author.image}
                 alt={project.author.name}
@@ -328,7 +329,7 @@ export function EditableProject({
             </div>
 
             {/* Meta info */}
-            <div className="project-details-meta">
+            <div className="text-xs text-muted flex flex-col gap-1 mb-6">
               <span>Submitted {formatRelativeTime(project.createdAt)}</span>
               {project.lastEditedAt && (
                 <span>Last edited {formatRelativeTime(project.lastEditedAt)}</span>
@@ -336,7 +337,7 @@ export function EditableProject({
             </div>
 
             {/* Links (read-only display, editable below) */}
-            <div className="project-details-links">
+            <div className="flex flex-wrap gap-3">
               {mainUrl && (
                 <a
                   href={mainUrl}
@@ -361,11 +362,11 @@ export function EditableProject({
           </div>
         </div>
 
-        <div className="project-details-body">
-          <div className="project-details-main">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
+          <div className="min-w-0">
             {/* Description section */}
-            <div className="project-details-description">
-              <h3>About</h3>
+            <div className="mb-6">
+              <h3 className="text-base font-semibold mb-3">About</h3>
               <InlineEditTextarea
                 value={description}
                 onSave={handleDescriptionChange}
@@ -375,23 +376,23 @@ export function EditableProject({
             </div>
 
             {/* Tools section */}
-            <div className="project-details-tools">
-              <h3>Built with</h3>
-              <div className="tools-editor-inline">
+            <div className="mt-6">
+              <h3 className="text-base font-semibold mb-3">Built with</h3>
+              <div className="mt-3 pt-3 border-t border-border">
                 <TagEditor selected={tools} onChange={handleToolsChange} />
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="project-details-sidebar">
-            <div className="score-widget preview-mode">
+          <div className="md:order-first lg:order-last">
+            <div className="bg-bg border border-border rounded-lg p-6">
               {/* Vibe Score - editable */}
-              <div className="score-widget-section">
-                <h4>Vibe Score</h4>
-                <div className="vibe-editor-preview">
+              <div className="mb-6">
+                <h4 className="text-sm text-muted mb-3">Vibe Score</h4>
+                <div className="flex flex-col gap-4">
                   <VibeMeter percent={vibePercent} showLabel />
-                  <div className="vibe-editor-inline">
+                  <div className="pt-3 border-t border-border">
                     <VibeInput
                       mode={vibeMode}
                       onModeChange={handleVibeModeChange}
@@ -405,18 +406,18 @@ export function EditableProject({
               </div>
 
               {/* Voting display (read-only) */}
-              <div className="score-widget-section">
-                <h4>Community Votes</h4>
-                <div className="score-channels">
-                  <div className="score-channel-row">
-                    <span className="score-channel-label">People</span>
-                    <span className="score-votes">
+              <div>
+                <h4 className="text-sm text-muted mb-3">Community Votes</h4>
+                <div className="flex flex-col gap-4 opacity-60">
+                  <div className="flex items-center gap-3">
+                    <span className="w-[50px] text-sm text-muted">People</span>
+                    <span className="flex-1 text-sm">
                       +{project.normalUp} / -{project.normalDown}
                     </span>
                   </div>
-                  <div className="score-channel-row">
-                    <span className="score-channel-label">Devs</span>
-                    <span className="score-votes">
+                  <div className="flex items-center gap-3">
+                    <span className="w-[50px] text-sm text-muted">Devs</span>
+                    <span className="flex-1 text-sm">
                       +{project.devUp} / -{project.devDown}
                     </span>
                   </div>
@@ -428,27 +429,29 @@ export function EditableProject({
       </div>
 
       {/* URL editors */}
-      <div className="preview-url-editors">
-        <h3>Project Links</h3>
-        <p className="text-muted text-small">At least one URL is required</p>
-        <div className="form-field">
-          <label htmlFor="mainUrl">Live URL</label>
+      <div className="mt-6 p-4 bg-bg-secondary border border-border rounded-lg">
+        <h3 className="text-base font-semibold mb-2">Project Links</h3>
+        <p className="text-muted text-sm mb-4">At least one URL is required</p>
+        <div className="mb-4">
+          <label htmlFor="mainUrl" className="block mb-2 font-medium text-sm">Live URL</label>
           <input
             id="mainUrl"
             type="url"
             value={mainUrl}
             onChange={(e) => setMainUrl(e.target.value)}
             placeholder="https://your-app.com"
+            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
         </div>
-        <div className="form-field">
-          <label htmlFor="repoUrl">Repository URL</label>
+        <div>
+          <label htmlFor="repoUrl" className="block mb-2 font-medium text-sm">Repository URL</label>
           <input
             id="repoUrl"
             type="url"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
             placeholder="https://github.com/user/repo"
+            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
         </div>
       </div>

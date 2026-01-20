@@ -22,10 +22,15 @@ export function CommentForm({
   onCancel,
   placeholder = "Write a comment...",
 }: CommentFormProps) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const { showToast } = useToast();
   const [body, setBody] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Render placeholder during session loading to avoid hydration mismatch
+  if (isPending) {
+    return <div className="py-4 h-[120px]" />;
+  }
 
   if (!session?.user) {
     return (

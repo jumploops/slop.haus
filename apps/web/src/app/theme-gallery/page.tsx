@@ -1,4 +1,4 @@
-import { PRESET_THEMES } from "@/hooks/useTheme";
+import { PRESET_THEMES } from "@/lib/theme-constants";
 import { ThemePreview } from "@/components/theme/ThemePreview";
 
 export default function ThemeGalleryPage() {

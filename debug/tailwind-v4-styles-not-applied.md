@@ -1,7 +1,7 @@
 # Debug: Tailwind v4 Styles Not Being Applied
 
 **Date:** 2026-01-18
-**Status:** Investigation
+**Status:** RESOLVED
 
 ## Problem Statement
 
@@ -284,6 +284,27 @@ This is minimal - may need additional configuration for Next.js.
 | `apps/web/src/styles/presets.css` | Theme presets |
 | `apps/web/src/app/globals.css` | Legacy CSS (contains conflicts) |
 | `apps/web/.next/static/css/app/layout.css` | Generated output |
+
+## Resolution
+
+**Fixed on 2026-01-18:**
+
+The root cause was **Hypothesis 1: CSS Variable Circular Reference**.
+
+globals.css defined `--background: var(--bg)` AFTER theme.css defined `--bg: var(--background)`, creating a circular reference that broke CSS variable resolution.
+
+**Fix applied (Path A):**
+1. Removed the circular reference aliases from globals.css
+2. Subsequently removed all hardcoded `:root` variables from globals.css
+3. theme.css now owns all CSS variable definitions
+
+Additionally fixed:
+- `buttonVariants` Server Component error by extracting to `button-variants.ts`
+- Content left-alignment issue by removing unlayered CSS that overrode Tailwind utilities
+
+See also:
+- `debug/content-left-aligned.md` - Follow-up centering issue
+- `plan/remove-globals-css.md` - Broader cleanup plan
 
 ## References
 

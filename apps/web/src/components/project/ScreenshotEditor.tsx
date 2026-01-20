@@ -73,22 +73,22 @@ export function ScreenshotEditor({
   };
 
   return (
-    <div className="screenshot-editor">
-      <div className="screenshot-editor-preview">
+    <div className="flex flex-col gap-3">
+      <div className="w-full aspect-video overflow-hidden rounded-lg bg-bg-secondary">
         <img
           src={imageUrl}
           alt={projectTitle}
-          className="screenshot-editor-image"
+          className="w-full h-full object-cover"
         />
       </div>
 
-      <div className="screenshot-editor-actions">
+      <div className="flex gap-2">
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
           accept="image/png,image/jpeg,image/webp"
-          style={{ display: "none" }}
+          className="hidden"
         />
 
         <Button
@@ -114,10 +114,10 @@ export function ScreenshotEditor({
       </div>
 
       {error && (
-        <p className="screenshot-editor-error">{error}</p>
+        <p className="text-danger text-sm">{error}</p>
       )}
 
-      <p className="screenshot-editor-hint">
+      <p className="text-muted text-xs">
         Upload PNG, JPEG, or WebP (max 5MB)
       </p>
     </div>

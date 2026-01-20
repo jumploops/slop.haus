@@ -16,15 +16,17 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="error-page">
-      <div className="error-content">
-        <ErrorIcon />
-        <h1>Something went wrong</h1>
-        <p>
+    <div className="flex items-center justify-center min-h-[calc(100vh-200px)] p-8">
+      <div className="text-center max-w-[480px]">
+        <div className="text-danger mb-6">
+          <ErrorIcon />
+        </div>
+        <h1 className="text-[1.75rem] font-bold mb-2">Something went wrong</h1>
+        <p className="text-muted mb-6">
           An unexpected error occurred. Please try again or contact support if
           the problem persists.
         </p>
-        <div className="error-actions">
+        <div className="flex gap-3 justify-center">
           <Button variant="primary" onClick={reset}>
             Try Again
           </Button>
@@ -33,9 +35,9 @@ export default function Error({
           </Button>
         </div>
         {process.env.NODE_ENV === "development" && (
-          <details className="error-details">
-            <summary>Error Details</summary>
-            <pre>{error.message}</pre>
+          <details className="mt-8 text-left p-4 bg-bg-secondary rounded-lg text-xs">
+            <summary className="cursor-pointer text-muted mb-2">Error Details</summary>
+            <pre className="overflow-x-auto whitespace-pre-wrap break-all">{error.message}</pre>
             {error.digest && <p>Digest: {error.digest}</p>}
           </details>
         )}

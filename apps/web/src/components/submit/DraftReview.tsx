@@ -100,30 +100,30 @@ export function DraftReview({
     title.trim() && tagline.trim() && (mainUrl || repoUrl);
 
   return (
-    <form onSubmit={handleSubmit} className="draft-review">
-      <div className="draft-review-header">
-        <h1>Review Your Project</h1>
+    <form onSubmit={handleSubmit}>
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">Review Your Project</h1>
         <p className="text-muted">
-          We've extracted these details from {draft.inputUrl}. Edit anything
+          We&apos;ve extracted these details from {draft.inputUrl}. Edit anything
           that looks wrong.
         </p>
-      </div>
+      </header>
 
       {/* Screenshot */}
       {draft.screenshot && (
-        <div className="draft-review-section">
+        <section className="mb-6 pb-6 border-b border-border">
           <ScreenshotPreview url={draft.screenshot} />
-        </div>
+        </section>
       )}
 
       {/* Basic Info */}
-      <div className="draft-review-section">
-        <h2>Basic Info</h2>
+      <section className="mb-6 pb-6 border-b border-border">
+        <h2 className="text-lg font-semibold mb-3">Basic Info</h2>
 
-        <div className="form-field">
-          <label htmlFor="title">
+        <div className="mb-4">
+          <label htmlFor="title" className="block mb-2 font-medium text-sm">
             Title *
-            {savingField === "title" && <span className="save-indicator">Saving...</span>}
+            {savingField === "title" && <span className="text-xs text-muted ml-2 font-normal">Saving...</span>}
           </label>
           <input
             id="title"
@@ -133,16 +133,17 @@ export function DraftReview({
             onBlur={() => handleFieldBlur("title", title)}
             maxLength={255}
             required
+            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
-          <span className={`char-count ${title.length > 230 ? "warning" : ""}`}>
+          <span className={`block text-right text-xs mt-1 ${title.length > 230 ? "text-warning" : "text-muted"}`}>
             {title.length}/255
           </span>
         </div>
 
-        <div className="form-field">
-          <label htmlFor="tagline">
+        <div className="mb-4">
+          <label htmlFor="tagline" className="block mb-2 font-medium text-sm">
             Tagline *
-            {savingField === "tagline" && <span className="save-indicator">Saving...</span>}
+            {savingField === "tagline" && <span className="text-xs text-muted ml-2 font-normal">Saving...</span>}
           </label>
           <input
             id="tagline"
@@ -153,16 +154,17 @@ export function DraftReview({
             maxLength={500}
             placeholder="One-sentence description"
             required
+            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
-          <span className={`char-count ${tagline.length > 450 ? "warning" : ""}`}>
+          <span className={`block text-right text-xs mt-1 ${tagline.length > 450 ? "text-warning" : "text-muted"}`}>
             {tagline.length}/500
           </span>
         </div>
 
-        <div className="form-field">
-          <label htmlFor="description">
+        <div>
+          <label htmlFor="description" className="block mb-2 font-medium text-sm">
             Description
-            {savingField === "description" && <span className="save-indicator">Saving...</span>}
+            {savingField === "description" && <span className="text-xs text-muted ml-2 font-normal">Saving...</span>}
           </label>
           <textarea
             id="description"
@@ -172,20 +174,21 @@ export function DraftReview({
             maxLength={10000}
             rows={4}
             placeholder="Optional longer description"
+            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg resize-y min-h-[100px] focus:outline-none focus:border-accent"
           />
-          <span className={`char-count ${description.length > 9000 ? "warning" : ""}`}>
+          <span className={`block text-right text-xs mt-1 ${description.length > 9000 ? "text-warning" : "text-muted"}`}>
             {description.length}/10000
           </span>
         </div>
-      </div>
+      </section>
 
       {/* Links */}
-      <div className="draft-review-section">
-        <h2>Links</h2>
-        <p className="text-muted text-small">At least one URL is required</p>
+      <section className="mb-6 pb-6 border-b border-border">
+        <h2 className="text-lg font-semibold mb-1">Links</h2>
+        <p className="text-muted text-sm mb-3">At least one URL is required</p>
 
-        <div className="form-field">
-          <label htmlFor="mainUrl">Live URL</label>
+        <div className="mb-4">
+          <label htmlFor="mainUrl" className="block mb-2 font-medium text-sm">Live URL</label>
           <input
             id="mainUrl"
             type="url"
@@ -193,11 +196,12 @@ export function DraftReview({
             onChange={(e) => setMainUrl(e.target.value)}
             onBlur={() => handleFieldBlur("mainUrl", mainUrl || null)}
             placeholder="https://your-app.com"
+            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
         </div>
 
-        <div className="form-field">
-          <label htmlFor="repoUrl">Repository URL</label>
+        <div>
+          <label htmlFor="repoUrl" className="block mb-2 font-medium text-sm">Repository URL</label>
           <input
             id="repoUrl"
             type="url"
@@ -205,14 +209,15 @@ export function DraftReview({
             onChange={(e) => setRepoUrl(e.target.value)}
             onBlur={() => handleFieldBlur("repoUrl", repoUrl || null)}
             placeholder="https://github.com/user/repo"
+            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
         </div>
-      </div>
+      </section>
 
       {/* Tags */}
-      <div className="draft-review-section">
-        <h2>Technologies</h2>
-        <p className="text-muted text-small">
+      <section className="mb-6 pb-6 border-b border-border">
+        <h2 className="text-lg font-semibold mb-1">Technologies</h2>
+        <p className="text-muted text-sm mb-3">
           We detected these tools. Add or remove as needed.
         </p>
         <TagEditor
@@ -222,12 +227,12 @@ export function DraftReview({
             handleFieldBlur("tools", newTools);
           }}
         />
-      </div>
+      </section>
 
       {/* Vibe Score */}
-      <div className="draft-review-section">
-        <h2>Vibe Score</h2>
-        <p className="text-muted text-small">
+      <section className="mb-6 pb-6 border-b border-border">
+        <h2 className="text-lg font-semibold mb-1">Vibe Score</h2>
+        <p className="text-muted text-sm mb-3">
           How much AI was involved in creating this project?
         </p>
         <VibeInput
@@ -241,22 +246,22 @@ export function DraftReview({
           vibeDetails={vibeDetails}
           onVibeDetailsChange={setVibeDetails}
         />
-      </div>
+      </section>
 
       {/* Error */}
       {error && (
-        <div className="draft-review-error">
-          <p className="error-message">{error}</p>
+        <div className="mb-4 p-3 bg-danger/10 border border-danger rounded-md">
+          <p className="text-danger m-0">{error}</p>
         </div>
       )}
 
       {/* Actions */}
-      <div className="draft-review-actions">
+      <div className="flex flex-col gap-3">
         <Button
           type="submit"
           variant="primary"
           disabled={isSubmitting || !hasRequiredFields}
-          className="btn-large"
+          className="py-3 text-base"
         >
           {isSubmitting ? "Submitting..." : "Submit Project"}
         </Button>
@@ -276,10 +281,10 @@ export function DraftReview({
         onClose={() => setShowDiscardModal(false)}
         title="Discard draft?"
       >
-        <div className="delete-modal-content">
-          <p>You&apos;ll lose all changes and need to re-analyze the URL.</p>
-          <p className="text-muted text-small">This action cannot be undone.</p>
-          <div className="delete-modal-actions">
+        <div className="max-w-[400px]">
+          <p className="mb-3 leading-relaxed">You&apos;ll lose all changes and need to re-analyze the URL.</p>
+          <p className="text-muted text-sm mb-3">This action cannot be undone.</p>
+          <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-border">
             <Button
               variant="ghost"
               onClick={() => setShowDiscardModal(false)}

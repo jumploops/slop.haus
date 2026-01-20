@@ -662,3 +662,108 @@ All modals use the same base `Modal` component, so all are now fixed:
 - `DeleteProjectModal`
 - `UrlChangeModal`
 - `LoginModal`
+
+---
+
+## Tailwind v4 Migration & globals.css Cleanup
+
+**Status:** Phase 1 Complete
+**Last Updated:** 2026-01-18
+**Plan Doc:** `plan/remove-globals-css.md`
+**Debug Docs:**
+- `debug/tailwind-v4-styles-not-applied.md`
+- `debug/content-left-aligned.md`
+
+### Overview
+
+Migration to Tailwind CSS v4 revealed issues with CSS variable architecture and cascading layer conflicts. After fixing critical bugs, began systematic cleanup of legacy globals.css.
+
+### Bug 1: Tailwind v4 Styles Not Applied ✅
+
+**Problem:** Tailwind utility classes like `bg-bg`, `text-fg`, `mx-auto` were not being applied.
+
+**Root Cause:** CSS Variable Circular Reference
+- `theme.css`: `--background: oklch(0.07 0 0)` → `--bg: var(--background)`
+- `globals.css`: `--background: var(--bg)` (loaded later, creates circular reference)
+
+**Fix:** Removed the circular reference aliases from globals.css.
+
+### Bug 2: Content Left-Aligned Instead of Centered ✅
+
+**Problem:** Content aligned to left edge instead of being centered with `mx-auto`.
+
+**Root Cause:** Unlayered CSS Override
+- `globals.css`: `* { margin: 0; }` (unlayered)
+- `@layer utilities`: `.mx-auto { margin-inline: auto; }`
+- CSS Cascade Layers spec: unlayered CSS beats layered CSS
+
+**Fix:** Removed the unlayered universal selector reset.
+
+### Bug 3: Light Theme Not Applying ✅
+
+**Problem:** Body background stayed dark even on light theme.
+
+**Root Cause:** Hardcoded CSS variables in globals.css overriding theme.css's themeable `var()` indirection.
+
+**Fix:** Removed hardcoded `:root` variables from globals.css.
+
+### Phase 1: Remove Dead Code ✅
+
+Comprehensive audit found ~80% of globals.css was dead code after Tailwind migration.
+
+**Results:**
+- Before: ~3,500 lines
+- After: ~1,340 lines
+- Reduction: 62% (~2,160 lines removed)
+
+**Categories Removed:**
+- Button variants (migrated to Tailwind + CVA)
+- Input variants (using Tailwind classes)
+- Navigation styles (using Tailwind classes)
+- Vibe/vote system (using Tailwind classes)
+- Avatar component (using Tailwind classes)
+- Badge component (using Tailwind classes)
+- Toast component (using Tailwind classes)
+- Comment system (using Tailwind classes)
+- Settings layout (using Tailwind classes)
+- Admin layout (using Tailwind classes)
+- Mobile navigation (using Tailwind classes)
+- Tools selector (using Tailwind classes)
+- Generic utility classes (replaced by Tailwind)
+
+**Kept for Phase 2:**
+- Skeleton animation (shared across components)
+- Empty state styles
+- Project card/details styles
+- Modal styles
+- Form styles
+- Admin/revision styles
+- Preview/editable styles
+- Accessibility/print styles
+
+### All Phases Complete ✅
+
+| Phase | Name | Status |
+|-------|------|--------|
+| 1 | Remove dead code | ✅ Complete |
+| 2 | Migrate remaining used classes to Tailwind | ✅ Complete |
+| 3 | Update component files with Tailwind utilities | ✅ Complete |
+| 4 | Move shared styles (skeleton) to theme.css | ✅ Complete |
+| 5 | Delete globals.css and verify | ✅ Complete |
+
+**Final result:** globals.css has been deleted. All ~3,500 lines removed. Styles now use Tailwind utilities directly in components or are shared via theme.css.
+
+### Related Files
+
+| File | Purpose |
+|------|---------|
+| `apps/web/src/styles/theme.css` | Tailwind v4 @theme definitions, CSS variables, skeleton animation |
+| `apps/web/src/components/ui/button-variants.ts` | Extracted CVA button variants for Server Components |
+
+### Technical Insights
+
+1. **CSS Cascade Layers:** Tailwind v4 uses `@layer theme, base, components, utilities`. Any unlayered CSS has higher priority than all layered CSS.
+
+2. **CSS Variable Indirection:** For theming, use `--bg: var(--background)` where `--background` is set per theme (via `[data-theme="light"]` selectors).
+
+3. **Server Components + CVA:** Components using `cva()` must be extracted to separate `.ts` files (not `.tsx` with "use client") to be importable by Server Components.

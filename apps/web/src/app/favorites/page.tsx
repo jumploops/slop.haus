@@ -22,23 +22,23 @@ function FavoritesContent() {
   );
 
   return (
-    <div className="favorites-page">
-      <div className="favorites-header">
-        <h1>Favorites</h1>
-        <p className="favorites-description">
-          Projects you've saved for later
+    <div className="py-8">
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold mb-2">Favorites</h1>
+        <p className="text-muted">
+          Projects you&apos;ve saved for later
         </p>
-      </div>
+      </header>
 
       {isLoading && (
         <div className="project-grid">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="project-card">
-              <Skeleton className="skeleton-image" style={{ height: "120px" }} />
-              <div style={{ padding: "1rem" }}>
-                <Skeleton className="skeleton-text" style={{ width: "70%" }} />
-                <Skeleton className="skeleton-text" style={{ width: "100%", marginTop: "0.5rem" }} />
-                <Skeleton className="skeleton-text" style={{ width: "50%", marginTop: "1rem" }} />
+            <div key={i} className="border border-border rounded-lg p-6 bg-bg">
+              <Skeleton className="h-[120px] w-full rounded" />
+              <div className="pt-4">
+                <Skeleton className="h-4 w-[70%]" />
+                <Skeleton className="h-4 w-full mt-2" />
+                <Skeleton className="h-4 w-[50%] mt-4" />
               </div>
             </div>
           ))}
@@ -46,15 +46,15 @@ function FavoritesContent() {
       )}
 
       {error && (
-        <div className="empty-state">
+        <div className="text-center py-12 text-muted">
           <p>Failed to load favorites</p>
         </div>
       )}
 
       {!isLoading && !error && favorites?.length === 0 && (
-        <div className="empty-state">
+        <div className="text-center py-12 text-muted">
           <EmptyHeartIcon />
-          <h3>No favorites yet</h3>
+          <h3 className="text-fg mb-2 mt-4">No favorites yet</h3>
           <p>
             Browse the{" "}
             <Link href="/">feed</Link> and click the heart on projects you love.

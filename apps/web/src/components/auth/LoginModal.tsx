@@ -24,16 +24,16 @@ export function LoginModal() {
 
   return (
     <Modal isOpen={isOpen} onClose={closeLoginModal} title="Sign In">
-      <div className="login-modal">
-        <p className="login-modal-description">
+      <div className="py-4">
+        <p className="text-muted mb-6 text-center">
           Sign in to submit projects, vote, comment, and save your favorites.
         </p>
 
-        <div className="login-modal-buttons">
+        <div className="flex flex-col gap-3">
           <Button
             variant="secondary"
             onClick={handleGitHubLogin}
-            className="login-modal-btn"
+            className="w-full justify-center gap-3 py-3.5"
           >
             <GithubIcon />
             Continue with GitHub
@@ -42,14 +42,14 @@ export function LoginModal() {
           <Button
             variant="secondary"
             onClick={handleGoogleLogin}
-            className="login-modal-btn"
+            className="w-full justify-center gap-3 py-3.5"
           >
             <GoogleIcon />
             Continue with Google
           </Button>
         </div>
 
-        <p className="login-modal-note">
+        <p className="text-xs text-muted text-center mt-6">
           GitHub is required to submit projects. You can link additional
           accounts later in settings.
         </p>

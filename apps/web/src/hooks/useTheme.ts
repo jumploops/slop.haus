@@ -2,17 +2,10 @@
 
 import { useTheme as useNextTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { PRESET_THEMES, type PresetThemeId } from "@/lib/theme-constants";
 
-export const PRESET_THEMES = [
-  { id: "default", name: "Default", description: "The classic slop.haus look" },
-  { id: "cyberpunk", name: "Cyberpunk", description: "Neon cyan on dark blue" },
-  { id: "warm", name: "Warm", description: "Cozy orange tones" },
-  { id: "light", name: "Light", description: "Clean light mode" },
-  { id: "midnight", name: "Midnight", description: "Elegant purple accent" },
-  { id: "forest", name: "Forest", description: "Natural green tones" },
-] as const;
-
-export type PresetThemeId = (typeof PRESET_THEMES)[number]["id"];
+// Re-export for backwards compatibility
+export { PRESET_THEMES, type PresetThemeId } from "@/lib/theme-constants";
 
 const RUNTIME_STYLE_ID = "user-theme-styles";
 

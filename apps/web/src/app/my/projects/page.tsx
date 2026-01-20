@@ -44,27 +44,27 @@ function MyProjectsContent() {
   };
 
   return (
-    <div className="my-projects-page">
-      <div className="my-projects-header">
+    <div className="max-w-[900px] mx-auto p-4">
+      <header className="flex justify-between items-start mb-6 gap-4 flex-col sm:flex-row">
         <div>
-          <h1>My Projects</h1>
-          <p className="my-projects-description">
+          <h1 className="text-2xl font-bold">My Projects</h1>
+          <p className="text-muted mt-2">
             Manage your submitted projects
           </p>
         </div>
         <Link href="/submit" className={buttonVariants({ variant: "primary" })}>
           <PlusIcon /> Submit New
         </Link>
-      </div>
+      </header>
 
       {isLoading && (
-        <div className="my-projects-list">
+        <div className="flex flex-col gap-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="my-project-card skeleton-card">
-              <div className="skeleton" style={{ width: "80px", height: "60px" }} />
-              <div style={{ flex: 1 }}>
-                <div className="skeleton" style={{ width: "60%", height: "1.25rem" }} />
-                <div className="skeleton" style={{ width: "80%", height: "1rem", marginTop: "0.5rem" }} />
+            <div key={i} className="flex gap-4 p-4 bg-bg-secondary border border-border rounded-lg items-center">
+              <div className="skeleton w-[80px] h-[60px]" />
+              <div className="flex-1">
+                <div className="skeleton w-3/5 h-5" />
+                <div className="skeleton w-4/5 h-4 mt-2" />
               </div>
             </div>
           ))}
@@ -72,15 +72,15 @@ function MyProjectsContent() {
       )}
 
       {error && (
-        <div className="empty-state">
+        <div className="text-center py-12 text-muted">
           <p>Failed to load projects</p>
         </div>
       )}
 
       {!isLoading && !error && projects?.length === 0 && (
-        <div className="empty-state">
+        <div className="text-center py-12 text-muted">
           <EmptyBoxIcon />
-          <h3>No projects yet</h3>
+          <h3 className="text-fg mt-4 mb-2 font-semibold">No projects yet</h3>
           <p>
             <Link href="/submit">Submit your first project</Link> to get started.
           </p>
@@ -88,7 +88,7 @@ function MyProjectsContent() {
       )}
 
       {!isLoading && !error && projects && projects.length > 0 && (
-        <div className="my-projects-list">
+        <div className="flex flex-col gap-3">
           {projects.map((project) => (
             <MyProjectCard
               key={project.id}
@@ -126,14 +126,14 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
   const statusBadge = getStatusBadge(project.status);
 
   return (
-    <div className="my-project-card">
-      <Link href={`/p/${project.slug}`} className="my-project-card-image">
-        <img src={imageUrl} alt={project.title} />
+    <div className="flex gap-4 p-4 bg-bg-secondary border border-border rounded-lg items-start flex-col sm:flex-row">
+      <Link href={`/p/${project.slug}`} className="shrink-0 w-full sm:w-[100px] h-[120px] sm:h-[75px] rounded overflow-hidden bg-bg">
+        <img src={imageUrl} alt={project.title} className="w-full h-full object-cover" />
       </Link>
 
-      <div className="my-project-card-content">
-        <div className="my-project-card-header">
-          <Link href={`/p/${project.slug}`} className="my-project-card-title">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <Link href={`/p/${project.slug}`} className="font-semibold text-fg truncate hover:text-accent hover:no-underline">
             {project.title}
           </Link>
           {statusBadge && (
@@ -141,9 +141,9 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
           )}
         </div>
 
-        <p className="my-project-card-tagline">{project.tagline}</p>
+        <p className="text-muted text-sm line-clamp-2 mb-2">{project.tagline}</p>
 
-        <div className="my-project-card-meta">
+        <div className="flex gap-3 text-xs text-muted">
           <span>Submitted {formatRelativeTime(project.createdAt)}</span>
           {project.lastEditedAt && (
             <span>Edited {formatRelativeTime(project.lastEditedAt)}</span>
@@ -152,7 +152,7 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
         </div>
       </div>
 
-      <div className="my-project-card-actions">
+      <div className="flex gap-2 shrink-0 w-full sm:w-auto justify-start">
         {project.status !== "removed" && (
           <>
             <Button variant="secondary" onClick={onEdit}>
@@ -164,7 +164,7 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
           </>
         )}
         {project.status === "removed" && (
-          <span className="my-project-card-removed">Deleted</span>
+          <span className="text-muted text-sm italic">Deleted</span>
         )}
       </div>
     </div>

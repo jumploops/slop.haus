@@ -20,14 +20,14 @@ export function DeleteProjectModal({
 }: DeleteProjectModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Delete "${projectTitle}"?`}>
-      <div className="delete-modal-content">
-        <p>
+      <div className="max-w-[400px]">
+        <p className="mb-3 leading-relaxed">
           This will hide your project from public view. Comments and votes will be preserved.
         </p>
-        <p className="text-muted text-small">
+        <p className="text-muted text-sm mb-3">
           If you need to restore a deleted project, please contact support.
         </p>
-        <div className="delete-modal-actions">
+        <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-border">
           <Button variant="secondary" onClick={onClose} disabled={isDeleting}>
             Cancel
           </Button>
