@@ -41,7 +41,7 @@ export default function EditProjectPage({ params }: Props) {
   if (!project || sessionPending) {
     return (
       <RequireAuth>
-        <div className="edit-project-loading">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4">
           <div className="skeleton" style={{ width: "100%", height: "400px" }} />
         </div>
       </RequireAuth>
@@ -52,8 +52,8 @@ export default function EditProjectPage({ params }: Props) {
   if (error) {
     return (
       <RequireAuth>
-        <div className="empty-state">
-          <p>Failed to load project. Please try again.</p>
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+          <p className="text-sm text-danger">Failed to load project. Please try again.</p>
         </div>
       </RequireAuth>
     );

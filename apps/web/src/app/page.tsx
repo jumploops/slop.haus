@@ -63,34 +63,45 @@ export default function FeedPage() {
   };
 
   return (
-    <div>
-      <h1>Feed</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <Tabs
+          tabs={sortTabs}
+          activeTab={sort}
+          onTabChange={handleSortChange}
+          className="mb-0 w-full sm:w-auto"
+        />
 
-      <div className="feed-controls">
-        <Tabs tabs={sortTabs} activeTab={sort} onTabChange={handleSortChange} />
-
-        <div className="channel-toggle">
-          <button
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <Button
             type="button"
-            className={cn(channel === "normal" && "active")}
+            variant={channel === "normal" ? "primary" : "secondary"}
+            size="sm"
             onClick={() => handleChannelChange("normal")}
           >
             Normal
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className={cn(channel === "dev" && "active")}
+            variant={channel === "dev" ? "primary" : "secondary"}
+            size="sm"
             onClick={() => handleChannelChange("dev")}
           >
             Dev
-          </button>
+          </Button>
         </div>
 
         {sort === "top" && (
           <select
             value={timeWindow}
             onChange={handleWindowChange}
-            className="time-window-select"
+            className={cn(
+              "w-full sm:w-auto",
+              "min-h-10 sm:min-h-0 px-2 py-2 sm:py-1 text-xs font-bold",
+              "bg-bg text-fg",
+              "border-2 border-[color:var(--border)]",
+              "shadow-[2px_2px_0_var(--foreground)]"
+            )}
           >
             {windowOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -102,9 +113,9 @@ export default function FeedPage() {
       </div>
 
       {error && (
-        <div className="empty-state">
-          <h3>Failed to load feed</h3>
-          <p>Please try again later.</p>
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+          <h3 className="text-lg font-bold text-slop-coral mb-2">Failed to load feed</h3>
+          <p className="text-sm text-muted">Please try again later.</p>
           <Button onClick={() => mutate()} className="mt-4">
             Retry
           </Button>
@@ -112,7 +123,7 @@ export default function FeedPage() {
       )}
 
       {isLoading && !data && (
-        <div className="feed">
+        <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
             <ProjectCardSkeleton key={i} />
           ))}
@@ -120,9 +131,9 @@ export default function FeedPage() {
       )}
 
       {data && data.projects.length === 0 && (
-        <div className="empty-state">
-          <h3>No projects yet</h3>
-          <p>Be the first to submit a project!</p>
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+          <h3 className="text-lg font-bold text-slop-purple mb-2">No projects yet</h3>
+          <p className="text-sm text-muted">Be the first to submit a project!</p>
           <Button onClick={() => (window.location.href = "/submit")} className="mt-4">
             Submit a Project
           </Button>
@@ -131,9 +142,9 @@ export default function FeedPage() {
 
       {data && data.projects.length > 0 && (
         <>
-          <div className="feed">
-            {data.projects.map((project) => (
-              <ProjectCard key={project.id} project={project} channel={channel} />
+          <div className="space-y-3">
+            {data.projects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} channel={channel} rank={index + 1} />
             ))}
           </div>
 
@@ -145,7 +156,7 @@ export default function FeedPage() {
             </div>
           )}
 
-          <div className="text-center text-muted text-sm mt-4">
+          <div className="text-center text-muted text-xs mt-4">
             Showing {data.projects.length} of {data.pagination.total} projects
           </div>
         </>

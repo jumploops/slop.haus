@@ -69,11 +69,13 @@ export default function ConnectionsPage() {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-2">Connections</h1>
-      <p className="text-muted mb-6">
-        Manage your linked accounts. You need at least one account to sign in.
-      </p>
+    <div className="space-y-6">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <h1 className="text-xl font-bold text-slop-blue">★ CONNECTIONS ★</h1>
+        <p className="text-xs text-muted mt-1">
+          Manage your linked accounts. You need at least one account to sign in.
+        </p>
+      </div>
 
       <div className="space-y-4">
         {PROVIDERS.map((provider) => {
@@ -83,41 +85,43 @@ export default function ConnectionsPage() {
           return (
             <div
               key={provider.id}
-              className="flex items-center justify-between p-4 rounded-lg border border-border bg-bg-secondary"
+              className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 flex items-center justify-center text-fg">
-                  <Icon />
+              <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center border-2 border-[color:var(--border)] bg-bg-secondary">
+                    <Icon />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold">{provider.name}</h3>
+                    <p className="text-xs text-muted">{provider.description}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium">{provider.name}</h3>
-                  <p className="text-sm text-muted">{provider.description}</p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-3">
-                {isLinked ? (
-                  <>
-                    <Badge variant="success">Connected</Badge>
+                <div className="flex items-center gap-3">
+                  {isLinked ? (
+                    <>
+                      <Badge variant="success">Connected</Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleUnlink(provider.id)}
+                        disabled={!canUnlink || isUnlinking === provider.id}
+                      >
+                        {isUnlinking === provider.id ? "Unlinking..." : "Unlink"}
+                      </Button>
+                    </>
+                  ) : (
                     <Button
-                      variant="ghost"
+                      variant="secondary"
                       size="sm"
-                      onClick={() => handleUnlink(provider.id)}
-                      disabled={!canUnlink || isUnlinking === provider.id}
+                      onClick={() => handleLink(provider.id)}
+                      disabled={isLinking === provider.id}
                     >
-                      {isUnlinking === provider.id ? "Unlinking..." : "Unlink"}
+                      {isLinking === provider.id ? "Linking..." : "Link Account"}
                     </Button>
-                  </>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleLink(provider.id)}
-                    disabled={isLinking === provider.id}
-                  >
-                    {isLinking === provider.id ? "Linking..." : "Link Account"}
-                  </Button>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -125,8 +129,8 @@ export default function ConnectionsPage() {
       </div>
 
       {!user?.hasGitHub && (
-        <div className="mt-6 p-4 rounded-lg border border-warning bg-warning/10">
-          <p className="text-sm">
+        <div className="border-2 border-[color:var(--border)] bg-warning/20 shadow-[2px_2px_0_var(--foreground)] p-4">
+          <p className="text-xs">
             <strong>Note:</strong> A GitHub account is required to submit projects.
             Link your GitHub account to enable project submissions.
           </p>

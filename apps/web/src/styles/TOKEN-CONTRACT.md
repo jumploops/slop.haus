@@ -33,6 +33,18 @@ Runtime themes (user-generated)
 | `--warning` | `bg-warning`, `text-warning` | Warning states |
 | `--success` | `bg-success`, `text-success` | Success states |
 
+### Slop Palette Tokens
+
+| Token | Tailwind Utility | Purpose |
+|-------|------------------|---------|
+| `--slop-green` | `bg-slop-green`, `text-slop-green` | SLOP score + success accents |
+| `--slop-coral` | `bg-slop-coral`, `text-slop-coral` | VIBE score + highlights |
+| `--slop-blue` | `bg-slop-blue`, `text-slop-blue` | Links + primary headings |
+| `--slop-yellow` | `bg-slop-yellow`, `text-slop-yellow` | Tags + warnings |
+| `--slop-pink` | `bg-slop-pink`, `text-slop-pink` | Decorative accents |
+| `--slop-teal` | `bg-slop-teal`, `text-slop-teal` | Decorative accents |
+| `--slop-purple` | `bg-slop-purple`, `text-slop-purple` | Section headers + labels |
+
 ## Spacing
 
 Spacing utilities derive from Tailwind's default scale:
@@ -49,9 +61,14 @@ Spacing utilities derive from Tailwind's default scale:
 
 | Token | Tailwind Utility | Value |
 |-------|------------------|-------|
-| `--radius-sm` | `rounded-sm` | 0.25rem |
-| `--radius` | `rounded-md` | 0.5rem |
-| `--radius-lg` | `rounded-lg` | 0.75rem |
+| `--radius-sm` | `rounded-sm` | 0px |
+| `--radius` | `rounded-md` | 0px |
+| `--radius-lg` | `rounded-lg` | 0px |
+
+## Typography
+
+- Default `--font-sans`: `"Comic Sans MS", "Comic Sans", cursive`
+- Default `--font-mono`: `"Courier New", Courier, monospace`
 
 ## Component Patterns
 
@@ -143,11 +160,10 @@ import { Input, Textarea } from "@/components/ui/Input";
 
 ## Migration Status
 
-As of Phase 9:
+As of the retro reskin:
 
-- **Fully Tailwind:** Button, Badge, Input, Textarea, Tabs, Modal, Avatar, Toast
-- **Mixed (Tailwind + legacy CSS):** Skeleton, page-specific layouts
-- **Legacy CSS:** Page layout classes in globals.css (submit-page, form-section, etc.)
+- **Fully Tailwind:** Button, Badge, Input, Textarea, Tabs, Modal, Avatar, Toast, Skeleton
+- **Page Layouts:** All primary pages now use Tailwind utilities (legacy layout classnames removed)
 
 ## Adding New Tokens
 

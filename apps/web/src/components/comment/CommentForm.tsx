@@ -34,7 +34,7 @@ export function CommentForm({
 
   if (!session?.user) {
     return (
-      <div className="py-4 text-center">
+      <div className="py-2 text-center">
         <p className="text-muted text-sm">Sign in to leave a comment</p>
       </div>
     );
@@ -61,21 +61,27 @@ export function CommentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6">
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <p className="text-[10px] font-bold text-slop-purple">📝 ADD YOUR COMMENT:</p>
       <Textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
         placeholder={placeholder}
         rows={3}
-        className="mb-3"
+        className="min-h-[90px]"
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
         {onCancel && (
-          <Button type="button" variant="ghost" onClick={onCancel}>
+          <Button type="button" variant="ghost" onClick={onCancel} className="w-full sm:w-auto">
             Cancel
           </Button>
         )}
-        <Button type="submit" loading={isSubmitting} disabled={!body.trim()}>
+        <Button
+          type="submit"
+          loading={isSubmitting}
+          disabled={!body.trim()}
+          className="w-full sm:w-auto"
+        >
           {parentCommentId ? "Reply" : "Comment"}
         </Button>
       </div>

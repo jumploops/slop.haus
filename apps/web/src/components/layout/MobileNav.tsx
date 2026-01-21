@@ -38,7 +38,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       {/* Overlay */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/50 z-[100]",
+          "fixed inset-0 bg-fg/50 z-[100]",
           "transition-opacity duration-200",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
@@ -50,7 +50,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       <nav
         className={cn(
           "fixed top-0 right-0 bottom-0 w-[280px] max-w-full",
-          "bg-bg border-l border-border z-[101]",
+          "bg-bg-secondary border-l-2 border-[color:var(--border)] z-[101]",
           "flex flex-col",
           "transform transition-transform duration-200 ease-out",
           isOpen ? "translate-x-0" : "translate-x-full"
@@ -58,11 +58,17 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
         aria-label="Mobile navigation"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center justify-between p-4 border-b-2 border-[color:var(--border)]">
           <span className="text-lg font-bold text-accent">slop.haus</span>
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded text-muted hover:text-fg hover:bg-border transition-colors"
+            className={cn(
+              "flex items-center justify-center w-8 h-8",
+              "border-2 border-[color:var(--border)]",
+              "bg-bg-secondary text-fg",
+              "shadow-[2px_2px_0_var(--foreground)]",
+              "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+            )}
             aria-label="Close navigation"
           >
             <CloseIcon />
@@ -106,16 +112,24 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           ) : session?.user ? (
             <>
               <span className="text-sm text-muted truncate">{session.user.name}</span>
-              <Button variant="secondary" onClick={() => signOut()}>
+              <Button variant="secondary" onClick={() => signOut()} className="w-full">
                 Sign Out
               </Button>
             </>
           ) : (
             <>
-              <Button variant="primary" onClick={() => signIn.social({ provider: "github" })}>
+              <Button
+                variant="primary"
+                onClick={() => signIn.social({ provider: "github" })}
+                className="w-full"
+              >
                 Sign in with GitHub
               </Button>
-              <Button variant="secondary" onClick={() => signIn.social({ provider: "google" })}>
+              <Button
+                variant="secondary"
+                onClick={() => signIn.social({ provider: "google" })}
+                className="w-full"
+              >
                 Sign in with Google
               </Button>
             </>
@@ -139,9 +153,13 @@ function MobileNavLink({
     <Link
       href={href}
       className={cn(
-        "block px-4 py-3 rounded-md transition-colors",
-        "hover:no-underline",
-        active ? "bg-border text-accent" : "text-fg hover:bg-border"
+        "block px-4 py-2 text-sm font-bold transition-colors",
+        "border-2 border-[color:var(--border)]",
+        "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]",
+        "no-underline hover:no-underline",
+        active
+          ? "bg-accent text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none"
+          : "text-fg hover:bg-bg"
       )}
     >
       {children}

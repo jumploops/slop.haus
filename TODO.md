@@ -24,6 +24,8 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **Duplicate URL detection** - Same URL can be submitted multiple times by the same user. Check for existing draft/project with same URL.
 
+- [ ] **Server-based visitor counter** - Replace localStorage-based counter with server values that increment using Cloudflare unique user data.
+
 - [ ] **Field save indicator** - No visual feedback when auto-saving fields on blur. Add "Saving..."/"Saved" indicator.
 
 - [ ] **Character counts** - No character count indicators on title (255), tagline (500), description (10000) inputs.

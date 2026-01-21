@@ -18,7 +18,8 @@ export function Avatar({ src, alt, size = "md", className }: AvatarProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center justify-center rounded-full bg-border overflow-hidden flex-shrink-0",
+        "inline-flex items-center justify-center rounded-sm bg-bg-secondary overflow-hidden flex-shrink-0",
+        "border-2 border-[color:var(--border)]",
         size === "sm" && "w-6 h-6 text-[0.625rem]",
         size === "md" && "w-8 h-8 text-xs",
         size === "lg" && "w-12 h-12 text-base",

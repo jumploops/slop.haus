@@ -5,8 +5,9 @@ import Link from "next/link";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonVariants } from "@/components/ui/Button";
+import { ProjectCardSkeleton } from "@/components/ui/Skeleton";
 import { fetchMyProjects, deleteProject, type MyProjectListItem } from "@/lib/api/projects";
-import { formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
+import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import { useState } from "react";
 import { DeleteProjectModal } from "@/components/project/DeleteProjectModal";
 import { useRouter } from "next/navigation";
@@ -44,51 +45,62 @@ function MyProjectsContent() {
   };
 
   return (
-    <div className="max-w-[900px] mx-auto p-4">
-      <header className="flex justify-between items-start mb-6 gap-4 flex-col sm:flex-row">
-        <div>
-          <h1 className="text-2xl font-bold">My Projects</h1>
-          <p className="text-muted mt-2">
-            Manage your submitted projects
-          </p>
+    <div className="max-w-[900px] mx-auto space-y-6">
+      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-slop-blue">★ MY PROJECTS ★</h1>
+            <p className="text-xs text-muted mt-1">
+              Manage your submitted projects.
+            </p>
+          </div>
+          <Link
+            href="/submit"
+            className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline")}
+          >
+            <PlusIcon /> Submit New
+          </Link>
         </div>
-        <Link href="/submit" className={buttonVariants({ variant: "primary" })}>
-          <PlusIcon /> Submit New
-        </Link>
       </header>
 
       {isLoading && (
-        <div className="flex flex-col gap-3">
+        <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex gap-4 p-4 bg-bg-secondary border border-border rounded-lg items-center">
-              <div className="skeleton w-[80px] h-[60px]" />
-              <div className="flex-1">
-                <div className="skeleton w-3/5 h-5" />
-                <div className="skeleton w-4/5 h-4 mt-2" />
-              </div>
-            </div>
+            <ProjectCardSkeleton key={i} />
           ))}
         </div>
       )}
 
       {error && (
-        <div className="text-center py-12 text-muted">
-          <p>Failed to load projects</p>
+        <div className="border-2 border-danger bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
+          <div className="bg-bg border-2 border-danger/70 p-4">
+            <p className="text-danger font-bold text-sm">Failed to load projects</p>
+          </div>
         </div>
       )}
 
       {!isLoading && !error && projects?.length === 0 && (
-        <div className="text-center py-12 text-muted">
-          <EmptyBoxIcon />
-          <h3 className="text-fg mt-4 mb-2 font-semibold">No projects yet</h3>
-          <p>
-            <Link href="/submit">Submit your first project</Link> to get started.
-          </p>
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
+          <div className="bg-bg border-2 border-[color:var(--border)] p-6">
+            <div className="flex justify-center text-slop-coral">
+              <EmptyBoxIcon />
+            </div>
+            <h3 className="text-base font-bold text-slop-purple mt-3">No projects yet</h3>
+            <p className="text-xs text-muted mt-2">
+              Submit your first project to get started.
+            </p>
+            <Link
+              href="/submit"
+              className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline mt-4")}
+            >
+              Submit Project
+            </Link>
+          </div>
         </div>
       )}
 
       {!isLoading && !error && projects && projects.length > 0 && (
-        <div className="flex flex-col gap-3">
+        <div className="space-y-3">
           {projects.map((project) => (
             <MyProjectCard
               key={project.id}
@@ -126,46 +138,54 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
   const statusBadge = getStatusBadge(project.status);
 
   return (
-    <div className="flex gap-4 p-4 bg-bg-secondary border border-border rounded-lg items-start flex-col sm:flex-row">
-      <Link href={`/p/${project.slug}`} className="shrink-0 w-full sm:w-[100px] h-[120px] sm:h-[75px] rounded overflow-hidden bg-bg">
-        <img src={imageUrl} alt={project.title} className="w-full h-full object-cover" />
-      </Link>
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]">
+      <div className="bg-bg border-2 border-[color:var(--border)] p-3 flex gap-3 flex-col sm:flex-row">
+        <Link
+          href={`/p/${project.slug}`}
+          className="shrink-0 w-full sm:w-[120px] h-[90px] border-2 border-[color:var(--border)] bg-bg-secondary overflow-hidden no-underline"
+        >
+          <img src={imageUrl} alt={project.title} className="w-full h-full object-cover" />
+        </Link>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <Link href={`/p/${project.slug}`} className="font-semibold text-fg truncate hover:text-accent hover:no-underline">
-            {project.title}
-          </Link>
-          {statusBadge && (
-            <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
-          )}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/p/${project.slug}`}
+              className="font-bold text-slop-blue hover:text-slop-coral no-underline truncate"
+            >
+              {project.title}
+            </Link>
+            {statusBadge && (
+              <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
+            )}
+          </div>
+
+          <p className="text-xs text-muted line-clamp-2 mt-1">{project.tagline}</p>
+
+          <div className="flex flex-wrap gap-2 text-[10px] text-muted mt-2">
+            <span>Submitted {formatRelativeTime(project.createdAt)}</span>
+            {project.lastEditedAt && (
+              <span>Edited {formatRelativeTime(project.lastEditedAt)}</span>
+            )}
+            <span>{project.commentCount} comment{project.commentCount !== 1 ? "s" : ""}</span>
+          </div>
         </div>
 
-        <p className="text-muted text-sm line-clamp-2 mb-2">{project.tagline}</p>
-
-        <div className="flex gap-3 text-xs text-muted">
-          <span>Submitted {formatRelativeTime(project.createdAt)}</span>
-          {project.lastEditedAt && (
-            <span>Edited {formatRelativeTime(project.lastEditedAt)}</span>
+        <div className="flex gap-2 shrink-0 w-full sm:w-auto justify-start">
+          {project.status !== "removed" && (
+            <>
+              <Button variant="secondary" size="sm" onClick={onEdit}>
+                <PencilIcon /> Edit
+              </Button>
+              <Button variant="danger" size="sm" onClick={onDelete}>
+                <TrashIcon /> Delete
+              </Button>
+            </>
           )}
-          <span>{project.commentCount} comment{project.commentCount !== 1 ? "s" : ""}</span>
+          {project.status === "removed" && (
+            <span className="text-xs text-muted italic">Deleted</span>
+          )}
         </div>
-      </div>
-
-      <div className="flex gap-2 shrink-0 w-full sm:w-auto justify-start">
-        {project.status !== "removed" && (
-          <>
-            <Button variant="secondary" onClick={onEdit}>
-              <PencilIcon /> Edit
-            </Button>
-            <Button variant="ghost" onClick={onDelete} className="text-danger hover:bg-danger/10">
-              <TrashIcon /> Delete
-            </Button>
-          </>
-        )}
-        {project.status === "removed" && (
-          <span className="text-muted text-sm italic">Deleted</span>
-        )}
       </div>
     </div>
   );

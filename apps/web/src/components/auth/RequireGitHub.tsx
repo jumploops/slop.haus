@@ -22,19 +22,26 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
 
   if (isLoading) {
     return (
-      <div className="github-requirement-loading">
-        <Skeleton className="skeleton-text" style={{ width: "100%", height: "80px" }} />
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-4/5" />
+          <Skeleton className="h-8 w-48" />
+        </div>
       </div>
     );
   }
 
   if (!user?.hasGitHub) {
     return (
-      <div className="github-requirement">
-        <div className="github-requirement-content">
-          <GithubIcon />
-          <h3>GitHub Connection Required</h3>
-          <p>
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-5 text-center space-y-3">
+          <div className="flex justify-center text-slop-blue">
+            <GithubIcon />
+          </div>
+          <h3 className="text-base font-bold text-slop-purple">GitHub Connection Required</h3>
+          <p className="text-xs text-muted">
             To submit a project, you need to link your GitHub account. This helps verify
             project ownership and enables repo integration features.
           </p>

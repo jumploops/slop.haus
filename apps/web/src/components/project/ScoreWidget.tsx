@@ -28,42 +28,46 @@ export function ScoreWidget({
   const { voteState, submitVote, isVoting } = useVote(projectSlug);
 
   return (
-    <div className="border border-border rounded-lg p-4 bg-bg-secondary">
-      {/* Vibe Score Section */}
-      <div className="mb-6">
-        <h4 className="text-sm font-medium text-muted mb-2">Vibe Score</h4>
-        <VibeMeter percent={vibePercent} showLabel />
-      </div>
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+        {/* Vibe Score Section */}
+        <div className="mb-6">
+          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ VIBE SCORE ~~</h4>
+          <VibeMeter percent={vibePercent} showLabel />
+        </div>
 
-      {/* Community Votes Section */}
-      <div>
-        <h4 className="text-sm font-medium text-muted mb-3">Community Votes</h4>
-        <div className="flex flex-col gap-3">
-          {/* People channel */}
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-fg">People</span>
-            <span className="text-xs text-muted">
-              +{normalUp} / -{normalDown}
-            </span>
-            <VoteButtons
-              score={normalScore}
-              currentVote={voteState?.normal ?? null}
-              onVote={(value) => submitVote("normal", value)}
-              disabled={isVoting}
-            />
-          </div>
-          {/* Dev channel */}
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-fg">Devs</span>
-            <span className="text-xs text-muted">
-              +{devUp} / -{devDown}
-            </span>
-            <VoteButtons
-              score={devScore}
-              currentVote={voteState?.dev ?? null}
-              onVote={(value) => submitVote("dev", value)}
-              disabled={isVoting || !voteState?.hasDevCredential}
-            />
+        {/* Community Votes Section */}
+        <div>
+          <h4 className="text-xs font-bold text-slop-purple mb-3 text-center">~~ COMMUNITY VOTES ~~</h4>
+          <div className="flex flex-col gap-3">
+            {/* People channel */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <span className="text-xs font-bold text-fg">People</span>
+              <span className="text-[10px] text-muted">
+                +{normalUp} / -{normalDown}
+              </span>
+              <VoteButtons
+                score={normalScore}
+                currentVote={voteState?.normal ?? null}
+                onVote={(value) => submitVote("normal", value)}
+                disabled={isVoting}
+                size="sm"
+              />
+            </div>
+            {/* Dev channel */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <span className="text-xs font-bold text-fg">Devs</span>
+              <span className="text-[10px] text-muted">
+                +{devUp} / -{devDown}
+              </span>
+              <VoteButtons
+                score={devScore}
+                currentVote={voteState?.dev ?? null}
+                onVote={(value) => submitVote("dev", value)}
+                disabled={isVoting || !voteState?.hasDevCredential}
+                size="sm"
+              />
+            </div>
           </div>
         </div>
       </div>

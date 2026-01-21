@@ -44,21 +44,21 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     <dialog
       ref={dialogRef}
       className={cn(
-        "border-none rounded-xl bg-bg text-fg p-0",
+        "border-2 border-[color:var(--border)] bg-bg-secondary text-fg p-0",
         "max-w-[500px] w-[90%] m-auto",
-        "backdrop:bg-black/75",
+        "backdrop:bg-fg/75",
         className
       )}
       onClick={handleBackdropClick}
     >
-      <div className="p-6">
+      <div className="bg-bg border-2 border-[color:var(--border)] p-4">
         {title && (
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">{title}</h2>
+            <h2 className="text-sm font-bold text-slop-purple">{title}</h2>
             <button
               type="button"
               onClick={onClose}
-              className="text-muted hover:text-fg text-2xl leading-none p-0 bg-transparent border-none cursor-pointer"
+              className="text-fg text-xl leading-none p-0 bg-transparent border-none cursor-pointer hover:text-slop-coral"
               aria-label="Close"
             >
               &times;

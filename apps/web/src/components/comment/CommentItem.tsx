@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { CommentForm } from "./CommentForm";
 import { formatRelativeTime } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
@@ -50,10 +51,10 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
 
   if (comment.status === "removed") {
     return (
-      <div className="py-3">
-        <p className="text-muted italic">[removed]</p>
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <p className="text-muted italic text-sm">[removed]</p>
         {comment.children.length > 0 && (
-          <div className="ml-6 mt-3 border-l-2 border-border pl-4">
+          <div className="ml-3 sm:ml-6 mt-3 border-l-2 border-[color:var(--border)] pl-4">
             {comment.children.map((child) => (
               <CommentItem
                 key={child.id}
@@ -69,67 +70,73 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
   }
 
   return (
-    <div className="py-4">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-2">
-        <Avatar src={comment.author.image} alt={comment.author.name} size="sm" />
-        <span className="font-medium text-sm">{comment.author.name}</span>
-        {comment.author.devVerified && <Badge variant="dev">Dev</Badge>}
-        <span className="text-muted text-xs">{formatRelativeTime(comment.createdAt)}</span>
-      </div>
-
-      {/* Body */}
-      <p className="text-sm leading-relaxed mb-2 whitespace-pre-wrap">{comment.body}</p>
-
-      {/* Actions */}
-      <div className="flex gap-4">
-        {session?.user && comment.depth < 10 && (
-          <button
-            type="button"
-            onClick={() => setIsReplying(!isReplying)}
-            className="text-xs text-muted hover:text-fg bg-transparent border-none cursor-pointer transition-colors"
-          >
-            Reply
-          </button>
-        )}
-        {canDelete && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-xs text-muted hover:text-danger bg-transparent border-none cursor-pointer transition-colors disabled:opacity-50"
-          >
-            {isDeleting ? "Deleting..." : "Delete"}
-          </button>
-        )}
-      </div>
-
-      {/* Reply form */}
-      {isReplying && (
-        <div className="mt-4">
-          <CommentForm
-            projectSlug={projectSlug}
-            parentCommentId={comment.id}
-            onSuccess={handleReplySuccess}
-            onCancel={() => setIsReplying(false)}
-            placeholder={`Reply to ${comment.author.name}...`}
-          />
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="bg-bg border-2 border-[color:var(--border)] p-3">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-2 flex-wrap min-w-0">
+          <Avatar src={comment.author.image} alt={comment.author.name} size="sm" />
+          <span className="font-bold text-xs text-slop-blue break-words">{comment.author.name}</span>
+          {comment.author.devVerified && <Badge variant="dev">Dev</Badge>}
+          <span className="text-muted text-[10px]">{formatRelativeTime(comment.createdAt)}</span>
         </div>
-      )}
 
-      {/* Nested replies */}
-      {comment.children.length > 0 && (
-        <div className="ml-6 mt-3 border-l-2 border-border pl-4">
-          {comment.children.map((child) => (
-            <CommentItem
-              key={child.id}
-              comment={child}
+        {/* Body */}
+        <p className="text-sm leading-relaxed mb-3 whitespace-pre-wrap break-words">{comment.body}</p>
+
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          {session?.user && comment.depth < 10 && (
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => setIsReplying(!isReplying)}
+              className="w-full sm:w-auto"
+            >
+              Reply
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              type="button"
+              size="sm"
+              variant="danger"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="w-full sm:w-auto"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          )}
+        </div>
+
+        {/* Reply form */}
+        {isReplying && (
+          <div className="mt-4">
+            <CommentForm
               projectSlug={projectSlug}
-              onCommentUpdate={onCommentUpdate}
+              parentCommentId={comment.id}
+              onSuccess={handleReplySuccess}
+              onCancel={() => setIsReplying(false)}
+              placeholder={`Reply to ${comment.author.name}...`}
             />
-          ))}
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* Nested replies */}
+        {comment.children.length > 0 && (
+          <div className="ml-3 sm:ml-6 mt-3 border-l-2 border-[color:var(--border)] pl-4 space-y-3">
+            {comment.children.map((child) => (
+              <CommentItem
+                key={child.id}
+                comment={child}
+                projectSlug={projectSlug}
+                onCommentUpdate={onCommentUpdate}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

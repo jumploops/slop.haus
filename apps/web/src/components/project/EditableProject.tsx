@@ -14,7 +14,8 @@ import { RevisionStatusBanner } from "@/components/project/RevisionStatusBanner"
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonVariants } from "@/components/ui/Button";
-import { formatRelativeTime } from "@/lib/utils";
+import { Input } from "@/components/ui/Input";
+import { cn, formatRelativeTime } from "@/lib/utils";
 import { refreshProject, type ProjectDetail, type ProjectRevision } from "@/lib/api/projects";
 
 interface EditableProjectProps {
@@ -235,24 +236,30 @@ export function EditableProject({
   };
 
   return (
-    <div className="max-w-[900px] mx-auto p-4">
+    <div className="max-w-[900px] mx-auto space-y-6">
       {/* Edit mode header */}
-      <div className="flex justify-between items-center mb-4 pb-4 border-b border-border">
-        <div className="flex items-center">
-          <Link href={`/p/${project.slug}`} className="inline-flex items-center gap-2 text-muted hover:text-fg hover:no-underline" onClick={(e) => {
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <Link
+          href={`/p/${project.slug}`}
+          className="inline-flex items-center gap-2 text-xs font-bold text-slop-blue no-underline hover:text-slop-coral hover:no-underline"
+          onClick={(e) => {
             if (isDirty && !window.confirm("You have unsaved changes. Discard and leave?")) {
               e.preventDefault();
             }
-          }}>
-            <ArrowLeftIcon /> Back to project
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" onClick={onDelete} className="text-danger hover:bg-danger/10">
+          }}
+        >
+          <ArrowLeftIcon /> Back to project
+        </Link>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <Button
+            variant="ghost"
+            onClick={onDelete}
+            className="text-danger hover:bg-danger/10 w-full sm:w-auto"
+          >
             Delete
           </Button>
           {isDirty && (
-            <Button variant="ghost" onClick={handleDiscard}>
+            <Button variant="ghost" onClick={handleDiscard} className="w-full sm:w-auto">
               Discard
             </Button>
           )}
@@ -260,6 +267,7 @@ export function EditableProject({
             variant="primary"
             onClick={handleSubmit}
             disabled={!isDirty || isSaving}
+            className="w-full sm:w-auto"
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
@@ -276,150 +284,144 @@ export function EditableProject({
 
       {/* Error display */}
       {error && (
-        <div className="my-4 p-3 bg-danger/10 border border-danger rounded-lg">
-          <p className="text-danger m-0">{error}</p>
+        <div className="border-2 border-[color:var(--border)] bg-danger/10 shadow-[2px_2px_0_var(--foreground)] p-4">
+          <p className="text-danger text-sm m-0">{error}</p>
         </div>
       )}
 
       {/* Project preview - mirrors ProjectDetails structure */}
-      <div className="bg-bg-secondary border border-border rounded-xl p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Media section - editable screenshot */}
-          <div className="w-full">
-            <ScreenshotEditor
-              slug={project.slug}
-              currentUrl={screenshotUrl}
-              projectTitle={title}
-              mainUrl={mainUrl || null}
-              onUploadSuccess={handleScreenshotUpload}
-              onRefreshQueued={handleScreenshotRefresh}
-            />
-          </div>
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Media section - editable screenshot */}
+            <div className="w-full">
+              <ScreenshotEditor
+                slug={project.slug}
+                currentUrl={screenshotUrl}
+                projectTitle={title}
+                mainUrl={mainUrl || null}
+                onUploadSuccess={handleScreenshotUpload}
+                onRefreshQueued={handleScreenshotRefresh}
+              />
+            </div>
 
-          {/* Info section */}
-          <div>
-            <InlineEditText
-              value={title}
-              onSave={handleTitleChange}
-              placeholder="Project Title"
-              maxLength={255}
-              required
-              as="h1"
-            />
+            {/* Info section */}
+            <div className="space-y-3">
+              <InlineEditText
+                value={title}
+                onSave={handleTitleChange}
+                placeholder="Project Title"
+                maxLength={255}
+                required
+                as="h1"
+                className="text-2xl text-slop-blue"
+              />
 
-            <div className="text-muted text-lg mb-4">
               <InlineEditTextarea
                 value={tagline}
                 onSave={handleTaglineChange}
                 placeholder="One-sentence description"
                 maxLength={500}
                 minRows={2}
+                className="text-sm text-muted font-normal"
               />
-            </div>
 
-            {/* Author info (read-only) */}
-            <div className="flex items-center gap-2 mb-3">
-              <Avatar
-                src={project.author.image}
-                alt={project.author.name}
-                size="md"
-              />
-              <span>{project.author.name}</span>
-              {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
-            </div>
+              {/* Author info (read-only) */}
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary p-2 text-xs flex flex-wrap gap-3">
+                <span className="flex items-center gap-2 font-bold text-slop-purple">
+                  <Avatar
+                    src={project.author.image}
+                    alt={project.author.name}
+                    size="sm"
+                  />
+                  {project.author.name}
+                </span>
+                {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
+                <span className="text-muted">Submitted {formatRelativeTime(project.createdAt)}</span>
+                {project.lastEditedAt && (
+                  <span className="text-muted">Last edited {formatRelativeTime(project.lastEditedAt)}</span>
+                )}
+              </div>
 
-            {/* Meta info */}
-            <div className="text-xs text-muted flex flex-col gap-1 mb-6">
-              <span>Submitted {formatRelativeTime(project.createdAt)}</span>
-              {project.lastEditedAt && (
-                <span>Last edited {formatRelativeTime(project.lastEditedAt)}</span>
-              )}
-            </div>
-
-            {/* Links (read-only display, editable below) */}
-            <div className="flex flex-wrap gap-3">
-              {mainUrl && (
-                <a
-                  href={mainUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonVariants({ variant: "primary" })}
-                >
-                  <ExternalLinkIcon /> Visit Site
-                </a>
-              )}
-              {repoUrl && (
-                <a
-                  href={repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonVariants({ variant: "secondary" })}
-                >
-                  <GithubIcon /> View Repo
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
-          <div className="min-w-0">
-            {/* Description section */}
-            <div className="mb-6">
-              <h3 className="text-base font-semibold mb-3">About</h3>
-              <InlineEditTextarea
-                value={description}
-                onSave={handleDescriptionChange}
-                placeholder="Add a description..."
-                maxLength={10000}
-              />
-            </div>
-
-            {/* Tools section */}
-            <div className="mt-6">
-              <h3 className="text-base font-semibold mb-3">Built with</h3>
-              <div className="mt-3 pt-3 border-t border-border">
-                <TagEditor selected={tools} onChange={handleToolsChange} />
+              {/* Links (read-only display, editable below) */}
+              <div className="flex flex-wrap gap-2">
+                {mainUrl && (
+                  <a
+                    href={mainUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline hover:no-underline")}
+                  >
+                    <ExternalLinkIcon /> Visit Site
+                  </a>
+                )}
+                {repoUrl && (
+                  <a
+                    href={repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "no-underline hover:no-underline")}
+                  >
+                    <GithubIcon /> View Repo
+                  </a>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="md:order-first lg:order-last">
-            <div className="bg-bg border border-border rounded-lg p-6">
-              {/* Vibe Score - editable */}
-              <div className="mb-6">
-                <h4 className="text-sm text-muted mb-3">Vibe Score</h4>
-                <div className="flex flex-col gap-4">
-                  <VibeMeter percent={vibePercent} showLabel />
-                  <div className="pt-3 border-t border-border">
-                    <VibeInput
-                      mode={vibeMode}
-                      onModeChange={handleVibeModeChange}
-                      vibePercent={vibePercent}
-                      onVibePercentChange={handleVibePercentChange}
-                      vibeDetails={vibeDetails}
-                      onVibeDetailsChange={handleVibeDetailsChange}
-                    />
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
+            <div className="space-y-6 min-w-0">
+              {/* Description section */}
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+                <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+                  <h3 className="text-sm font-bold text-slop-purple">~~ ABOUT THIS SLOP ~~</h3>
+                  <InlineEditTextarea
+                    value={description}
+                    onSave={handleDescriptionChange}
+                    placeholder="Add a description..."
+                    maxLength={10000}
+                  />
                 </div>
               </div>
 
-              {/* Voting display (read-only) */}
-              <div>
-                <h4 className="text-sm text-muted mb-3">Community Votes</h4>
-                <div className="flex flex-col gap-4 opacity-60">
-                  <div className="flex items-center gap-3">
-                    <span className="w-[50px] text-sm text-muted">People</span>
-                    <span className="flex-1 text-sm">
-                      +{project.normalUp} / -{project.normalDown}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="w-[50px] text-sm text-muted">Devs</span>
-                    <span className="flex-1 text-sm">
-                      +{project.devUp} / -{project.devDown}
-                    </span>
+              {/* Tools section */}
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+                <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+                  <h3 className="text-sm font-bold text-slop-purple">~~ BUILT WITH ~~</h3>
+                  <TagEditor selected={tools} onChange={handleToolsChange} />
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-4">
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+                <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+                  <h4 className="text-xs font-bold text-slop-purple text-center">~~ VIBE SCORE ~~</h4>
+                  <VibeMeter percent={vibePercent} showLabel />
+                  <VibeInput
+                    mode={vibeMode}
+                    onModeChange={handleVibeModeChange}
+                    vibePercent={vibePercent}
+                    onVibePercentChange={handleVibePercentChange}
+                    vibeDetails={vibeDetails}
+                    onVibeDetailsChange={handleVibeDetailsChange}
+                  />
+                </div>
+              </div>
+
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+                <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+                  <h4 className="text-xs font-bold text-slop-purple text-center">~~ COMMUNITY VOTES ~~</h4>
+                  <div className="flex flex-col gap-2 text-xs mt-3 opacity-60">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-fg">People</span>
+                      <span>+{project.normalUp} / -{project.normalDown}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-fg">Devs</span>
+                      <span>+{project.devUp} / -{project.devDown}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -429,30 +431,26 @@ export function EditableProject({
       </div>
 
       {/* URL editors */}
-      <div className="mt-6 p-4 bg-bg-secondary border border-border rounded-lg">
-        <h3 className="text-base font-semibold mb-2">Project Links</h3>
-        <p className="text-muted text-sm mb-4">At least one URL is required</p>
-        <div className="mb-4">
-          <label htmlFor="mainUrl" className="block mb-2 font-medium text-sm">Live URL</label>
-          <input
-            id="mainUrl"
-            type="url"
-            value={mainUrl}
-            onChange={(e) => setMainUrl(e.target.value)}
-            placeholder="https://your-app.com"
-            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
-          />
-        </div>
-        <div>
-          <label htmlFor="repoUrl" className="block mb-2 font-medium text-sm">Repository URL</label>
-          <input
-            id="repoUrl"
-            type="url"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="https://github.com/user/repo"
-            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
-          />
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+          <h3 className="text-sm font-bold text-slop-purple">~~ PROJECT LINKS ~~</h3>
+          <p className="text-[10px] text-muted">At least one URL is required</p>
+          <div className="space-y-3">
+            <Input
+              label="Live URL"
+              type="url"
+              value={mainUrl}
+              onChange={(e) => setMainUrl(e.target.value)}
+              placeholder="https://your-app.com"
+            />
+            <Input
+              label="Repository URL"
+              type="url"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              placeholder="https://github.com/user/repo"
+            />
+          </div>
         </div>
       </div>
 

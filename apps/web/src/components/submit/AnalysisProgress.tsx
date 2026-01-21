@@ -55,44 +55,42 @@ export function AnalysisProgress({
 
   return (
     <div className="max-w-md mx-auto text-center">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Analyzing your project</h2>
-        <p className="text-muted text-sm break-all">{inputUrl}</p>
-      </div>
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-slop-blue mb-2">★ ANALYZING YOUR PROJECT ★</h2>
+            <p className="text-muted text-xs break-all">{inputUrl}</p>
+          </div>
 
-      <div className="mb-6">
-        <Badge variant="default">{getTypeLabel(detectedType)}</Badge>
-      </div>
+          <div className="mb-4">
+            <Badge variant="default">{getTypeLabel(detectedType)}</Badge>
+          </div>
 
-      <div className="space-y-3 mb-6">
-        <ProgressStep
-          label="Fetching page content"
-          status={steps.scraping}
-        />
-        <ProgressStep
-          label="Extracting project details"
-          status={steps.analyzing}
-        />
-      </div>
+          <div className="space-y-3 mb-4 text-left">
+            <ProgressStep label="Fetching page content" status={steps.scraping} />
+            <ProgressStep label="Extracting project details" status={steps.analyzing} />
+          </div>
 
-      <div className="mb-6">
-        <p className="text-sm text-muted animate-pulse">{message}</p>
-      </div>
+          <div className="mb-4">
+            <p className="text-xs text-muted animate-pulse">{message}</p>
+          </div>
 
-      {error && (
-        <div className="mb-6">
-          <p className="text-sm text-danger mb-4">{error}</p>
-          <Button onClick={onCancel} variant="secondary">
-            Try Again
-          </Button>
+          {error && (
+            <div className="mb-4">
+              <p className="text-xs text-danger mb-3">{error}</p>
+              <Button onClick={onCancel} variant="secondary">
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {!error && !isComplete && (
+            <Button onClick={onCancel} variant="ghost">
+              Cancel
+            </Button>
+          )}
         </div>
-      )}
-
-      {!error && !isComplete && (
-        <Button onClick={onCancel} variant="ghost">
-          Cancel
-        </Button>
-      )}
+      </div>
     </div>
   );
 }
@@ -108,8 +106,8 @@ function ProgressStep({ label, status }: ProgressStepProps) {
       <span
         className={cn(
           "flex items-center justify-center w-6 h-6",
-          status === "completed" && "text-accent",
-          status === "in_progress" && "text-accent",
+          status === "completed" && "text-slop-green",
+          status === "in_progress" && "text-slop-blue",
           status === "pending" && "text-muted"
         )}
       >
@@ -119,7 +117,7 @@ function ProgressStep({ label, status }: ProgressStepProps) {
       </span>
       <span
         className={cn(
-          "text-sm",
+          "text-xs",
           status === "completed" && "text-fg",
           status === "in_progress" && "text-fg",
           status === "pending" && "text-muted"

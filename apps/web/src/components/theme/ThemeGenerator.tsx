@@ -80,32 +80,36 @@ export function ThemeGenerator() {
   };
 
   return (
-    <div className="p-4 bg-bg-secondary rounded-lg border border-border">
-      <h3 className="font-medium mb-3">Generate Custom Theme</h3>
-      <div className="flex gap-2">
-        <div className="flex-1">
-          <Input
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe your theme... (e.g., 'cyberpunk with neon pink')"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !isGenerating) {
-                handleGenerate();
-              }
-            }}
-          />
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+        <div>
+          <h3 className="text-sm font-bold text-slop-purple">GENERATE CUSTOM THEME</h3>
+          <p className="text-[10px] text-muted mt-1">
+            Tip: Describe colors, mood, or reference existing styles.
+          </p>
         </div>
-        <Button
-          onClick={handleGenerate}
-          loading={isGenerating}
-          disabled={!prompt.trim()}
-        >
-          Generate
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex-1">
+            <Input
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe your theme... (e.g., 'cyberpunk with neon pink')"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !isGenerating) {
+                  handleGenerate();
+                }
+              }}
+            />
+          </div>
+          <Button
+            onClick={handleGenerate}
+            loading={isGenerating}
+            disabled={!prompt.trim()}
+          >
+            Generate
+          </Button>
+        </div>
       </div>
-      <p className="text-xs text-muted mt-2">
-        Tip: Describe colors, mood, or reference existing styles
-      </p>
     </div>
   );
 }

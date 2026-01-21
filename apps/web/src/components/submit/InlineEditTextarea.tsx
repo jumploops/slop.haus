@@ -119,16 +119,22 @@ export function InlineEditTextarea({
           placeholder={placeholder}
           rows={minRows}
           aria-label={placeholder}
-          className="w-full px-3 py-2 rounded-md border border-border bg-bg-secondary text-fg resize-none focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+          className={cn(
+            "w-full px-2 py-1 text-sm resize-none",
+            "bg-bg-secondary text-fg",
+            "border-2 border-[color:var(--border)]",
+            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
+            "focus:outline-none focus:border-accent"
+          )}
         />
         <div className="flex justify-between mt-1">
-          <span className="text-xs text-muted">
+          <span className="text-[10px] text-muted">
             Press Escape to cancel, Cmd+Enter to save
           </span>
           {maxLength && (
             <span
               className={cn(
-                "text-xs",
+                "text-[10px]",
                 editValue.length > maxLength * 0.9 ? "text-warning" : "text-muted"
               )}
             >
@@ -145,8 +151,10 @@ export function InlineEditTextarea({
   return (
     <div
       className={cn(
-        "px-3 py-2 rounded-md border border-border bg-bg-secondary cursor-pointer transition-colors",
-        "hover:border-accent hover:bg-bg",
+        "px-2 py-1 text-sm",
+        "border-2 border-[color:var(--border)]",
+        "bg-bg-secondary cursor-pointer transition-colors",
+        "hover:bg-bg",
         isEmpty && "text-muted italic",
         className
       )}

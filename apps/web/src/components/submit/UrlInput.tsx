@@ -52,14 +52,16 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto text-center">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Share your vibecoded project</h1>
-        <p className="text-muted">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-slop-blue mb-2">
+          ★ Share your vibecoded project ★
+        </h1>
+        <p className="text-xs text-muted">
           Enter a URL and we'll extract the details for you
         </p>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <input
           type="url"
           value={url}
@@ -67,14 +69,17 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
           placeholder="https://github.com/user/project or any live URL"
           disabled={isLoading}
           className={cn(
-            "w-full px-4 py-3 rounded-lg border bg-bg-secondary text-fg",
-            "placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent",
-            displayError ? "border-danger" : "border-border"
+            "w-full px-3 py-2 text-sm",
+            "bg-bg-secondary text-fg",
+            "border-2 border-[color:var(--border)]",
+            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
+            "placeholder:text-muted focus:outline-none focus:border-accent",
+            displayError && "border-danger"
           )}
           autoFocus
         />
         {displayError && (
-          <p className="text-sm text-danger mt-2">{displayError}</p>
+          <p className="text-xs text-danger mt-2">{displayError}</p>
         )}
       </div>
 
@@ -89,8 +94,8 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
         {isLoading ? "Analyzing..." : "Analyze Project"}
       </Button>
 
-      <div className="mt-6">
-        <p className="text-xs text-muted">
+      <div className="mt-4">
+        <p className="text-[10px] text-muted">
           Supported: GitHub, GitLab, npm, live websites, Chrome Web Store, Steam
         </p>
       </div>

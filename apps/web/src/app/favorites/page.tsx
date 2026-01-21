@@ -3,8 +3,10 @@
 import useSWR from "swr";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { ProjectCard } from "@/components/project/ProjectCard";
-import { Skeleton } from "@/components/ui/Skeleton";
+import { ProjectCardSkeleton } from "@/components/ui/Skeleton";
+import { buttonVariants } from "@/components/ui/Button";
 import { fetchFavorites } from "@/lib/api/favorites";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export default function FavoritesPage() {
@@ -22,52 +24,59 @@ function FavoritesContent() {
   );
 
   return (
-    <div className="py-8">
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Favorites</h1>
-        <p className="text-muted">
-          Projects you&apos;ve saved for later
-        </p>
+    <div className="space-y-6">
+      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <h1 className="text-xl font-bold text-slop-blue">★ FAVORITES ★</h1>
+          <p className="text-xs text-muted mt-1">
+            Projects you&apos;ve saved for later.
+          </p>
+        </div>
       </header>
 
       {isLoading && (
-        <div className="project-grid">
+        <div className="space-y-3">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="border border-border rounded-lg p-6 bg-bg">
-              <Skeleton className="h-[120px] w-full rounded" />
-              <div className="pt-4">
-                <Skeleton className="h-4 w-[70%]" />
-                <Skeleton className="h-4 w-full mt-2" />
-                <Skeleton className="h-4 w-[50%] mt-4" />
-              </div>
-            </div>
+            <ProjectCardSkeleton key={i} />
           ))}
         </div>
       )}
 
       {error && (
-        <div className="text-center py-12 text-muted">
-          <p>Failed to load favorites</p>
+        <div className="border-2 border-danger bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
+          <div className="bg-bg border-2 border-danger/70 p-4">
+            <p className="text-danger font-bold text-sm">Failed to load favorites</p>
+          </div>
         </div>
       )}
 
       {!isLoading && !error && favorites?.length === 0 && (
-        <div className="text-center py-12 text-muted">
-          <EmptyHeartIcon />
-          <h3 className="text-fg mb-2 mt-4">No favorites yet</h3>
-          <p>
-            Browse the{" "}
-            <Link href="/">feed</Link> and click the heart on projects you love.
-          </p>
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
+          <div className="bg-bg border-2 border-[color:var(--border)] p-6">
+            <div className="flex justify-center text-slop-coral">
+              <EmptyHeartIcon />
+            </div>
+            <h3 className="text-base font-bold text-slop-purple mt-3">No favorites yet</h3>
+            <p className="text-xs text-muted mt-2">
+              Browse the feed and click the heart on projects you love.
+            </p>
+            <Link
+              href="/"
+              className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline mt-4")}
+            >
+              Back to Feed
+            </Link>
+          </div>
         </div>
       )}
 
       {!isLoading && !error && favorites && favorites.length > 0 && (
-        <div className="project-grid">
-          {favorites.map((project) => (
+        <div className="space-y-3">
+          {favorites.map((project, index) => (
             <ProjectCard
               key={project.id}
               project={project}
+              rank={index + 1}
               showFavoriteButton
               onFavoriteChange={() => mutate()}
             />

@@ -93,7 +93,7 @@ export function InlineEditText({
 
   if (isEditing) {
     return (
-      <div className={cn("inline-edit-input", className)}>
+      <div className={cn("w-full", className)}>
         <input
           ref={inputRef}
           type="text"
@@ -105,6 +105,13 @@ export function InlineEditText({
           placeholder={placeholder}
           aria-label={placeholder}
           aria-required={required}
+          className={cn(
+            "w-full px-2 py-1 text-sm",
+            "bg-bg-secondary text-fg",
+            "border-2 border-[color:var(--border)]",
+            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
+            "focus:outline-none focus:border-accent"
+          )}
         />
       </div>
     );
@@ -114,7 +121,14 @@ export function InlineEditText({
 
   return (
     <Element
-      className={cn("editable-field", className, isEmpty && "empty")}
+      className={cn(
+        "block px-2 py-1 text-sm font-bold",
+        "border-2 border-[color:var(--border)]",
+        "bg-bg-secondary cursor-pointer transition-colors",
+        "hover:bg-bg",
+        isEmpty && "text-muted italic",
+        className
+      )}
       onClick={handleClick}
       onKeyDown={handleDisplayKeyDown}
       tabIndex={0}

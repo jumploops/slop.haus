@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { VibeMeter } from "./VibeMeter";
+import { MessageCircle, ExternalLink } from "lucide-react";
 import { VoteButtons } from "./VoteButtons";
-import { Avatar } from "@/components/ui/Avatar";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useVote } from "@/hooks/useVote";
 import { useFavorite } from "@/hooks/useFavorite";
-import { formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
+import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import type { ProjectListItem } from "@/lib/api/projects";
 
 interface ProjectCardProps {
@@ -16,6 +14,7 @@ interface ProjectCardProps {
   channel?: "normal" | "dev";
   showFavoriteButton?: boolean;
   onFavoriteChange?: () => void;
+  rank?: number;
 }
 
 export function ProjectCard({
@@ -23,6 +22,7 @@ export function ProjectCard({
   channel = "normal",
   showFavoriteButton,
   onFavoriteChange,
+  rank,
 }: ProjectCardProps) {
   const { voteState, submitVote, isVoting } = useVote(project.slug);
   const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavorite(
@@ -34,66 +34,114 @@ export function ProjectCard({
   const currentVote = voteState?.[channel] ?? null;
 
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
+  const isNew = Date.now() - new Date(project.createdAt).getTime() < 2 * 24 * 60 * 60 * 1000;
+  const scoreLabel = channel === "dev" ? "DEV" : "SLOP";
+  const scoreColor = channel === "dev" ? "bg-slop-purple" : "bg-slop-green";
+  const visitUrl = project.mainUrl || project.repoUrl;
 
   return (
-    <article className="border border-border rounded-lg p-6 mb-4 bg-bg hover:border-accent-dim transition-colors">
-      {/* Header: Thumbnail + Content */}
-      <div className="flex gap-4 mb-4">
-        <Link href={`/p/${project.slug}`} className="flex-shrink-0">
-          <img
-            src={thumbnailUrl}
-            alt={project.title}
-            className="w-[120px] h-[80px] rounded object-cover bg-bg-secondary"
-          />
-        </Link>
-        <div className="flex-1 min-w-0">
-          <h3 className="mb-1">
-            <Link
-              href={`/p/${project.slug}`}
-              className="text-fg hover:text-accent hover:no-underline font-semibold"
-            >
-              {project.title}
-            </Link>
-          </h3>
-          <p className="text-muted text-sm mb-2 line-clamp-2">{project.tagline}</p>
-          <VibeMeter percent={project.vibePercent} size="sm" />
-        </div>
-      </div>
+    <article
+      className={cn(
+        "border-2 border-[color:var(--border)] bg-border p-0.5 group transition-transform",
+        "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
+        "hover:translate-x-1"
+      )}
+    >
+      <div className="bg-bg-secondary border border-[color:var(--border)] flex flex-col sm:flex-row gap-3 p-3">
+        {rank && (
+          <div className="flex-shrink-0 sm:w-8 sm:text-center">
+            <span className="text-2xl font-bold text-muted/70">{rank}</span>
+          </div>
+        )}
 
-      {/* Footer: Meta + Actions */}
-      <div className="flex items-center justify-between pt-4 border-t border-border flex-wrap gap-4">
-        <div className="flex gap-4 text-sm text-muted flex-wrap items-center">
-          <span className="flex items-center gap-2">
-            <Avatar
-              src={project.author.image}
-              alt={project.author.name}
+        <Link href={`/p/${project.slug}`} className="flex-shrink-0 w-full sm:w-auto no-underline">
+          <div className="relative w-full h-32 sm:w-24 sm:h-16 overflow-hidden border-2 border-[color:var(--foreground)] bg-bg">
+            <img src={thumbnailUrl} alt={project.title} className="w-full h-full object-cover" />
+            {isNew && (
+              <span className="absolute top-0 left-0">
+                <span className="inline-block motion-safe:animate-[wobble_2.4s_ease-in-out_infinite]">
+                  <span className="bg-danger text-bg text-[8px] font-bold px-1 animate-[blink_1s_step-end_infinite]">
+                    NEW!
+                  </span>
+                </span>
+              </span>
+            )}
+          </div>
+        </Link>
+
+        <div className="flex-1 min-w-0">
+          <Link href={`/p/${project.slug}`} className="no-underline hover:no-underline">
+            <h3 className="font-bold text-slop-blue hover:text-slop-coral break-words sm:truncate">
+              {project.title}
+            </h3>
+            <p className="text-xs text-muted line-clamp-2 mt-0.5">{project.tagline}</p>
+          </Link>
+
+          <div className="flex items-center gap-3 mt-2 flex-wrap text-[10px] text-muted">
+            <span className="text-muted">
+              by <span className="font-bold text-slop-purple">{project.author.name}</span>
+            </span>
+            <span className="text-muted/70">•</span>
+            <span>{formatRelativeTime(project.createdAt)}</span>
+            <span className="text-muted/70">•</span>
+            <span className="flex items-center gap-1 text-muted">
+              <MessageCircle className="h-3 w-3" />
+              {project.commentCount}
+            </span>
+            {visitUrl && (
+              <a
+                href={visitUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-slop-blue hover:text-slop-purple flex items-center gap-0.5 no-underline hover:no-underline"
+              >
+                <ExternalLink className="h-3 w-3" />
+                visit
+              </a>
+            )}
+          </div>
+        </div>
+
+        <div className="flex w-full sm:w-auto sm:flex-shrink-0 items-center gap-2 flex-wrap sm:flex-nowrap mt-2 sm:mt-0">
+          <div className="flex flex-col items-center">
+            <div
+              className={cn(
+                "w-12 h-12 flex items-center justify-center",
+                "border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)]",
+                "text-accent-foreground font-bold text-lg",
+                scoreColor
+              )}
+            >
+              {score}
+            </div>
+            <span className="text-[9px] font-bold text-slop-purple mt-0.5">{scoreLabel}</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-12 h-12 flex items-center justify-center border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)] bg-slop-coral text-accent-foreground font-bold text-lg">
+              {Math.round(project.vibePercent)}
+            </div>
+            <span className="text-[9px] font-bold text-slop-purple mt-0.5">VIBE</span>
+          </div>
+          <div className="flex flex-col gap-2 sm:ml-1">
+            {showFavoriteButton && (
+              <Button
+                variant={isFavorited ? "secondary" : "ghost"}
+                size="sm"
+                onClick={toggleFavorite}
+                disabled={favoriteLoading}
+                aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+              >
+                <HeartIcon filled={isFavorited} />
+              </Button>
+            )}
+            <VoteButtons
+              score={score}
+              currentVote={currentVote}
+              onVote={(value) => submitVote(channel, value)}
+              disabled={isVoting}
               size="sm"
             />
-            <span>{project.author.name}</span>
-            {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
-          </span>
-          <span>{formatRelativeTime(project.createdAt)}</span>
-          <span>{project.commentCount} comments</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {showFavoriteButton && (
-            <Button
-              variant={isFavorited ? "secondary" : "ghost"}
-              size="sm"
-              onClick={toggleFavorite}
-              disabled={favoriteLoading}
-              aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-            >
-              <HeartIcon filled={isFavorited} />
-            </Button>
-          )}
-          <VoteButtons
-            score={score}
-            currentVote={currentVote}
-            onVote={(value) => submitVote(channel, value)}
-            disabled={isVoting}
-            size="sm"
-          />
+          </div>
         </div>
       </div>
     </article>

@@ -51,74 +51,81 @@ export default function ProfilePage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Profile</h1>
+    <div className="space-y-6">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <h1 className="text-xl font-bold text-slop-blue">★ PROFILE ★</h1>
+      </div>
 
       {/* Profile Header */}
-      <section className="mb-8 p-6 rounded-lg border border-border bg-bg-secondary">
-        <div className="flex items-center gap-4">
-          <Avatar src={user.image} alt={user.name} size="lg" />
-          <div>
-            <h2 className="text-xl font-semibold">{user.name}</h2>
-            <p className="text-muted text-sm">{user.email}</p>
-            <div className="flex gap-2 mt-2">
-              {user.devVerified && <Badge variant="dev">Verified Dev</Badge>}
-              {user.role === "admin" && <Badge variant="admin">Admin</Badge>}
-              {user.role === "mod" && <Badge variant="mod">Moderator</Badge>}
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <div className="flex items-center gap-4">
+            <Avatar src={user.image} alt={user.name} size="lg" />
+            <div>
+              <h2 className="text-lg font-bold text-slop-blue">{user.name}</h2>
+              <p className="text-muted text-xs">{user.email}</p>
+              <div className="flex gap-2 mt-2">
+                {user.devVerified && <Badge variant="dev">Verified Dev</Badge>}
+                {user.role === "admin" && <Badge variant="admin">Admin</Badge>}
+                {user.role === "mod" && <Badge variant="mod">Moderator</Badge>}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Display Name Section */}
-      <section className="mb-8">
-        <h3 className="text-lg font-semibold mb-2">Display Name</h3>
-        <p className="text-sm text-muted mb-4">
-          This is the name displayed on your comments and submissions.
-        </p>
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+          <h3 className="text-sm font-bold text-slop-purple">~~ DISPLAY NAME ~~</h3>
+          <p className="text-xs text-muted">
+            This is the name displayed on your comments and submissions.
+          </p>
 
-        {isEditing ? (
-          <div>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your display name"
-              maxLength={100}
-              className="mb-3"
-            />
-            <div className="flex gap-2">
-              <Button
-                variant="primary"
-                onClick={handleSave}
-                disabled={isSaving}
-                loading={isSaving}
-              >
-                Save
-              </Button>
-              <Button variant="ghost" onClick={handleCancel}>
-                Cancel
+          {isEditing ? (
+            <div className="space-y-3">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your display name"
+                maxLength={100}
+              />
+              <div className="flex gap-2">
+                <Button
+                  variant="primary"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  loading={isSaving}
+                >
+                  Save
+                </Button>
+                <Button variant="ghost" onClick={handleCancel}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <span className="px-2 py-1 text-sm border-2 border-[color:var(--border)] bg-bg-secondary">
+                {user.name}
+              </span>
+              <Button variant="secondary" onClick={handleEdit}>
+                Edit
               </Button>
             </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-4">
-            <span className="px-3 py-2 bg-bg-secondary border border-border rounded-md">
-              {user.name}
-            </span>
-            <Button variant="secondary" onClick={handleEdit}>
-              Edit
-            </Button>
-          </div>
-        )}
+          )}
+        </div>
       </section>
 
       {/* Avatar Section */}
-      <section className="mb-8">
-        <h3 className="text-lg font-semibold mb-2">Avatar</h3>
-        <p className="text-sm text-muted">
-          Your avatar is imported from your OAuth provider (GitHub or Google).
-          To change it, update your profile picture on the connected service.
-        </p>
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-2">
+          <h3 className="text-sm font-bold text-slop-purple">~~ AVATAR ~~</h3>
+          <p className="text-xs text-muted">
+            Your avatar is imported from your OAuth provider (GitHub or Google).
+            To change it, update your profile picture on the connected service.
+          </p>
+        </div>
       </section>
     </div>
   );

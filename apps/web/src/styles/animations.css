@@ -49,6 +49,63 @@
   }
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes rainbow {
+  0% {
+    color: var(--slop-pink);
+  }
+  20% {
+    color: var(--slop-yellow);
+  }
+  40% {
+    color: var(--slop-green);
+  }
+  60% {
+    color: var(--slop-teal);
+  }
+  80% {
+    color: var(--slop-blue);
+  }
+  100% {
+    color: var(--slop-purple);
+  }
+}
+
+@keyframes wobble {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes spinSlow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Animation utility classes */
 .animate-spin {
   animation: spin 0.6s linear infinite;
