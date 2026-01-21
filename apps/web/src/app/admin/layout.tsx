@@ -22,8 +22,8 @@ export default function AdminLayout({
 
   if (isPending) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 min-h-[calc(100vh-200px)]">
-        <aside className="md:border-r md:border-border md:pr-8">
+      <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 min-h-[calc(100vh-200px)]">
+        <aside className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
           <Skeleton variant="text" className="w-24 h-6" />
         </aside>
         <div>
@@ -39,20 +39,22 @@ export default function AdminLayout({
 
   if (!hasAccess) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <h1 className="text-2xl font-bold mb-2">Unauthorized</h1>
-        <p className="text-muted mb-6">You don't have permission to access this page.</p>
-        <Link href="/">
-          <Button variant="primary">Go Home</Button>
-        </Link>
+      <div className="max-w-lg mx-auto">
+        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+          <h1 className="text-xl font-bold text-danger mb-2">Unauthorized</h1>
+          <p className="text-xs text-muted mb-4">You don't have permission to access this page.</p>
+          <Link href="/">
+            <Button variant="primary">Go Home</Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 min-h-[calc(100vh-200px)]">
-      <aside className="md:border-r md:border-border md:pr-8">
-        <h2 className="text-xl font-semibold mb-4 text-danger">Admin</h2>
+    <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 min-h-[calc(100vh-200px)]">
+      <aside className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <h2 className="text-sm font-bold text-danger mb-3">~~ ADMIN ~~</h2>
         <AdminNav isAdmin={isAdmin} />
       </aside>
       <div>{children}</div>
@@ -73,10 +75,12 @@ function AdminNav({ isAdmin }: { isAdmin: boolean }) {
           key={item.href}
           href={item.href}
           className={cn(
-            "px-3 py-2 rounded-md text-sm transition-colors hover:no-underline",
+            "px-3 py-2 text-xs font-bold transition-colors no-underline hover:no-underline",
+            "border-2 border-[color:var(--foreground)]",
+            "bg-bg shadow-[2px_2px_0_var(--foreground)]",
             pathname === item.href
-              ? "bg-border text-fg"
-              : "text-muted hover:text-fg hover:bg-bg-secondary"
+              ? "bg-accent text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none"
+              : "text-fg hover:bg-bg-secondary"
           )}
         >
           {item.label}

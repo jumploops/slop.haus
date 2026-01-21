@@ -6,6 +6,7 @@ import { ScreenshotPreview } from "./ScreenshotPreview";
 import { TagEditor } from "./TagEditor";
 import { VibeInput } from "@/components/form/VibeInput";
 import { Button } from "@/components/ui/Button";
+import { Input, Textarea } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 
 interface DraftData {
@@ -81,6 +82,23 @@ export function DraftReview({
   const [savingField, setSavingField] = useState<string | null>(null);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
 
+  const labelWithSaving = (label: string, field: string) => (
+    <span className="flex items-center gap-2">
+      <span>{label}</span>
+      {savingField === field && (
+        <span className="text-[10px] text-muted">Saving...</span>
+      )}
+    </span>
+  );
+
+  const countHelper = (count: number, max: number, warnAt: number) => (
+    <span
+      className={`block text-right ${count > warnAt ? "text-warning" : ""}`}
+    >
+      {count}/{max}
+    </span>
+  );
+
   const handleFieldBlur = async (field: string, value: unknown) => {
     setSavingField(field);
     try {
@@ -100,182 +118,166 @@ export function DraftReview({
     title.trim() && tagline.trim() && (mainUrl || repoUrl);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Review Your Project</h1>
-        <p className="text-muted">
-          We&apos;ve extracted these details from {draft.inputUrl}. Edit anything
-          that looks wrong.
-        </p>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <header className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <h1 className="text-xl font-bold text-slop-blue">★ REVIEW YOUR PROJECT ★</h1>
+          <p className="text-xs text-muted mt-2">
+            We&apos;ve extracted these details from {draft.inputUrl}. Edit anything that looks wrong.
+          </p>
+        </div>
       </header>
 
-      {/* Screenshot */}
       {draft.screenshot && (
-        <section className="mb-6 pb-6 border-b border-border">
-          <ScreenshotPreview url={draft.screenshot} />
+        <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+          <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+            <h2 className="text-sm font-bold text-slop-purple">SCREENSHOT</h2>
+            <div className="mt-3">
+              <ScreenshotPreview url={draft.screenshot} />
+            </div>
+          </div>
         </section>
       )}
 
-      {/* Basic Info */}
-      <section className="mb-6 pb-6 border-b border-border">
-        <h2 className="text-lg font-semibold mb-3">Basic Info</h2>
+      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
+          <h2 className="text-sm font-bold text-slop-purple">BASIC INFO</h2>
 
-        <div className="mb-4">
-          <label htmlFor="title" className="block mb-2 font-medium text-sm">
-            Title *
-            {savingField === "title" && <span className="text-xs text-muted ml-2 font-normal">Saving...</span>}
-          </label>
-          <input
+          <Input
             id="title"
-            type="text"
+            label={labelWithSaving("Title *", "title")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => handleFieldBlur("title", title)}
             maxLength={255}
             required
-            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
+            helperText={countHelper(title.length, 255, 230)}
           />
-          <span className={`block text-right text-xs mt-1 ${title.length > 230 ? "text-warning" : "text-muted"}`}>
-            {title.length}/255
-          </span>
-        </div>
 
-        <div className="mb-4">
-          <label htmlFor="tagline" className="block mb-2 font-medium text-sm">
-            Tagline *
-            {savingField === "tagline" && <span className="text-xs text-muted ml-2 font-normal">Saving...</span>}
-          </label>
-          <input
+          <Input
             id="tagline"
-            type="text"
+            label={labelWithSaving("Tagline *", "tagline")}
             value={tagline}
             onChange={(e) => setTagline(e.target.value)}
             onBlur={() => handleFieldBlur("tagline", tagline)}
             maxLength={500}
             placeholder="One-sentence description"
             required
-            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
+            helperText={countHelper(tagline.length, 500, 450)}
           />
-          <span className={`block text-right text-xs mt-1 ${tagline.length > 450 ? "text-warning" : "text-muted"}`}>
-            {tagline.length}/500
-          </span>
-        </div>
 
-        <div>
-          <label htmlFor="description" className="block mb-2 font-medium text-sm">
-            Description
-            {savingField === "description" && <span className="text-xs text-muted ml-2 font-normal">Saving...</span>}
-          </label>
-          <textarea
+          <Textarea
             id="description"
+            label={labelWithSaving("Description", "description")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             onBlur={() => handleFieldBlur("description", description)}
             maxLength={10000}
             rows={4}
             placeholder="Optional longer description"
-            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg resize-y min-h-[100px] focus:outline-none focus:border-accent"
+            helperText={countHelper(description.length, 10000, 9000)}
           />
-          <span className={`block text-right text-xs mt-1 ${description.length > 9000 ? "text-warning" : "text-muted"}`}>
-            {description.length}/10000
-          </span>
         </div>
       </section>
 
-      {/* Links */}
-      <section className="mb-6 pb-6 border-b border-border">
-        <h2 className="text-lg font-semibold mb-1">Links</h2>
-        <p className="text-muted text-sm mb-3">At least one URL is required</p>
+      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
+          <div>
+            <h2 className="text-sm font-bold text-slop-purple">LINKS</h2>
+            <p className="text-xs text-muted mt-1">At least one URL is required.</p>
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="mainUrl" className="block mb-2 font-medium text-sm">Live URL</label>
-          <input
+          <Input
             id="mainUrl"
             type="url"
+            label="Live URL"
             value={mainUrl}
             onChange={(e) => setMainUrl(e.target.value)}
             onBlur={() => handleFieldBlur("mainUrl", mainUrl || null)}
             placeholder="https://your-app.com"
-            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
-        </div>
 
-        <div>
-          <label htmlFor="repoUrl" className="block mb-2 font-medium text-sm">Repository URL</label>
-          <input
+          <Input
             id="repoUrl"
             type="url"
+            label="Repository URL"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
             onBlur={() => handleFieldBlur("repoUrl", repoUrl || null)}
             placeholder="https://github.com/user/repo"
-            className="w-full px-3 py-2 border border-border rounded-md bg-bg text-fg focus:outline-none focus:border-accent"
           />
         </div>
       </section>
 
-      {/* Tags */}
-      <section className="mb-6 pb-6 border-b border-border">
-        <h2 className="text-lg font-semibold mb-1">Technologies</h2>
-        <p className="text-muted text-sm mb-3">
-          We detected these tools. Add or remove as needed.
-        </p>
-        <TagEditor
-          selected={tools}
-          onChange={(newTools) => {
-            setTools(newTools);
-            handleFieldBlur("tools", newTools);
-          }}
-        />
+      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+          <div>
+            <h2 className="text-sm font-bold text-slop-purple">TECHNOLOGIES</h2>
+            <p className="text-xs text-muted mt-1">
+              We detected these tools. Add or remove as needed.
+            </p>
+          </div>
+          <TagEditor
+            selected={tools}
+            onChange={(newTools) => {
+              setTools(newTools);
+              handleFieldBlur("tools", newTools);
+            }}
+          />
+        </div>
       </section>
 
-      {/* Vibe Score */}
-      <section className="mb-6 pb-6 border-b border-border">
-        <h2 className="text-lg font-semibold mb-1">Vibe Score</h2>
-        <p className="text-muted text-sm mb-3">
-          How much AI was involved in creating this project?
-        </p>
-        <VibeInput
-          mode={vibeMode}
-          onModeChange={setVibeMode}
-          vibePercent={vibePercent}
-          onVibePercentChange={(value) => {
-            setVibePercent(value);
-            handleFieldBlur("vibePercent", value);
-          }}
-          vibeDetails={vibeDetails}
-          onVibeDetailsChange={setVibeDetails}
-        />
+      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+          <div>
+            <h2 className="text-sm font-bold text-slop-purple">VIBE SCORE</h2>
+            <p className="text-xs text-muted mt-1">
+              How much AI was involved in creating this project?
+            </p>
+          </div>
+          <VibeInput
+            mode={vibeMode}
+            onModeChange={setVibeMode}
+            vibePercent={vibePercent}
+            onVibePercentChange={(value) => {
+              setVibePercent(value);
+              handleFieldBlur("vibePercent", value);
+            }}
+            vibeDetails={vibeDetails}
+            onVibeDetailsChange={setVibeDetails}
+          />
+        </div>
       </section>
 
-      {/* Error */}
       {error && (
-        <div className="mb-4 p-3 bg-danger/10 border border-danger rounded-md">
-          <p className="text-danger m-0">{error}</p>
+        <div className="border-2 border-danger bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+          <div className="bg-bg border-2 border-danger/70 p-3">
+            <p className="text-danger font-bold text-sm">{error}</p>
+          </div>
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex flex-col gap-3">
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={isSubmitting || !hasRequiredFields}
-          className="py-3 text-base"
-        >
-          {isSubmitting ? "Submitting..." : "Submit Project"}
-        </Button>
-        <Button
-          type="button"
-          onClick={() => setShowDiscardModal(true)}
-          disabled={isSubmitting}
-          variant="ghost"
-        >
-          Start Over
-        </Button>
+      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isSubmitting || !hasRequiredFields}
+            className="py-3 text-base"
+          >
+            {isSubmitting ? "Submitting..." : "Submit Project"}
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setShowDiscardModal(true)}
+            disabled={isSubmitting}
+            variant="ghost"
+          >
+            Start Over
+          </Button>
+        </div>
       </div>
 
-      {/* Discard Confirmation Modal */}
       <Modal
         isOpen={showDiscardModal}
         onClose={() => setShowDiscardModal(false)}

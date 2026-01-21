@@ -51,7 +51,7 @@ export default async function ProjectPage({ params }: Props) {
   }
 
   return (
-    <div className="project-page">
+    <div className="space-y-8">
       <ProjectDetails project={project} />
       <CommentThread projectSlug={slug} />
     </div>

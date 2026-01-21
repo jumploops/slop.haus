@@ -1,6 +1,6 @@
 # Phase 2: Retro Component Variants
 
-**Status:** Not started
+**Status:** Completed
 
 ## Objective
 
@@ -28,6 +28,11 @@ Restyle core UI primitives to match retro patterns (beveled buttons, inset input
 - Restyle skeletons to better fit the lighter retro palette.
 - Remove ThemeSwitcher UI from `apps/web/src/components/layout/Header.tsx` and adjust header layout accordingly.
 - Ensure mobile nav styles follow retro buttons and panels.
+
+## Tech Debt / TODO
+
+- Decide whether to keep `apps/web/src/components/theme/ThemeSwitcher.tsx` for a future settings page or remove it entirely.
+- If ThemeSwitcher is retired, also prune its usage paths (`apps/web/src/hooks/useTheme.ts`, `apps/web/src/lib/theme-constants.ts`, and ThemeProvider UX) or relocate them into admin-only tooling.
 
 ## Code Snippets
 

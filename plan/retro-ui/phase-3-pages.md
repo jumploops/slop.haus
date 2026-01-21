@@ -1,6 +1,6 @@
 # Phase 3: Page-Level Reskin
 
-**Status:** Not started
+**Status:** Completed
 
 ## Objective
 
@@ -10,16 +10,26 @@ Apply the retro aesthetic to all pages and page-level components, replacing lega
 
 - `apps/web/src/app/layout.tsx`
 - `apps/web/src/app/page.tsx`
+- `apps/web/src/app/favorites/page.tsx`
+- `apps/web/src/app/my/projects/page.tsx`
+- `apps/web/src/app/not-found.tsx`
+- `apps/web/src/app/error.tsx`
 - `apps/web/src/components/layout/Header.tsx`
+- `apps/web/src/components/auth/AuthButtons.tsx`
+- `apps/web/src/components/auth/RequireGitHub.tsx`
 - `apps/web/src/components/project/ProjectCard.tsx`
 - `apps/web/src/components/project/ProjectDetails.tsx`
 - `apps/web/src/components/project/ScoreWidget.tsx`
 - `apps/web/src/components/project/VoteButtons.tsx`
 - `apps/web/src/components/comment/*`
 - `apps/web/src/app/submit/*`
+- `apps/web/src/components/submit/DraftReview.tsx`
 - `apps/web/src/app/settings/*`
 - `apps/web/src/app/admin/*`
 - `apps/web/src/app/theme-gallery/*`
+- `apps/web/src/components/theme/ThemeGenerator.tsx`
+- `apps/web/src/components/theme/ThemePreview.tsx`
+- `apps/web/src/components/ui/Toast.tsx`
 
 ## Tasks
 
@@ -30,6 +40,8 @@ Apply the retro aesthetic to all pages and page-level components, replacing lega
 - Define and implement the mapping for retro score labels (SLOP/VIBE) using existing data fields.
 - Restyle the project detail page to use retro inset/outset panels, ASCII-style headers, and retro badges.
 - Update comments UI to match retro panel styling.
+- Restyle favorites, my projects, and auth/account UI (dropdown, GitHub requirement).
+- Reskin submit review flow, theme gallery widgets, toast, and app error/404 states.
 - Audit submit/settings/admin/theme-gallery pages and apply retro panels, buttons, and typography consistently.
 
 ## Code Snippets
@@ -58,6 +70,8 @@ Apply the retro aesthetic to all pages and page-level components, replacing lega
 ## Verification Checklist
 
 - Feed, project detail, submit, admin, settings, and theme-gallery pages all render with retro visual language.
+- Favorites, my-projects, and auth-required surfaces align with retro styling.
+- Error/404 screens and toasts reflect the retro panel treatment.
 - Legacy placeholder class names removed or no longer relied upon.
 - Header/footer match the gradient + beveled style of the reference UI.
 - Score badges and tags display consistently across feed and project pages.

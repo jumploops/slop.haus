@@ -11,6 +11,7 @@ import { VibeMeter } from "@/components/project/VibeMeter";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonVariants } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { cn, getPlaceholderImage } from "@/lib/utils";
 
 interface DraftData {
@@ -129,92 +130,103 @@ export function EditableProjectPreview({
     title.trim() && tagline.trim() && (mainUrl || repoUrl);
 
   return (
-    <div className="project-preview-container">
+    <div className="space-y-6">
       {/* Edit mode banner */}
-      <div className="preview-banner">
-        <p>Review your project. Click any highlighted area to edit.</p>
+      <div className="bg-warning border-2 border-[color:var(--foreground)] px-4 py-2 text-xs font-bold text-fg text-center">
+        Review your project. Click any highlighted area to edit.
       </div>
 
       {/* Project preview - mirrors ProjectDetails structure */}
-      <div className="project-details preview-mode">
-        <div className="project-details-header">
-          {/* Media section */}
-          <div className="project-details-media">
-            <img
-              src={imageUrl}
-              alt={title || "Project screenshot"}
-              className="project-details-image"
-            />
-          </div>
-
-          {/* Info section */}
-          <div className="project-details-info">
-            <InlineEditText
-              value={title}
-              onSave={handleTitleSave}
-              placeholder="Project Title"
-              maxLength={255}
-              required
-              as="h1"
-            />
-
-            <InlineEditText
-              value={tagline}
-              onSave={handleTaglineSave}
-              placeholder="One-sentence description"
-              maxLength={500}
-              required
-              className="project-details-tagline"
-              as="p"
-            />
-
-            {/* Author info (read-only) */}
-            <div className="project-details-author">
-              <Avatar src={userImage} alt={userName} size="md" />
-              <span>{userName}</span>
+      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Media section */}
+            <div className="md:w-[420px] flex-shrink-0">
+              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary">
+                <img
+                  src={imageUrl}
+                  alt={title || "Project screenshot"}
+                  className="w-full object-cover aspect-video"
+                />
+              </div>
             </div>
 
-            {/* Meta info (preview) */}
-            <div className="project-details-meta">
-              <span>Submitted just now</span>
-            </div>
+            {/* Info section */}
+            <div className="flex-1 space-y-3">
+              <InlineEditText
+                value={title}
+                onSave={handleTitleSave}
+                placeholder="Project Title"
+                maxLength={255}
+                required
+                as="h1"
+                className="text-2xl text-slop-blue"
+              />
 
-            {/* Links - placeholder for Phase 2 */}
-            <div className="project-details-links">
-              {mainUrl && (
-                <a
-                  href={mainUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonVariants({ variant: "primary" })}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <ExternalLinkIcon /> Visit Site
-                </a>
-              )}
-              {repoUrl && (
-                <a
-                  href={repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonVariants({ variant: "secondary" })}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <GithubIcon /> View Repo
-                </a>
-              )}
-              {!mainUrl && !repoUrl && (
-                <span className="text-muted">Add a URL below</span>
-              )}
+              <InlineEditText
+                value={tagline}
+                onSave={handleTaglineSave}
+                placeholder="One-sentence description"
+                maxLength={500}
+                required
+                className="text-sm text-muted font-normal"
+                as="p"
+              />
+
+              {/* Author info (read-only) */}
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary p-2 text-xs flex flex-wrap gap-3">
+                <span className="flex items-center gap-2 font-bold text-slop-purple">
+                  <Avatar src={userImage} alt={userName} size="sm" />
+                  {userName}
+                </span>
+                <span className="text-muted">Submitted just now</span>
+              </div>
+
+              {/* Links */}
+              <div className="flex flex-wrap gap-2">
+                {mainUrl && (
+                  <a
+                    href={mainUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({ variant: "primary", size: "sm" }),
+                      "no-underline hover:no-underline"
+                    )}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <ExternalLinkIcon /> Visit Site
+                  </a>
+                )}
+                {repoUrl && (
+                  <a
+                    href={repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({ variant: "secondary", size: "sm" }),
+                      "no-underline hover:no-underline"
+                    )}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <GithubIcon /> View Repo
+                  </a>
+                )}
+                {!mainUrl && !repoUrl && (
+                  <span className="text-xs text-muted">Add a URL below</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="project-details-body">
-          <div className="project-details-main">
-            {/* Description section */}
-            <div className="project-details-description">
-              <h3>About</h3>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
+        <div className="space-y-6">
+          {/* Description section */}
+          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+            <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+              <h3 className="text-sm font-bold text-slop-purple">~~ ABOUT THIS SLOP ~~</h3>
               <InlineEditTextarea
                 value={description}
                 onSave={handleDescriptionSave}
@@ -222,121 +234,106 @@ export function EditableProjectPreview({
                 maxLength={10000}
               />
             </div>
+          </div>
 
-            {/* Tools section */}
-            <div className="project-details-tools">
-              <h3>Built with</h3>
-              <div
-                className="editable-field tools-list-editable"
-                onClick={() => {}}
-                tabIndex={0}
-                role="button"
-              >
-                {tools.length > 0 ? (
-                  <div className="tools-list">
-                    {tools.map((tool) => (
-                      <Badge key={tool} variant="default">
-                        {tool}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="empty">Add technologies...</span>
-                )}
-              </div>
-              {/* Inline TagEditor for Phase 1 (simple version) */}
-              <div className="tools-editor-inline">
-                <TagEditor selected={tools} onChange={handleToolsChange} />
-              </div>
+          {/* Tools section */}
+          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+            <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+              <h3 className="text-sm font-bold text-slop-purple">~~ BUILT WITH ~~</h3>
+              {tools.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {tools.map((tool) => (
+                    <Badge key={tool} variant="default">
+                      #{tool}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-xs text-muted">Add technologies...</span>
+              )}
+              <TagEditor selected={tools} onChange={handleToolsChange} />
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-4">
+          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+            <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+              <h4 className="text-xs font-bold text-slop-purple text-center">~~ VIBE SCORE ~~</h4>
+              <VibeMeter percent={vibePercent} showLabel />
+              <VibeInput
+                mode={vibeMode}
+                onModeChange={setVibeMode}
+                vibePercent={vibePercent}
+                onVibePercentChange={handleVibePercentChange}
+                vibeDetails={vibeDetails}
+                onVibeDetailsChange={setVibeDetails}
+              />
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="project-details-sidebar">
-            <div className="score-widget preview-mode">
-              {/* Vibe Score - editable */}
-              <div className="score-widget-section">
-                <h4>Vibe Score</h4>
-                <div className="vibe-editor-preview">
-                  <VibeMeter percent={vibePercent} showLabel />
-                  <div className="vibe-editor-inline">
-                    <VibeInput
-                      mode={vibeMode}
-                      onModeChange={setVibeMode}
-                      vibePercent={vibePercent}
-                      onVibePercentChange={handleVibePercentChange}
-                      vibeDetails={vibeDetails}
-                      onVibeDetailsChange={setVibeDetails}
-                    />
-                  </div>
+          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+            <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+              <h4 className="text-xs font-bold text-slop-purple text-center">~~ COMMUNITY VOTES ~~</h4>
+              <div className="space-y-2 text-xs mt-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-fg">People</span>
+                  <span className="text-muted">+0 / -0</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-fg">Devs</span>
+                  <span className="text-muted">+0 / -0</span>
                 </div>
               </div>
-
-              {/* Voting preview (disabled) */}
-              <div className="score-widget-section">
-                <h4>Community Votes</h4>
-                <div className="score-channels preview-disabled">
-                  <div className="score-channel-row">
-                    <span className="score-channel-label">People</span>
-                    <span className="score-votes">+0 / -0</span>
-                  </div>
-                  <div className="score-channel-row">
-                    <span className="score-channel-label">Devs</span>
-                    <span className="score-votes">+0 / -0</span>
-                  </div>
-                </div>
-                <p className="text-muted text-small">
-                  Voting enabled after submission
-                </p>
-              </div>
+              <p className="text-[10px] text-muted mt-3">
+                Voting enabled after submission
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* URL editors (temporary inline for Phase 1) */}
-      <div className="preview-url-editors">
-        <h3>Project Links</h3>
-        <p className="text-muted text-small">At least one URL is required</p>
-        <div className="form-field">
-          <label htmlFor="mainUrl">Live URL</label>
-          <input
-            id="mainUrl"
-            type="url"
-            value={mainUrl}
-            onChange={(e) => setMainUrl(e.target.value)}
-            onBlur={() => onFieldChange("mainUrl", mainUrl || null)}
-            placeholder="https://your-app.com"
-          />
-        </div>
-        <div className="form-field">
-          <label htmlFor="repoUrl">Repository URL</label>
-          <input
-            id="repoUrl"
-            type="url"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            onBlur={() => onFieldChange("repoUrl", repoUrl || null)}
-            placeholder="https://github.com/user/repo"
-          />
+      {/* URL editors */}
+      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+          <h3 className="text-sm font-bold text-slop-purple">~~ PROJECT LINKS ~~</h3>
+          <p className="text-[10px] text-muted">At least one URL is required</p>
+          <div className="space-y-3">
+            <Input
+              label="Live URL"
+              type="url"
+              value={mainUrl}
+              onChange={(e) => setMainUrl(e.target.value)}
+              onBlur={() => onFieldChange("mainUrl", mainUrl || null)}
+              placeholder="https://your-app.com"
+            />
+            <Input
+              label="Repository URL"
+              type="url"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              onBlur={() => onFieldChange("repoUrl", repoUrl || null)}
+              placeholder="https://github.com/user/repo"
+            />
+          </div>
         </div>
       </div>
 
       {/* Error display */}
       {error && (
-        <div className="preview-error">
-          <p className="error-message">{error}</p>
+        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 text-center">
+          <p className="text-xs text-danger">{error}</p>
         </div>
       )}
 
       {/* Actions */}
-      <div className="preview-actions">
+      <div className="flex flex-wrap items-center gap-3">
         <Button
           type="button"
           variant="primary"
           onClick={handleSubmit}
           disabled={isSubmitting || !hasRequiredFields}
-          className="btn-large"
         >
           {isSubmitting ? "Submitting..." : "Submit Project"}
         </Button>

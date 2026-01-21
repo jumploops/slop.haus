@@ -36,11 +36,13 @@ export function VoteButtons({
         onClick={handleUpvote}
         disabled={disabled}
         className={cn(
-          "flex items-center justify-center rounded transition-colors",
+          "flex items-center justify-center transition-colors",
+          "border-2 border-[color:var(--foreground)]",
+          "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]",
           buttonSize,
-          "bg-transparent border-none cursor-pointer",
-          "text-muted hover:bg-border hover:text-fg",
-          currentVote === 1 && "text-accent",
+          "cursor-pointer",
+          "text-fg hover:bg-bg",
+          currentVote === 1 && "bg-slop-green text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none",
           disabled && "opacity-50 cursor-not-allowed"
         )}
         aria-label="Upvote"
@@ -50,8 +52,10 @@ export function VoteButtons({
 
       <span
         className={cn(
-          "min-w-[2rem] text-center text-sm font-medium",
-          score > 0 && "text-accent",
+          "min-w-[2.25rem] text-center text-xs font-bold",
+          "border-2 border-[color:var(--foreground)]",
+          "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] px-1 py-0.5",
+          score > 0 && "text-slop-green",
           score < 0 && "text-danger"
         )}
       >
@@ -63,11 +67,13 @@ export function VoteButtons({
         onClick={handleDownvote}
         disabled={disabled}
         className={cn(
-          "flex items-center justify-center rounded transition-colors",
+          "flex items-center justify-center transition-colors",
+          "border-2 border-[color:var(--foreground)]",
+          "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]",
           buttonSize,
-          "bg-transparent border-none cursor-pointer",
-          "text-muted hover:bg-border hover:text-fg",
-          currentVote === -1 && "text-danger",
+          "cursor-pointer",
+          "text-fg hover:bg-bg",
+          currentVote === -1 && "bg-slop-coral text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none",
           disabled && "opacity-50 cursor-not-allowed"
         )}
         aria-label="Downvote"

@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { AuthButtons } from "@/components/auth/AuthButtons";
-import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { MobileNav } from "./MobileNav";
+import { Star } from "lucide-react";
 
 export function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -15,14 +15,16 @@ export function Header() {
   const { data: session } = useSession();
 
   return (
-    <header className="sticky top-0 z-50 bg-bg border-b border-border h-[var(--app-header-height)]">
+    <header className="sticky top-0 z-50 border-b-4 border-[color:var(--foreground)] bg-gradient-to-r from-slop-teal via-slop-purple to-slop-pink h-[var(--app-header-height)]">
       <div className="max-w-[var(--app-container-max)] mx-auto px-4 h-full flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="text-2xl font-bold text-accent hover:no-underline"
+          className="flex items-center gap-1 text-xl font-bold drop-shadow-[2px_2px_0_var(--foreground)] no-underline hover:no-underline"
         >
-          slop.haus
+          <Star className="h-4 w-4 text-slop-yellow motion-safe:animate-[spinSlow_6s_linear_infinite]" />
+          <span className="text-accent-foreground">SlOp</span>
+          <span className="text-slop-yellow">.HaUs</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -55,9 +57,8 @@ export function Header() {
           )}
         </nav>
 
-        {/* Right side - theme switcher + auth buttons + mobile trigger */}
+        {/* Right side - auth buttons + mobile trigger */}
         <div className="flex items-center gap-3">
-          <ThemeSwitcher />
           <div className="hidden sm:block">
             <AuthButtons />
           </div>
@@ -65,9 +66,11 @@ export function Header() {
             onClick={() => setMobileNavOpen(true)}
             className={cn(
               "sm:hidden flex items-center justify-center",
-              "w-10 h-10 rounded-md",
-              "bg-transparent hover:bg-border",
-              "text-fg transition-colors"
+              "w-10 h-10",
+              "border-2 border-[color:var(--foreground)]",
+              "bg-bg-secondary text-fg",
+              "shadow-[2px_2px_0_var(--foreground)]",
+              "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
             )}
             aria-label="Open navigation"
           >
@@ -94,9 +97,9 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "text-fg hover:text-accent transition-colors duration-200",
-        "hover:no-underline",
-        active && "text-accent"
+        "text-accent-foreground hover:text-slop-yellow transition-colors duration-200",
+        "no-underline hover:no-underline",
+        active && "text-slop-yellow"
       )}
     >
       {children}

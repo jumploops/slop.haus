@@ -71,34 +71,38 @@ export function AnalysisError({
   };
 
   return (
-    <div className="analysis-error">
-      <div className="analysis-error-icon">
-        <WarningIcon />
-      </div>
+    <div className="max-w-md mx-auto text-center">
+      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <div className="flex justify-center mb-3 text-danger">
+            <WarningIcon />
+          </div>
 
-      <div className="analysis-error-content">
-        <h3 className="analysis-error-title">Analysis Failed</h3>
-        <p className="analysis-error-message">{errorMessage}</p>
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-danger mb-2">Analysis Failed</h3>
+            <p className="text-sm text-fg">{errorMessage}</p>
 
-        {recovery.message !== errorMessage && (
-          <p className="analysis-error-hint">{recovery.message}</p>
-        )}
-      </div>
+            {recovery.message !== errorMessage && (
+              <p className="text-xs text-muted mt-2">{recovery.message}</p>
+            )}
+          </div>
 
-      <div className="analysis-error-actions">
-        {getActionButton(recovery.action)}
+          <div className="flex flex-col gap-2">
+            {getActionButton(recovery.action)}
 
-        {recovery.action !== "manual" && (
-          <Button onClick={onManualEntry} variant="ghost">
-            Enter Manually Instead
-          </Button>
-        )}
+            {recovery.action !== "manual" && (
+              <Button onClick={onManualEntry} variant="ghost">
+                Enter Manually Instead
+              </Button>
+            )}
 
-        {recovery.action === "manual" && (
-          <Button onClick={onRetry} variant="ghost">
-            Try Different URL
-          </Button>
-        )}
+            {recovery.action === "manual" && (
+              <Button onClick={onRetry} variant="ghost">
+                Try Different URL
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

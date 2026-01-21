@@ -32,10 +32,10 @@ Transform the entire `apps/web` UI to the 90s/early 2000s retro aesthetic define
 
 | Phase | Name | Status |
 | --- | --- | --- |
-| 1 | Tokens + Global Styles | Not started |
-| 2 | Retro Component Variants | Not started |
-| 3 | Page-Level Reskin | Not started |
-| 4 | Motion + Assets | Not started |
+| 1 | Tokens + Global Styles | Completed |
+| 2 | Retro Component Variants | Completed |
+| 3 | Page-Level Reskin | Completed |
+| 4 | Motion + Assets | Completed |
 
 ## Dependencies
 

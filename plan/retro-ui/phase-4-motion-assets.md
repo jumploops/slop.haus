@@ -1,6 +1,6 @@
 # Phase 4: Motion + Assets
 
-**Status:** Not started
+**Status:** Completed
 
 ## Objective
 
@@ -22,6 +22,13 @@ Add retro motion flourishes and approved assets, keeping motion respectful of re
 - Ensure `prefers-reduced-motion` continues to suppress animations.
 - Create `apps/web/public` and copy assets from `reference-ui/public` (badges, avatars, awards, placeholders).
 - Replace placeholder imagery with approved retro assets where appropriate.
+
+## Progress Notes
+
+- Added rainbow, wobble, and slow spin keyframes in `apps/web/src/styles/animations.css`.
+- Applied marquee rainbow text, wobble NEW badge, and slow-spinning header star.
+- Copied approved retro assets into `apps/web/public`.
+- Swapped project placeholders to use retro sample imagery.
 
 ## Code Snippets
 

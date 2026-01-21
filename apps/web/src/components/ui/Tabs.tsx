@@ -16,25 +16,24 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
   return (
-    <div className={cn("flex gap-2 border-b border-border mb-6", className)}>
+    <div className={cn("flex flex-wrap gap-1 mb-4", className)}>
       {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"
           className={cn(
-            "px-4 py-3 text-sm font-medium relative",
-            "bg-transparent border-none cursor-pointer",
+            "px-3 py-2 text-xs font-bold",
+            "border-2 border-[color:var(--foreground)]",
+            "shadow-[2px_2px_0_var(--foreground)]",
+            "bg-bg-secondary cursor-pointer",
             "transition-colors duration-200",
             activeTab === tab.id
-              ? "text-accent"
-              : "text-muted hover:text-fg"
+              ? "bg-accent text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none"
+              : "text-fg hover:bg-bg"
           )}
           onClick={() => onTabChange(tab.id)}
         >
           {tab.label}
-          {activeTab === tab.id && (
-            <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-accent" />
-          )}
         </button>
       ))}
     </div>

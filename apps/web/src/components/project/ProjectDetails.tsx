@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { ScoreWidget } from "./ScoreWidget";
 import { useFavorite } from "@/hooks/useFavorite";
 import { useSession } from "@/lib/auth-client";
-import { formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
+import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import type { ProjectDetail } from "@/lib/api/projects";
 
 interface ProjectDetailsProps {
@@ -25,73 +25,88 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   return (
     <div>
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row gap-6 mb-8">
-        {/* Media */}
-        <div className="md:w-[400px] flex-shrink-0">
-          <img
-            src={imageUrl}
-            alt={project.title}
-            className="w-full rounded-lg object-cover bg-bg-secondary aspect-video"
-          />
-        </div>
+      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1 mb-8">
+        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Media */}
+            <div className="md:w-[420px] flex-shrink-0">
+              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary">
+                <img
+                  src={imageUrl}
+                  alt={project.title}
+                  className="w-full object-cover aspect-video"
+                />
+              </div>
+            </div>
 
-        {/* Info */}
-        <div className="flex-1">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">{project.title}</h1>
-          <p className="text-lg text-muted mb-4">{project.tagline}</p>
+            {/* Info */}
+            <div className="flex-1">
+              <h1 className="text-2xl md:text-3xl font-bold text-slop-blue mb-2">
+                ★ {project.title} ★
+              </h1>
+              <p className="text-sm text-muted mb-4">{project.tagline}</p>
 
-          {/* Author */}
-          <div className="flex items-center gap-3 mb-4">
-            <Avatar src={project.author.image} alt={project.author.name} size="md" />
-            <span className="font-medium">{project.author.name}</span>
-            {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
-          </div>
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary p-2 mb-4 text-xs flex flex-wrap gap-3">
+                <span className="flex items-center gap-2 font-bold text-slop-purple">
+                  <Avatar src={project.author.image} alt={project.author.name} size="sm" />
+                  {project.author.name}
+                </span>
+                {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
+                <span className="text-muted">Submitted {formatRelativeTime(project.createdAt)}</span>
+                {project.lastEditedAt && (
+                  <span className="text-muted">Last edited {formatRelativeTime(project.lastEditedAt)}</span>
+                )}
+              </div>
 
-          {/* Meta */}
-          <div className="flex flex-wrap gap-4 text-sm text-muted mb-6">
-            <span>Submitted {formatRelativeTime(project.createdAt)}</span>
-            {project.lastEditedAt && (
-              <span>Last edited {formatRelativeTime(project.lastEditedAt)}</span>
-            )}
-          </div>
-
-          {/* Action Links */}
-          <div className="flex flex-wrap gap-3">
-            {project.mainUrl && (
-              <a
-                href={project.mainUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-accent text-accent-foreground font-medium hover:opacity-90 hover:no-underline transition-opacity"
-              >
-                <ExternalLinkIcon /> Visit Site
-              </a>
-            )}
-            {project.repoUrl && (
-              <a
-                href={project.repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-fg hover:bg-border hover:no-underline transition-colors"
-              >
-                <GithubIcon /> View Repo
-              </a>
-            )}
-            <Button
-              variant={isFavorited ? "secondary" : "ghost"}
-              onClick={toggleFavorite}
-              disabled={favoriteLoading}
-            >
-              <HeartIcon filled={isFavorited} /> {isFavorited ? "Favorited" : "Favorite"}
-            </Button>
-            {isAuthor && (
-              <Link
-                href={`/p/${project.slug}/edit`}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-fg hover:bg-border hover:no-underline transition-colors"
-              >
-                <PencilIcon /> Edit
-              </Link>
-            )}
+              {/* Action Links */}
+              <div className="flex flex-wrap gap-3">
+                {project.mainUrl && (
+                  <a
+                    href={project.mainUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({ variant: "primary", size: "sm" }),
+                      "no-underline hover:no-underline"
+                    )}
+                  >
+                    <ExternalLinkIcon /> Visit Site
+                  </a>
+                )}
+                {project.repoUrl && (
+                  <a
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({ variant: "secondary", size: "sm" }),
+                      "no-underline hover:no-underline"
+                    )}
+                  >
+                    <GithubIcon /> View Repo
+                  </a>
+                )}
+                <Button
+                  variant={isFavorited ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={toggleFavorite}
+                  disabled={favoriteLoading}
+                >
+                  <HeartIcon filled={isFavorited} /> {isFavorited ? "Favorited" : "Favorite"}
+                </Button>
+                {isAuthor && (
+                  <Link
+                    href={`/p/${project.slug}/edit`}
+                    className={cn(
+                      buttonVariants({ variant: "secondary", size: "sm" }),
+                      "no-underline hover:no-underline"
+                    )}
+                  >
+                    <PencilIcon /> Edit
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -102,20 +117,28 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
         <div>
           {project.description && (
             <section className="mb-8">
-              <h3 className="text-lg font-semibold mb-3">About</h3>
-              <p className="text-fg leading-relaxed whitespace-pre-wrap">{project.description}</p>
+              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+                <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+                  <h3 className="text-sm font-bold text-slop-purple mb-3">~~ ABOUT THIS SLOP ~~</h3>
+                  <p className="text-sm text-fg leading-relaxed whitespace-pre-wrap">{project.description}</p>
+                </div>
+              </div>
             </section>
           )}
 
           {project.tools.length > 0 && (
             <section className="mb-8">
-              <h3 className="text-lg font-semibold mb-3">Built with</h3>
-              <div className="flex flex-wrap gap-2">
-                {project.tools.map((tool) => (
-                  <Badge key={tool.id} variant="default">
-                    {tool.name}
-                  </Badge>
-                ))}
+              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+                <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+                  <h3 className="text-sm font-bold text-slop-purple mb-3">~~ BUILT WITH ~~</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {project.tools.map((tool) => (
+                      <Badge key={tool.id} variant="default">
+                        #{tool.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
             </section>
           )}

@@ -74,7 +74,7 @@ export function ScreenshotEditor({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="w-full aspect-video overflow-hidden rounded-lg bg-bg-secondary">
+      <div className="w-full aspect-video overflow-hidden border-2 border-[color:var(--foreground)] bg-bg-secondary">
         <img
           src={imageUrl}
           alt={projectTitle}
@@ -93,6 +93,7 @@ export function ScreenshotEditor({
 
         <Button
           variant="secondary"
+          size="sm"
           onClick={handleUploadClick}
           disabled={isUploading || isRefreshing}
         >
@@ -103,6 +104,7 @@ export function ScreenshotEditor({
         {mainUrl && (
           <Button
             variant="ghost"
+            size="sm"
             onClick={handleRefresh}
             disabled={isUploading || isRefreshing}
             title="Capture a fresh screenshot from the live URL"
@@ -114,10 +116,10 @@ export function ScreenshotEditor({
       </div>
 
       {error && (
-        <p className="text-danger text-sm">{error}</p>
+        <p className="text-danger text-xs">{error}</p>
       )}
 
-      <p className="text-muted text-xs">
+      <p className="text-muted text-[10px]">
         Upload PNG, JPEG, or WebP (max 5MB)
       </p>
     </div>

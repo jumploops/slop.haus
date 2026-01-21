@@ -114,19 +114,22 @@ function SubmitFlow() {
   };
 
   return (
-    <div className="submit-page">
-      <div className="submit-container">
+    <div className="max-w-2xl mx-auto space-y-6">
         {step === "input" && (
           <>
-            <UrlInput
-              onAnalyze={handleAnalyze}
-              isLoading={isLoading}
-              error={error?.message ?? null}
-            />
-            <div className="submit-manual-link">
-              <Link href="/submit/manual" className="text-muted">
-                Or enter details manually
-              </Link>
+            <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+                <UrlInput
+                  onAnalyze={handleAnalyze}
+                  isLoading={isLoading}
+                  error={error?.message ?? null}
+                />
+                <div className="mt-4 text-center">
+                  <Link href="/submit/manual" className="text-xs text-slop-blue hover:text-slop-coral">
+                    Or enter details manually
+                  </Link>
+                </div>
+              </div>
             </div>
           </>
         )}
@@ -150,7 +153,6 @@ function SubmitFlow() {
             onManualEntry={handleManualEntry}
           />
         )}
-      </div>
     </div>
   );
 }

@@ -4,9 +4,9 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  label?: React.ReactNode;
   error?: string;
-  helperText?: string;
+  helperText?: React.ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -24,9 +24,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "px-3 py-2.5 rounded-md",
+            "px-3 py-2 rounded-sm",
             "bg-bg-secondary text-fg text-sm",
-            "border border-border",
+            "border-2 border-[color:var(--foreground)]",
+            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
             "transition-colors duration-200",
             "placeholder:text-muted",
             "focus:outline-none focus:border-accent",
@@ -45,9 +46,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string;
+  label?: React.ReactNode;
   error?: string;
-  helperText?: string;
+  helperText?: React.ReactNode;
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -65,9 +66,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "px-3 py-2.5 rounded-md min-h-[100px] resize-y",
+            "px-3 py-2 rounded-sm min-h-[100px] resize-y",
             "bg-bg-secondary text-fg text-sm",
-            "border border-border",
+            "border-2 border-[color:var(--foreground)]",
+            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
             "transition-colors duration-200",
             "placeholder:text-muted",
             "focus:outline-none focus:border-accent",

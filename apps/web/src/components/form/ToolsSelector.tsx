@@ -73,14 +73,14 @@ export function ToolsSelector({
 
   return (
     <div className="mb-6 relative" ref={containerRef}>
-      <label className="block text-sm font-medium mb-1">Tools & Technologies</label>
-      <p className="text-sm text-muted mb-2">What was used to build this project?</p>
+      <label className="block text-xs font-bold text-slop-purple mb-1">Tools & Technologies</label>
+      <p className="text-xs text-muted mb-2">What was used to build this project?</p>
 
       <div
         className={cn(
-          "flex flex-wrap gap-2 p-3 min-h-[48px] rounded-md border border-border bg-bg-secondary cursor-text",
-          "focus-within:border-accent focus-within:ring-1 focus-within:ring-accent",
-          isOpen && "border-accent ring-1 ring-accent"
+          "flex flex-wrap gap-2 p-2 min-h-[48px] border-2 border-[color:var(--foreground)] bg-bg-secondary cursor-text",
+          "focus-within:border-accent",
+          isOpen && "border-accent"
         )}
         onClick={() => inputRef.current?.focus()}
       >
@@ -93,7 +93,7 @@ export function ToolsSelector({
                 e.stopPropagation();
                 handleRemove(tool);
               }}
-              className="ml-1 p-0.5 rounded hover:bg-black/20 transition-colors"
+              className="ml-1 p-0.5 hover:bg-bg transition-colors"
               aria-label={`Remove ${tool}`}
             >
               <CloseIcon />
@@ -117,16 +117,16 @@ export function ToolsSelector({
       </div>
 
       {selectedTools.length >= maxTools && (
-        <p className="text-sm text-danger mt-1">Maximum {maxTools} tools allowed</p>
+        <p className="text-xs text-danger mt-1">Maximum {maxTools} tools allowed</p>
       )}
 
       {isOpen && (search || availableTools?.length) && (
-        <div className="absolute z-50 w-full mt-1 bg-bg border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-bg border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)] max-h-60 overflow-y-auto">
           {isLoading && (
-            <div className="px-4 py-3 text-sm text-muted">Loading...</div>
+            <div className="px-4 py-3 text-xs text-muted">Loading...</div>
           )}
           {!isLoading && availableTools?.length === 0 && search && (
-            <div className="px-4 py-3 text-sm text-muted">
+            <div className="px-4 py-3 text-xs text-muted">
               No tools found for "{search}"
             </div>
           )}
@@ -136,7 +136,7 @@ export function ToolsSelector({
                 key={tool.id}
                 type="button"
                 onClick={() => handleSelect(tool)}
-                className="w-full px-4 py-2 text-left text-sm text-fg hover:bg-border transition-colors"
+                className="w-full px-3 py-2 text-left text-xs text-fg hover:bg-bg-secondary transition-colors"
               >
                 {tool.name}
               </button>

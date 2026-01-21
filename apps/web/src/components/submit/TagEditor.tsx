@@ -40,15 +40,18 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
   const selectedTools = tools.filter((t) => selected.includes(t.slug));
 
   return (
-    <div className="tag-editor">
-      <div className="tag-editor-selected">
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
         {selectedTools.map((tool) => (
-          <span key={tool.slug} className="tag">
+          <span
+            key={tool.slug}
+            className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-slop-yellow/40 border-2 border-[color:var(--foreground)]"
+          >
             {tool.name}
             <button
               type="button"
               onClick={() => handleRemove(tool.slug)}
-              className="tag-remove"
+              className="ml-1 text-xs font-bold text-slop-coral"
               aria-label={`Remove ${tool.name}`}
             >
               &times;
@@ -56,12 +59,12 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
           </span>
         ))}
         {selected.length === 0 && (
-          <span className="text-muted">No technologies selected</span>
+          <span className="text-xs text-muted">No technologies selected</span>
         )}
       </div>
 
       {selected.length < maxTags && (
-        <div className="tag-editor-input">
+        <div className="relative">
           <input
             type="text"
             value={search}
@@ -75,17 +78,18 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
               setTimeout(() => setIsOpen(false), 200);
             }}
             placeholder="Search to add..."
+            className="w-full px-2 py-1 text-sm bg-bg-secondary border-2 border-[color:var(--foreground)] shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)] focus:outline-none focus:border-accent"
           />
 
           {isOpen && search && filteredTools.length > 0 && (
-            <div className="tag-editor-dropdown">
+            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--foreground)] bg-bg shadow-[2px_2px_0_var(--foreground)]">
               {filteredTools.map((tool) => (
                 <button
                   key={tool.slug}
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => handleAdd(tool.slug)}
-                  className="tag-editor-option"
+                  className="w-full text-left px-2 py-1 text-xs font-bold hover:bg-bg-secondary"
                 >
                   {tool.name}
                 </button>
@@ -94,14 +98,14 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
           )}
 
           {isOpen && search && filteredTools.length === 0 && (
-            <div className="tag-editor-dropdown">
-              <span className="text-muted tag-editor-empty">No matching tools</span>
+            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--foreground)] bg-bg shadow-[2px_2px_0_var(--foreground)] px-2 py-2">
+              <span className="text-xs text-muted">No matching tools</span>
             </div>
           )}
         </div>
       )}
 
-      <p className="text-muted text-small">
+      <p className="text-[10px] text-muted">
         {selected.length}/{maxTags} technologies
       </p>
     </div>

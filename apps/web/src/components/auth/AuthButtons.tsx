@@ -39,8 +39,11 @@ export function AuthButtons() {
 
     return (
       <div className="relative" ref={dropdownRef}>
-        <button
-          className="flex items-center gap-2 px-2 py-1 bg-transparent border border-transparent rounded-md text-fg cursor-pointer transition-all hover:bg-bg-secondary hover:border-border"
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="px-2 py-1"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           aria-expanded={isDropdownOpen}
           aria-haspopup="true"
@@ -52,47 +55,49 @@ export function AuthButtons() {
           />
           <span>{session.user.name}</span>
           <ChevronIcon open={isDropdownOpen} />
-        </button>
+        </Button>
 
         {isDropdownOpen && (
-          <div className="absolute top-[calc(100%+0.5rem)] right-0 min-w-[180px] bg-bg-secondary border border-border rounded-lg shadow-lg z-[1000] overflow-hidden">
-            <Link
-              href="/favorites"
-              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg no-underline hover:bg-border"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <HeartIcon />
-              Favorites
-            </Link>
-            <Link
-              href="/settings"
-              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg no-underline hover:bg-border"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <SettingsIcon />
-              Settings
-            </Link>
-            {showAdminLink && (
+          <div className="absolute top-[calc(100%+0.5rem)] right-0 min-w-[180px] border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] z-[1000]">
+            <div className="bg-bg border-2 border-[color:var(--border)]">
               <Link
-                href="/admin"
-                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg no-underline hover:bg-border"
+                href="/favorites"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg no-underline hover:bg-warning/20"
                 onClick={() => setIsDropdownOpen(false)}
               >
-                <ShieldIcon />
-                {isAdmin ? "Admin" : "Mod Queue"}
+                <HeartIcon />
+                Favorites
               </Link>
-            )}
-            <div className="h-px bg-border my-1" />
-            <button
-              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-fg bg-transparent border-none cursor-pointer hover:bg-border"
-              onClick={() => {
-                setIsDropdownOpen(false);
-                signOut();
-              }}
-            >
-              <LogoutIcon />
-              Sign Out
-            </button>
+              <Link
+                href="/settings"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg no-underline hover:bg-warning/20"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                <SettingsIcon />
+                Settings
+              </Link>
+              {showAdminLink && (
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg no-underline hover:bg-warning/20"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  <ShieldIcon />
+                  {isAdmin ? "Admin" : "Mod Queue"}
+                </Link>
+              )}
+              <div className="h-px bg-border" />
+              <button
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg bg-transparent border-none cursor-pointer hover:bg-warning/20 text-left"
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  signOut();
+                }}
+              >
+                <LogoutIcon />
+                Sign Out
+              </button>
+            </div>
           </div>
         )}
       </div>

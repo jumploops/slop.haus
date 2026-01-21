@@ -10,7 +10,8 @@ export function Skeleton({ className, variant, style }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "rounded bg-gradient-to-r from-border via-bg-secondary to-border bg-[length:200%_100%] animate-shimmer",
+        "rounded-sm border-2 border-[color:var(--foreground)]",
+        "bg-gradient-to-r from-bg-secondary via-bg to-border bg-[length:200%_100%] animate-shimmer",
         variant === "text" && "h-4 w-full",
         variant === "avatar" && "w-8 h-8 rounded-full",
         variant === "image" && "w-[120px] h-[80px]",
@@ -34,19 +35,18 @@ export function SkeletonAvatar({ className }: { className?: string }) {
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="border border-border rounded-lg p-6 mb-4">
-      <div className="flex gap-4 mb-4">
+    <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="flex gap-3">
         <Skeleton variant="image" />
         <div className="flex-1">
           <Skeleton variant="title" className="mb-2" />
           <Skeleton variant="tagline" className="mb-2" />
-          <Skeleton variant="vibe" />
+          <div className="flex gap-2">
+            <Skeleton className="h-6 w-10" />
+            <Skeleton className="h-6 w-10" />
+            <Skeleton className="h-6 w-14" />
+          </div>
         </div>
-      </div>
-      <div className="flex gap-4 pt-4 border-t border-border">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-4 w-24" />
       </div>
     </div>
   );

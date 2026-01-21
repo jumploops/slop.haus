@@ -22,17 +22,17 @@ export function RequireAuth({ children, fallback }: RequireAuthProps) {
 
   if (isPending) {
     return (
-      <div className="auth-loading">
-        <Skeleton className="skeleton-text" style={{ width: "200px", height: "24px" }} />
-        <Skeleton className="skeleton-text" style={{ width: "100%", height: "200px", marginTop: "1rem" }} />
+      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 space-y-3">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-40 w-full" />
       </div>
     );
   }
 
   if (!session?.user) {
     return fallback || (
-      <div className="empty-state">
-        <p>Please sign in to continue</p>
+      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <p className="text-sm text-muted">Please sign in to continue</p>
       </div>
     );
   }

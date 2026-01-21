@@ -53,17 +53,23 @@ export function formatVotes(up: number, down: number): string {
 }
 
 export function getPlaceholderImage(title: string): string {
-  // Generate a simple placeholder based on title initials
-  const initials = title
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-  return `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-      <rect fill="#1a1a1a" width="400" height="300"/>
-      <text x="200" y="160" fill="#00ff88" font-size="48" font-family="sans-serif" text-anchor="middle">${initials}</text>
-    </svg>`
-  )}`;
+  const placeholders = [
+    "/colorful-email-app-interface-with-mood-indicators.jpg",
+    "/minimalist-todo-app-with-philosophical-quotes-over.jpg",
+    "/chaotic-colorful-css-code-editor.jpg",
+    "/futuristic-calendar-with-glowing-quantum-particles.jpg",
+    "/sticky-notes-app-with-sarcastic-handwriting.jpg",
+    "/pitch-deck-generator-with-money-and-rocket-emojis.jpg",
+  ];
+
+  if (!title) {
+    return "/placeholder.jpg";
+  }
+
+  let hash = 0;
+  for (let i = 0; i < title.length; i += 1) {
+    hash = (hash * 31 + title.charCodeAt(i)) % placeholders.length;
+  }
+
+  return placeholders[Math.abs(hash) % placeholders.length] || "/placeholder.jpg";
 }
