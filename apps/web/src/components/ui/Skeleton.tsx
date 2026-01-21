@@ -34,7 +34,7 @@ export function SkeletonAvatar({ className }: { className?: string }) {
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="border border-border rounded-lg p-6 mb-4">
+    <div className="card mb-4">
       <div className="flex gap-4 mb-4">
         <Skeleton variant="image" />
         <div className="flex-1">

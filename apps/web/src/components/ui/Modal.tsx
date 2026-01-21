@@ -44,9 +44,9 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     <dialog
       ref={dialogRef}
       className={cn(
-        "border-none rounded-xl bg-bg text-fg p-0",
+        "modal border-none p-0",
         "max-w-[500px] w-[90%] m-auto",
-        "backdrop:bg-black/75",
+        "backdrop:bg-bg/75",
         className
       )}
       onClick={handleBackdropClick}

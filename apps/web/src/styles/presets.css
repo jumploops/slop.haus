@@ -32,6 +32,12 @@
   --warning: oklch(0.85 0.18 85);
   --success: oklch(0.85 0.2 180);
   --radius: 4px;
+  --border-width: 1px;
+  --border-style: solid;
+  --app-card-pad: 16px;
+  --app-page-gutter: 16px;
+  --app-section-pad: 24px;
+  --app-grid-cols: repeat(1, minmax(0, 1fr));
 }
 
 /* Warm - orange on warm brown */
@@ -48,6 +54,12 @@
   --danger: oklch(0.65 0.22 25);
   --warning: oklch(0.85 0.15 85);
   --success: oklch(0.7 0.18 160);
+  --border-width: 1px;
+  --border-style: solid;
+  --app-card-pad: 16px;
+  --app-page-gutter: 16px;
+  --app-section-pad: 24px;
+  --app-grid-cols: repeat(1, minmax(0, 1fr));
 }
 
 /* Light - high contrast light mode */
@@ -64,6 +76,12 @@
   --danger: oklch(0.55 0.22 25);
   --warning: oklch(0.7 0.15 70);
   --success: oklch(0.55 0.18 155);
+  --border-width: 1px;
+  --border-style: solid;
+  --app-card-pad: 16px;
+  --app-page-gutter: 16px;
+  --app-section-pad: 24px;
+  --app-grid-cols: repeat(1, minmax(0, 1fr));
 }
 
 /* Midnight - elegant purple */
@@ -80,6 +98,12 @@
   --danger: oklch(0.65 0.2 25);
   --warning: oklch(0.8 0.15 85);
   --success: oklch(0.7 0.18 160);
+  --border-width: 1px;
+  --border-style: solid;
+  --app-card-pad: 16px;
+  --app-page-gutter: 16px;
+  --app-section-pad: 24px;
+  --app-grid-cols: repeat(1, minmax(0, 1fr));
 }
 
 /* Forest - natural green */
@@ -96,4 +120,10 @@
   --danger: oklch(0.65 0.2 25);
   --warning: oklch(0.8 0.15 85);
   --success: oklch(0.75 0.18 145);
+  --border-width: 1px;
+  --border-style: solid;
+  --app-card-pad: 16px;
+  --app-page-gutter: 16px;
+  --app-section-pad: 24px;
+  --app-grid-cols: repeat(1, minmax(0, 1fr));
 }

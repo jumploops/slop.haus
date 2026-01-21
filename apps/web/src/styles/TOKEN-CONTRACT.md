@@ -53,6 +53,29 @@ Spacing utilities derive from Tailwind's default scale:
 | `--radius` | `rounded-md` | 0.5rem |
 | `--radius-lg` | `rounded-lg` | 0.75rem |
 
+## Structure Tokens
+
+| Token | Purpose |
+|-------|---------|
+| `--border-width` | Global border width for semantic recipes |
+| `--border-style` | Border style (solid, inset, outset, double) |
+| `--shadow-xs` | Extra-small shadow |
+| `--shadow-sm` | Small shadow |
+| `--shadow-md` | Medium shadow |
+| `--shadow-lg` | Large shadow |
+
+## Layout Tokens
+
+| Token | Purpose |
+|-------|---------|
+| `--app-container-max` | Max width for page container |
+| `--app-header-height` | Header height |
+| `--app-sidebar-width` | Sidebar width |
+| `--app-card-pad` | Card padding |
+| `--app-page-gutter` | Page gutter padding |
+| `--app-section-pad` | Section padding |
+| `--app-grid-cols` | Layout grid columns |
+
 ## Component Patterns
 
 ### Buttons
@@ -111,7 +134,9 @@ import { Input, Textarea } from "@/components/ui/Input";
 |------|---------|
 | `src/styles/theme.css` | `@theme` token definitions + Tailwind mapping |
 | `src/styles/presets.css` | Preset theme overrides (cyberpunk, warm, etc.) |
-| `src/app/globals.css` | Page-specific layouts + legacy CSS (being migrated) |
+| `src/styles/recipes.css` | Semantic component recipes (Tailwind `@apply`) |
+| `src/styles/themes/*.css` | Built-in structural theme overrides |
+| `src/app/app.css` | App stylesheet entry point |
 
 ## Preset Themes
 
@@ -151,7 +176,7 @@ As of Phase 9:
 
 ## Adding New Tokens
 
-1. Add to `:root` in `globals.css` (base value)
+1. Add to `:root` in `theme.css` (base value)
 2. Add to `@theme` block in `theme.css` (Tailwind mapping)
 3. Add override in each preset in `presets.css`
 4. Update this document

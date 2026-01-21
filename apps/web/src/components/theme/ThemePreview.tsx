@@ -48,7 +48,7 @@ export function ThemePreview({ themeId }: ThemePreviewProps) {
       </div>
 
       {/* Card-like content */}
-      <div className="p-4 bg-bg-secondary rounded-md border border-border">
+      <div className="card">
         <div className="flex items-center gap-3 mb-2">
           <Avatar src={null} alt="Test User" size="md" />
           <div>

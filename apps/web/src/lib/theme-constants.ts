@@ -7,6 +7,8 @@
 
 export const PRESET_THEMES = [
   { id: "default", name: "Default", description: "The classic slop.haus look" },
+  { id: "slop-default", name: "Slop Default", description: "Current slop.haus styling" },
+  { id: "retro-90s", name: "Retro 90s", description: "Early web vibes with chunky borders" },
   { id: "cyberpunk", name: "Cyberpunk", description: "Neon cyan on dark blue" },
   { id: "warm", name: "Warm", description: "Cozy orange tones" },
   { id: "light", name: "Light", description: "Clean light mode" },

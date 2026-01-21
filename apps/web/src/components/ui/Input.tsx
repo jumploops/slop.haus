@@ -24,9 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "px-3 py-2.5 rounded-md",
-            "bg-bg-secondary text-fg text-sm",
-            "border border-border",
+            "input",
             "transition-colors duration-200",
             "placeholder:text-muted",
             "focus:outline-none focus:border-accent",
@@ -65,9 +63,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "px-3 py-2.5 rounded-md min-h-[100px] resize-y",
-            "bg-bg-secondary text-fg text-sm",
-            "border border-border",
+            "input min-h-[100px] resize-y",
             "transition-colors duration-200",
             "placeholder:text-muted",
             "focus:outline-none focus:border-accent",

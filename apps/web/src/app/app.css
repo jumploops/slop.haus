@@ -1,8 +1,15 @@
 /* Theme tokens (includes @import "tailwindcss") */
 @import "../styles/theme.css";
 
+/* Semantic recipes */
+@import "../styles/recipes.css";
+
 /* Animations */
 @import "../styles/animations.css";
 
 /* Preset theme overrides */
 @import "../styles/presets.css";
+
+/* Built-in structural themes */
+@import "../styles/themes/slop-default.css";
+@import "../styles/themes/retro-90s.css";

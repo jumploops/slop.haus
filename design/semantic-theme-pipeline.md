@@ -69,7 +69,7 @@ Examples:
 Definitions:
 
 - Built-in theme CSS: `apps/web/src/styles/themes/*.css` (may include gradients, box-shadow stacks, patterns).
-- User themes: `ThemeSpec` JSON validated and compiled to `:root[data-theme="user:<id>"] { --var: value; }`.
+- User themes: `ThemeSpec` JSON validated and compiled to `:root[data-theme="custom:<id>"] { --var: value; }`.
 - Theme previews: always emit `.theme-scope[data-theme="..."]` selectors for both built-in and user themes.
 
 ### 4) Runtime Application
@@ -219,6 +219,39 @@ To allow layout changes without unsafe CSS, prefer one of these patterns:
 - CSS uses `[data-layout="grid"]` selectors to switch safely
 
 This avoids arbitrary grid templates or `calc()` supplied by users.
+
+## Layout Token Usage (Practical Compromise)
+
+- Use `--app-page-gutter` for the global shell (header + main container).
+- For internal sections, prefer dedicated tokens like `--app-card-pad` or `--app-section-pad`.
+- Allow page-level wrapper classes to override padding when a screen needs a different layout.
+- Avoid scattering raw spacing utilities in primitives; keep overrides scoped to page wrappers.
+
+Example:
+
+```tsx
+// apps/web/src/app/example/page.tsx
+export default function ExamplePage() {
+  return (
+    <div className="page-wrapper page-wrapper--dense">
+      {/* Page content */}
+    </div>
+  );
+}
+```
+
+```css
+/* apps/web/src/styles/recipes.css */
+@layer components {
+  .page-wrapper {
+    padding-inline: var(--app-page-gutter);
+  }
+
+  .page-wrapper--dense {
+    padding-inline: calc(var(--app-page-gutter) * 0.75);
+  }
+}
+```
 
 ## Enforcing Semantic Usage
 

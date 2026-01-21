@@ -11,30 +11,40 @@
    Using OKLCH color space for better perceptual uniformity.
    ============================================ */
 
-:root {
-  /* Backgrounds */
-  --background: oklch(0.07 0 0);           /* #0a0a0a equivalent */
-  --background-secondary: oklch(0.11 0 0); /* #111111 equivalent */
+@layer base {
+  :root {
+    /* Backgrounds */
+    --background: oklch(0.07 0 0);           /* #0a0a0a equivalent */
+    --background-secondary: oklch(0.11 0 0); /* #111111 equivalent */
 
-  /* Foreground (text) */
-  --foreground: oklch(0.93 0 0);           /* #ededed equivalent */
-  --muted: oklch(0.55 0 0);                /* #888888 equivalent */
+    /* Foreground (text) */
+    --foreground: oklch(0.93 0 0);           /* #ededed equivalent */
+    --muted: oklch(0.55 0 0);                /* #888888 equivalent */
 
-  /* Borders & dividers */
-  --border: oklch(0.25 0 0);               /* #333333 equivalent */
+    /* Borders & dividers */
+    --border: oklch(0.25 0 0);               /* #333333 equivalent */
 
-  /* Brand / Accent - bright green */
-  --accent: oklch(0.85 0.2 155);           /* #00ff88 equivalent */
-  --accent-dim: oklch(0.7 0.18 155);       /* #00cc6a equivalent */
-  --accent-foreground: oklch(0.07 0 0);    /* Text on accent bg */
+    /* Brand / Accent - bright green */
+    --accent: oklch(0.85 0.2 155);           /* #00ff88 equivalent */
+    --accent-dim: oklch(0.7 0.18 155);       /* #00cc6a equivalent */
+    --accent-foreground: oklch(0.07 0 0);    /* Text on accent bg */
 
-  /* Semantic status colors */
-  --danger: oklch(0.65 0.25 25);           /* #ff4444 equivalent */
-  --warning: oklch(0.8 0.18 75);           /* #ffaa00 equivalent */
-  --success: oklch(0.85 0.2 155);          /* Same as accent */
+    /* Semantic status colors */
+    --danger: oklch(0.65 0.25 25);           /* #ff4444 equivalent */
+    --warning: oklch(0.8 0.18 75);           /* #ffaa00 equivalent */
+    --success: oklch(0.85 0.2 155);          /* Same as accent */
 
-  /* Border radius base */
-  --radius: 0.5rem;
+    /* Border radius base */
+    --radius: 0.5rem;
+
+    /* Structural defaults */
+    --border-width: 1px;
+    --border-style: solid;
+
+    /* Typography defaults */
+    --font-size-base: 16px;
+    --line-height: 1.6;
+  }
 }
 
 /* ============================================
@@ -90,31 +100,33 @@
    Remove in Phase 9 after full migration.
    ============================================ */
 
-:root {
-  --bg: var(--background);
-  --bg-secondary: var(--background-secondary);
-  --fg: var(--foreground);
-  /* --muted already matches */
-  /* --border already matches */
-  /* --accent already matches */
-  /* --accent-dim already matches */
-  /* --danger already matches */
-  /* --warning already matches */
-  /* --success already matches */
+@layer base {
+  :root {
+    --bg: var(--background);
+    --bg-secondary: var(--background-secondary);
+    --fg: var(--foreground);
+    /* --muted already matches */
+    /* --border already matches */
+    /* --accent already matches */
+    /* --accent-dim already matches */
+    /* --danger already matches */
+    /* --warning already matches */
+    /* --success already matches */
 
-  /* Spacing scale (legacy) */
-  --spacing-1: 0.25rem;
-  --spacing-2: 0.5rem;
-  --spacing-3: 0.75rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-7: 2rem;
-  --spacing-8: 2.5rem;
+    /* Spacing scale (legacy) */
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-7: 2rem;
+    --spacing-8: 2.5rem;
 
-  /* Radius aliases */
-  --radius-sm: 0.25rem;
-  --radius-lg: 0.75rem;
+    /* Radius aliases */
+    --radius-sm: 0.25rem;
+    --radius-lg: 0.75rem;
+  }
 }
 
 /* ============================================
@@ -124,10 +136,16 @@
    Tailwind utility generation.
    ============================================ */
 
-:root {
-  --app-container-max: 1200px;
-  --app-header-height: 60px;
-  --app-sidebar-width: 200px;
+@layer base {
+  :root {
+    --app-container-max: 1200px;
+    --app-header-height: 60px;
+    --app-sidebar-width: 200px;
+    --app-card-pad: 16px;
+    --app-page-gutter: 16px;
+    --app-section-pad: 24px;
+    --app-grid-cols: repeat(1, minmax(0, 1fr));
+  }
 }
 
 /* ============================================
@@ -142,7 +160,8 @@
   body {
     @apply bg-bg text-fg;
     font-family: var(--font-sans);
-    line-height: 1.6;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height);
   }
 
   /* Global link styles */

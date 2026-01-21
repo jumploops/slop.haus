@@ -65,8 +65,7 @@ function ToastContainer({
         <div
           key={toast.id}
           className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-lg",
-            "bg-bg-secondary border text-fg text-sm",
+            "toast",
             "animate-slide-in",
             toast.type === "success" && "border-accent",
             toast.type === "error" && "border-danger",

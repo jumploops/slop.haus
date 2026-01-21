@@ -14,6 +14,8 @@ interface GenerateResponse {
     themeId: string;
     spec: {
       name: string;
+      author?: string;
+      icon?: string;
       description?: string;
       colors: {
         bg: string;
@@ -56,7 +58,11 @@ export function ThemeGenerator() {
       }
 
       // Apply the generated theme
-      applyUserTheme(data.data.themeId, data.data.cssText);
+      applyUserTheme(data.data.themeId, data.data.cssText, {
+        name: data.data.spec.name,
+        author: data.data.spec.author,
+        icon: data.data.spec.icon,
+      });
 
       // Show result
       if (data.data.warnings.length > 0) {

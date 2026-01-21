@@ -1,0 +1,121 @@
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-medium;
+    @apply transition-colors duration-200;
+    border-width: var(--border-width);
+    border-style: var(--border-style);
+    border-radius: var(--radius);
+  }
+
+  .btn-primary {
+    @apply bg-accent text-accent-foreground border border-border;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-fg border border-border;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-muted border border-transparent;
+  }
+
+  .btn-danger {
+    @apply bg-danger text-white border border-danger;
+  }
+
+  .btn-sm {
+    @apply px-2 py-1 text-xs rounded-sm;
+  }
+
+  .btn-md {
+    @apply px-4 py-2 text-sm rounded-md;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base rounded-md;
+  }
+
+  .card {
+    @apply bg-bg-secondary text-fg border border-border rounded-md;
+    box-shadow: var(--shadow-sm);
+    padding: var(--app-card-pad);
+  }
+
+  .input {
+    @apply bg-bg-secondary text-fg border border-border rounded-md;
+    @apply px-3 py-2 text-sm;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full;
+    border-width: var(--border-width);
+    border-style: var(--border-style);
+  }
+
+  .modal {
+    @apply bg-bg text-fg rounded-lg;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .tabs {
+    @apply flex gap-2 border-b border-border;
+  }
+
+  .tab {
+    @apply px-4 py-3 text-sm font-medium relative;
+  }
+
+  .tabs-indicator {
+    @apply absolute left-0 right-0 h-0.5 bg-accent;
+  }
+
+  .toast {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg;
+    @apply bg-bg-secondary border text-fg text-sm;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .avatar {
+    @apply inline-flex items-center justify-center rounded-full bg-border text-fg;
+  }
+
+  .page-wrapper {
+    padding-inline: var(--app-page-gutter);
+    padding-block: var(--app-section-pad);
+  }
+
+  .page-wrapper--dense {
+    padding-inline: calc(var(--app-page-gutter) * 0.75);
+    padding-block: calc(var(--app-section-pad) * 0.75);
+  }
+
+  .theme-loading-screen {
+    @apply fixed inset-0 items-center justify-center z-[9999];
+    @apply bg-bg text-fg;
+    display: none;
+  }
+
+  .theme-loading-card {
+    @apply flex items-center gap-4 rounded-lg border border-border;
+    @apply bg-bg-secondary text-fg;
+    box-shadow: var(--shadow-md);
+    padding: 20px;
+  }
+
+  .theme-loading-icon {
+    @apply w-10 h-10 rounded-full bg-border text-fg;
+    @apply flex items-center justify-center text-lg;
+  }
+
+  .theme-loading-title {
+    @apply text-base font-semibold;
+  }
+
+  .theme-loading-meta {
+    @apply text-sm text-muted;
+  }
+
+  :root[data-theme-loading="true"] .theme-loading-screen {
+    display: flex;
+  }
+}

@@ -5,7 +5,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 
 export function ThemeSwitcher() {
-  const { theme, isUserTheme, currentPreset, presets, setTheme, reset, mounted } = useTheme();
+  const { theme, isCustomTheme, isUserTheme, currentPreset, presets, setTheme, reset, mounted } =
+    useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -96,7 +97,7 @@ export function ThemeSwitcher() {
             ))}
           </div>
 
-          {isUserTheme && (
+          {(isCustomTheme || isUserTheme) && (
             <>
               <div className="border-t border-border" />
               <div className="p-2">

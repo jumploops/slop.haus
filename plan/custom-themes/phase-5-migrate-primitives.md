@@ -1,6 +1,6 @@
 # Phase 5: Migrate Core Primitives
 
-Status: pending
+Status: completed
 
 ## Goal
 

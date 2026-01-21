@@ -1,6 +1,6 @@
 # Phase 1: ThemeSpec + Compiler
 
-Status: pending
+Status: completed
 
 ## Goal
 
@@ -10,7 +10,7 @@ Define a safe ThemeSpec schema and compiler that emits variable-only CSS for use
 
 - Schema (Zod or equivalent) for safe user theme inputs.
 - Compiler mapping enums + allowlists to CSS variables.
-- Emit selectors for `:root[data-theme="user:<id>"]` and `.theme-scope[data-theme="user:<id>"]`.
+- Emit selectors for `:root[data-theme="custom:<id>"]` and `.theme-scope[data-theme="custom:<id>"]`.
 - No raw CSS or arbitrary selectors allowed.
 
 ## Files to Change

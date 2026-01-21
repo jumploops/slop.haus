@@ -16,7 +16,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-bg border-b border-border h-[var(--app-header-height)]">
-      <div className="max-w-[var(--app-container-max)] mx-auto px-4 h-full flex items-center justify-between">
+      <div className="max-w-[var(--app-container-max)] mx-auto px-[var(--app-page-gutter)] h-full flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
