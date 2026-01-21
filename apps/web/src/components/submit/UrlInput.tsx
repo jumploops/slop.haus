@@ -71,7 +71,7 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
           className={cn(
             "w-full px-3 py-2 text-sm",
             "bg-bg-secondary text-fg",
-            "border-2 border-[color:var(--foreground)]",
+            "border-2 border-[color:var(--border)]",
             "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
             "placeholder:text-muted focus:outline-none focus:border-accent",
             displayError && "border-danger"

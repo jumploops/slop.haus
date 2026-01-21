@@ -4,7 +4,7 @@ import { ThemePreview } from "@/components/theme/ThemePreview";
 export default function ThemeGalleryPage() {
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <h1 className="text-xl font-bold text-slop-blue">★ THEME GALLERY ★</h1>
         <p className="text-xs text-muted mt-1">
           Preview all available themes side by side.
@@ -15,7 +15,7 @@ export default function ThemeGalleryPage() {
         {PRESET_THEMES.map((theme) => (
           <div
             key={theme.id}
-            className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
+            className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
           >
             <div className="bg-bg border-2 border-[color:var(--border)] p-3">
               <h2 className="text-sm font-bold text-slop-purple mb-1">{theme.name}</h2>

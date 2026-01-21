@@ -19,7 +19,7 @@ export function VibeMeter({
     <div className={className}>
       <div
         className={cn(
-          "w-full bg-bg-secondary border-2 border-[color:var(--foreground)] overflow-hidden",
+          "w-full bg-bg-secondary border-2 border-[color:var(--border)] overflow-hidden",
           size === "sm" ? "h-2" : "h-3"
         )}
       >

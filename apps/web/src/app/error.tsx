@@ -17,7 +17,7 @@ export default function Error({
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)] p-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center max-w-[520px]">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center max-w-[520px]">
         <div className="bg-bg border-2 border-[color:var(--border)] p-6">
           <div className="mx-auto mb-4 h-16 w-16 border-2 border-danger bg-danger/10 text-danger flex items-center justify-center">
             <ErrorIcon />
@@ -36,7 +36,7 @@ export default function Error({
             </Button>
           </div>
           {process.env.NODE_ENV === "development" && (
-            <details className="mt-6 text-left text-xs border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+            <details className="mt-6 text-left text-xs border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
               <summary className="cursor-pointer text-muted font-bold">Error Details</summary>
               <div className="bg-bg border-2 border-[color:var(--border)] p-3 mt-2">
                 <pre className="overflow-x-auto whitespace-pre-wrap break-all">{error.message}</pre>

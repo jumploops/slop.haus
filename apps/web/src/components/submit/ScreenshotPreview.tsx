@@ -8,8 +8,8 @@ interface ScreenshotPreviewProps {
 
 export function ScreenshotPreview({ url }: ScreenshotPreviewProps) {
   return (
-    <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-      <div className="bg-bg border-2 border-[color:var(--border)]">
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="bg-bg border-2 border-[color:var(--foreground)]">
         <Image
           src={url}
           alt="Project screenshot"

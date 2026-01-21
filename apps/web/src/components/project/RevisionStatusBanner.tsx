@@ -42,7 +42,7 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
   const iconColor = isPending ? "text-warning" : "text-danger";
 
   return (
-    <div className={`p-4 mb-4 border-2 border-[color:var(--foreground)] ${bannerStyles}`}>
+    <div className={`p-4 mb-4 border-2 border-[color:var(--border)] ${bannerStyles}`}>
       <div className="flex gap-3 items-start">
         <div className={`shrink-0 mt-0.5 ${iconColor}`}>
           {isPending ? <ClockIcon /> : <AlertIcon />}
@@ -83,7 +83,7 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
       )}
 
       {isExpanded && (
-        <div className="mt-3 pt-3 border-t-2 border-[color:var(--foreground)]">
+        <div className="mt-3 pt-3 border-t-2 border-[color:var(--border)]">
           {changedFields.length > 0 && (
             <div className="mb-3">
               <p className="text-[10px] text-muted uppercase tracking-wide mb-2">Fields changed:</p>
@@ -98,7 +98,7 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
           {isRejected && revision.reason && (
             <div className="mb-3">
               <p className="text-[10px] text-muted uppercase tracking-wide mb-2">Reason:</p>
-              <p className="text-xs p-2 border-2 border-[color:var(--foreground)] bg-bg-secondary">{revision.reason}</p>
+              <p className="text-xs p-2 border-2 border-[color:var(--border)] bg-bg-secondary">{revision.reason}</p>
             </div>
           )}
 

@@ -26,7 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             "px-3 py-2 rounded-sm",
             "bg-bg-secondary text-fg text-sm",
-            "border-2 border-[color:var(--foreground)]",
+            "border-2 border-[color:var(--border)]",
             "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
             "transition-colors duration-200",
             "placeholder:text-muted",
@@ -68,7 +68,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={cn(
             "px-3 py-2 rounded-sm min-h-[100px] resize-y",
             "bg-bg-secondary text-fg text-sm",
-            "border-2 border-[color:var(--foreground)]",
+            "border-2 border-[color:var(--border)]",
             "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
             "transition-colors duration-200",
             "placeholder:text-muted",

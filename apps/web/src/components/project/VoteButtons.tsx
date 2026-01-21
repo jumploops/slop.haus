@@ -27,7 +27,8 @@ export function VoteButtons({
     onVote(currentVote === -1 ? 0 : -1);
   };
 
-  const buttonSize = size === "sm" ? "w-7 h-7" : "w-8 h-8";
+  const buttonSize =
+    size === "sm" ? "w-9 h-9 sm:w-7 sm:h-7" : "w-10 h-10 sm:w-8 sm:h-8";
 
   return (
     <div className="flex items-center gap-1">
@@ -37,7 +38,7 @@ export function VoteButtons({
         disabled={disabled}
         className={cn(
           "flex items-center justify-center transition-colors",
-          "border-2 border-[color:var(--foreground)]",
+          "border-2 border-[color:var(--border)]",
           "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]",
           buttonSize,
           "cursor-pointer",
@@ -52,8 +53,8 @@ export function VoteButtons({
 
       <span
         className={cn(
-          "min-w-[2.25rem] text-center text-xs font-bold",
-          "border-2 border-[color:var(--foreground)]",
+          "min-w-[2.75rem] sm:min-w-[2.25rem] text-center text-sm sm:text-xs font-bold",
+          "border-2 border-[color:var(--border)]",
           "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] px-1 py-0.5",
           score > 0 && "text-slop-green",
           score < 0 && "text-danger"
@@ -68,7 +69,7 @@ export function VoteButtons({
         disabled={disabled}
         className={cn(
           "flex items-center justify-center transition-colors",
-          "border-2 border-[color:var(--foreground)]",
+          "border-2 border-[color:var(--border)]",
           "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]",
           buttonSize,
           "cursor-pointer",

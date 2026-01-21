@@ -117,7 +117,7 @@ function SubmitFlow() {
     <div className="max-w-2xl mx-auto space-y-6">
         {step === "input" && (
           <>
-            <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+            <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
               <div className="bg-bg border-2 border-[color:var(--border)] p-4">
                 <UrlInput
                   onAnalyze={handleAnalyze}

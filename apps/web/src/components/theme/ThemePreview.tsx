@@ -12,7 +12,7 @@ interface ThemePreviewProps {
 export function ThemePreview({ themeId }: ThemePreviewProps) {
   return (
     <div
-      className="theme-scope border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-2"
+      className="theme-scope border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-2"
       data-theme={themeId}
     >
       <div className="bg-bg border-2 border-[color:var(--border)] p-3 space-y-4">
@@ -43,7 +43,7 @@ export function ThemePreview({ themeId }: ThemePreviewProps) {
 
         <Input placeholder="Sample input..." />
 
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
           <div className="bg-bg border-2 border-[color:var(--border)] p-3">
             <div className="flex items-center gap-3 mb-2">
               <Avatar src={null} alt="Test User" size="md" />

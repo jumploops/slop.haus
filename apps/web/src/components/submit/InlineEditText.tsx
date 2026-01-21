@@ -108,7 +108,7 @@ export function InlineEditText({
           className={cn(
             "w-full px-2 py-1 text-sm",
             "bg-bg-secondary text-fg",
-            "border-2 border-[color:var(--foreground)]",
+            "border-2 border-[color:var(--border)]",
             "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
             "focus:outline-none focus:border-accent"
           )}
@@ -123,7 +123,7 @@ export function InlineEditText({
     <Element
       className={cn(
         "block px-2 py-1 text-sm font-bold",
-        "border-2 border-[color:var(--foreground)]",
+        "border-2 border-[color:var(--border)]",
         "bg-bg-secondary cursor-pointer transition-colors",
         "hover:bg-bg",
         isEmpty && "text-muted italic",

@@ -238,7 +238,7 @@ export function EditableProject({
   return (
     <div className="max-w-[900px] mx-auto space-y-6">
       {/* Edit mode header */}
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <Link
           href={`/p/${project.slug}`}
           className="inline-flex items-center gap-2 text-xs font-bold text-slop-blue no-underline hover:text-slop-coral hover:no-underline"
@@ -250,12 +250,16 @@ export function EditableProject({
         >
           <ArrowLeftIcon /> Back to project
         </Link>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button variant="ghost" onClick={onDelete} className="text-danger hover:bg-danger/10">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <Button
+            variant="ghost"
+            onClick={onDelete}
+            className="text-danger hover:bg-danger/10 w-full sm:w-auto"
+          >
             Delete
           </Button>
           {isDirty && (
-            <Button variant="ghost" onClick={handleDiscard}>
+            <Button variant="ghost" onClick={handleDiscard} className="w-full sm:w-auto">
               Discard
             </Button>
           )}
@@ -263,6 +267,7 @@ export function EditableProject({
             variant="primary"
             onClick={handleSubmit}
             disabled={!isDirty || isSaving}
+            className="w-full sm:w-auto"
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
@@ -279,13 +284,13 @@ export function EditableProject({
 
       {/* Error display */}
       {error && (
-        <div className="border-2 border-[color:var(--foreground)] bg-danger/10 shadow-[2px_2px_0_var(--foreground)] p-4">
+        <div className="border-2 border-[color:var(--border)] bg-danger/10 shadow-[2px_2px_0_var(--foreground)] p-4">
           <p className="text-danger text-sm m-0">{error}</p>
         </div>
       )}
 
       {/* Project preview - mirrors ProjectDetails structure */}
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Media section - editable screenshot */}
@@ -367,7 +372,7 @@ export function EditableProject({
           <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
             <div className="space-y-6 min-w-0">
               {/* Description section */}
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
                   <h3 className="text-sm font-bold text-slop-purple">~~ ABOUT THIS SLOP ~~</h3>
                   <InlineEditTextarea
@@ -380,7 +385,7 @@ export function EditableProject({
               </div>
 
               {/* Tools section */}
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
                   <h3 className="text-sm font-bold text-slop-purple">~~ BUILT WITH ~~</h3>
                   <TagEditor selected={tools} onChange={handleToolsChange} />
@@ -390,7 +395,7 @@ export function EditableProject({
 
             {/* Sidebar */}
             <div className="space-y-4">
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
                   <h4 className="text-xs font-bold text-slop-purple text-center">~~ VIBE SCORE ~~</h4>
                   <VibeMeter percent={vibePercent} showLabel />
@@ -405,7 +410,7 @@ export function EditableProject({
                 </div>
               </div>
 
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4">
                   <h4 className="text-xs font-bold text-slop-purple text-center">~~ COMMUNITY VOTES ~~</h4>
                   <div className="flex flex-col gap-2 text-xs mt-3 opacity-60">
@@ -426,7 +431,7 @@ export function EditableProject({
       </div>
 
       {/* URL editors */}
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
           <h3 className="text-sm font-bold text-slop-purple">~~ PROJECT LINKS ~~</h3>
           <p className="text-[10px] text-muted">At least one URL is required</p>

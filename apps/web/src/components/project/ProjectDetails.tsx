@@ -25,7 +25,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   return (
     <div>
       {/* Header Section */}
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1 mb-8">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1 mb-8">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Media */}
@@ -41,7 +41,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold text-slop-blue mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-slop-blue mb-2 break-words">
                 ★ {project.title} ★
               </h1>
               <p className="text-sm text-muted mb-4">{project.tagline}</p>
@@ -59,7 +59,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               </div>
 
               {/* Action Links */}
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
                 {project.mainUrl && (
                   <a
                     href={project.mainUrl}
@@ -67,7 +67,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                     rel="noopener noreferrer"
                     className={cn(
                       buttonVariants({ variant: "primary", size: "sm" }),
-                      "no-underline hover:no-underline"
+                      "no-underline hover:no-underline w-full sm:w-auto"
                     )}
                   >
                     <ExternalLinkIcon /> Visit Site
@@ -80,7 +80,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                     rel="noopener noreferrer"
                     className={cn(
                       buttonVariants({ variant: "secondary", size: "sm" }),
-                      "no-underline hover:no-underline"
+                      "no-underline hover:no-underline w-full sm:w-auto"
                     )}
                   >
                     <GithubIcon /> View Repo
@@ -91,6 +91,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                   size="sm"
                   onClick={toggleFavorite}
                   disabled={favoriteLoading}
+                  className="w-full sm:w-auto"
                 >
                   <HeartIcon filled={isFavorited} /> {isFavorited ? "Favorited" : "Favorite"}
                 </Button>
@@ -99,7 +100,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                     href={`/p/${project.slug}/edit`}
                     className={cn(
                       buttonVariants({ variant: "secondary", size: "sm" }),
-                      "no-underline hover:no-underline"
+                      "no-underline hover:no-underline w-full sm:w-auto"
                     )}
                   >
                     <PencilIcon /> Edit
@@ -117,7 +118,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
         <div>
           {project.description && (
             <section className="mb-8">
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4">
                   <h3 className="text-sm font-bold text-slop-purple mb-3">~~ ABOUT THIS SLOP ~~</h3>
                   <p className="text-sm text-fg leading-relaxed whitespace-pre-wrap">{project.description}</p>
@@ -128,7 +129,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
 
           {project.tools.length > 0 && (
             <section className="mb-8">
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4">
                   <h3 className="text-sm font-bold text-slop-purple mb-3">~~ BUILT WITH ~~</h3>
                   <div className="flex flex-wrap gap-2">

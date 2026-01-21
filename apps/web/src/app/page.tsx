@@ -64,10 +64,15 @@ export default function FeedPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Tabs tabs={sortTabs} activeTab={sort} onTabChange={handleSortChange} className="mb-0" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <Tabs
+          tabs={sortTabs}
+          activeTab={sort}
+          onTabChange={handleSortChange}
+          className="mb-0 w-full sm:w-auto"
+        />
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <Button
             type="button"
             variant={channel === "normal" ? "primary" : "secondary"}
@@ -91,9 +96,10 @@ export default function FeedPage() {
             value={timeWindow}
             onChange={handleWindowChange}
             className={cn(
-              "px-2 py-1 text-xs font-bold",
+              "w-full sm:w-auto",
+              "min-h-10 sm:min-h-0 px-2 py-2 sm:py-1 text-xs font-bold",
               "bg-bg text-fg",
-              "border-2 border-[color:var(--foreground)]",
+              "border-2 border-[color:var(--border)]",
               "shadow-[2px_2px_0_var(--foreground)]"
             )}
           >
@@ -107,7 +113,7 @@ export default function FeedPage() {
       </div>
 
       {error && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <h3 className="text-lg font-bold text-slop-coral mb-2">Failed to load feed</h3>
           <p className="text-sm text-muted">Please try again later.</p>
           <Button onClick={() => mutate()} className="mt-4">
@@ -125,7 +131,7 @@ export default function FeedPage() {
       )}
 
       {data && data.projects.length === 0 && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <h3 className="text-lg font-bold text-slop-purple mb-2">No projects yet</h3>
           <p className="text-sm text-muted">Be the first to submit a project!</p>
           <Button onClick={() => (window.location.href = "/submit")} className="mt-4">

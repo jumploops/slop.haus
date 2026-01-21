@@ -83,7 +83,7 @@ export default function ModQueuePage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <h1 className="text-xl font-bold text-slop-blue">★ MOD QUEUE ★</h1>
         <p className="text-xs text-muted mt-1">
           Review flagged and hidden content awaiting moderation.
@@ -104,7 +104,7 @@ export default function ModQueuePage() {
         {isLoading && (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="p-4 border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]">
+              <div key={i} className="p-4 border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]">
                 <Skeleton variant="text" className="w-3/5" />
                 <Skeleton variant="text" className="w-full mt-2" />
               </div>
@@ -113,13 +113,13 @@ export default function ModQueuePage() {
         )}
 
         {error && (
-          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
             <p className="text-sm text-danger">Failed to load mod queue</p>
           </div>
         )}
 
         {!isLoading && !error && items?.length === 0 && (
-          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
             <CheckIcon />
             <h3 className="text-lg font-bold mt-4 mb-1">Queue is empty</h3>
             <p className="text-xs text-muted">No items awaiting moderation.</p>
@@ -129,7 +129,7 @@ export default function ModQueuePage() {
         {!isLoading && !error && items && items.length > 0 && (
           <div className="space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+              <div key={item.id} className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4">
                   {/* Header */}
                   <div className="flex items-center justify-between mb-3 flex-wrap gap-2">

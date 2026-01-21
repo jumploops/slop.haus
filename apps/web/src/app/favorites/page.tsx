@@ -25,7 +25,7 @@ function FavoritesContent() {
 
   return (
     <div className="space-y-6">
-      <header className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <h1 className="text-xl font-bold text-slop-blue">★ FAVORITES ★</h1>
           <p className="text-xs text-muted mt-1">
@@ -51,7 +51,7 @@ function FavoritesContent() {
       )}
 
       {!isLoading && !error && favorites?.length === 0 && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
           <div className="bg-bg border-2 border-[color:var(--border)] p-6">
             <div className="flex justify-center text-slop-coral">
               <EmptyHeartIcon />

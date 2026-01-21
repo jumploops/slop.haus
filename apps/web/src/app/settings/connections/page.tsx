@@ -70,7 +70,7 @@ export default function ConnectionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <h1 className="text-xl font-bold text-slop-blue">★ CONNECTIONS ★</h1>
         <p className="text-xs text-muted mt-1">
           Manage your linked accounts. You need at least one account to sign in.
@@ -85,11 +85,11 @@ export default function ConnectionsPage() {
           return (
             <div
               key={provider.id}
-              className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
+              className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
             >
               <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center border-2 border-[color:var(--foreground)] bg-bg-secondary">
+                  <div className="w-10 h-10 flex items-center justify-center border-2 border-[color:var(--border)] bg-bg-secondary">
                     <Icon />
                   </div>
                   <div>
@@ -129,7 +129,7 @@ export default function ConnectionsPage() {
       </div>
 
       {!user?.hasGitHub && (
-        <div className="border-2 border-[color:var(--foreground)] bg-warning/20 shadow-[2px_2px_0_var(--foreground)] p-4">
+        <div className="border-2 border-[color:var(--border)] bg-warning/20 shadow-[2px_2px_0_var(--foreground)] p-4">
           <p className="text-xs">
             <strong>Note:</strong> A GitHub account is required to submit projects.
             Link your GitHub account to enable project submissions.

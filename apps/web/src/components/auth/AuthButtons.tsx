@@ -58,7 +58,7 @@ export function AuthButtons() {
         </Button>
 
         {isDropdownOpen && (
-          <div className="absolute top-[calc(100%+0.5rem)] right-0 min-w-[180px] border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] z-[1000]">
+          <div className="absolute top-[calc(100%+0.5rem)] right-0 min-w-[180px] border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] z-[1000]">
             <div className="bg-bg border-2 border-[color:var(--border)]">
               <Link
                 href="/favorites"

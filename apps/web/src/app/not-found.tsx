@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export default function NotFound() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)] p-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
         <div className="bg-bg border-2 border-[color:var(--border)] p-6">
           <p className="text-[10px] text-muted">ERROR 404</p>
           <h1 className="text-5xl font-bold text-slop-coral mt-2">404</h1>

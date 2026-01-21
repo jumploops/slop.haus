@@ -46,7 +46,7 @@ function MyProjectsContent() {
 
   return (
     <div className="max-w-[900px] mx-auto space-y-6">
-      <header className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-bold text-slop-blue">★ MY PROJECTS ★</h1>
@@ -80,7 +80,7 @@ function MyProjectsContent() {
       )}
 
       {!isLoading && !error && projects?.length === 0 && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
           <div className="bg-bg border-2 border-[color:var(--border)] p-6">
             <div className="flex justify-center text-slop-coral">
               <EmptyBoxIcon />
@@ -138,11 +138,11 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
   const statusBadge = getStatusBadge(project.status);
 
   return (
-    <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]">
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]">
       <div className="bg-bg border-2 border-[color:var(--border)] p-3 flex gap-3 flex-col sm:flex-row">
         <Link
           href={`/p/${project.slug}`}
-          className="shrink-0 w-full sm:w-[120px] h-[90px] border-2 border-[color:var(--foreground)] bg-bg-secondary overflow-hidden no-underline"
+          className="shrink-0 w-full sm:w-[120px] h-[90px] border-2 border-[color:var(--border)] bg-bg-secondary overflow-hidden no-underline"
         >
           <img src={imageUrl} alt={project.title} className="w-full h-full object-cover" />
         </Link>

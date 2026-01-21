@@ -78,7 +78,7 @@ export function ToolsSelector({
 
       <div
         className={cn(
-          "flex flex-wrap gap-2 p-2 min-h-[48px] border-2 border-[color:var(--foreground)] bg-bg-secondary cursor-text",
+          "flex flex-wrap gap-2 p-2 min-h-[48px] border-2 border-[color:var(--border)] bg-bg-secondary cursor-text",
           "focus-within:border-accent",
           isOpen && "border-accent"
         )}
@@ -121,7 +121,7 @@ export function ToolsSelector({
       )}
 
       {isOpen && (search || availableTools?.length) && (
-        <div className="absolute z-50 w-full mt-1 bg-bg border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)] max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-bg border-2 border-[color:var(--border)] shadow-[2px_2px_0_var(--foreground)] max-h-60 overflow-y-auto">
           {isLoading && (
             <div className="px-4 py-3 text-xs text-muted">Loading...</div>
           )}

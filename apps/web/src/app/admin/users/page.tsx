@@ -34,7 +34,7 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <h1 className="text-xl font-bold text-slop-blue">★ VERIFIED DEVELOPERS ★</h1>
         <p className="text-xs text-muted mt-1">
           Users with verified developer status can vote in the dev channel.
@@ -46,7 +46,7 @@ export default function UsersPage() {
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3"
+              className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3"
             >
               <div className="flex items-center gap-3">
                 <Skeleton variant="avatar" />
@@ -58,13 +58,13 @@ export default function UsersPage() {
       )}
 
       {error && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <p className="text-sm text-danger">Failed to load users</p>
         </div>
       )}
 
       {!isLoading && !error && users?.length === 0 && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <p className="text-sm text-muted">No verified developers yet.</p>
         </div>
       )}
@@ -74,7 +74,7 @@ export default function UsersPage() {
           {users.map((user) => (
             <div
               key={user.id}
-              className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
+              className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
             >
               <div className="bg-bg border-2 border-[color:var(--border)] p-3 flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">

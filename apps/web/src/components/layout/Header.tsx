@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
@@ -13,6 +13,7 @@ export function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
+  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
   return (
     <header className="sticky top-0 z-50 border-b-4 border-[color:var(--foreground)] bg-gradient-to-r from-slop-teal via-slop-purple to-slop-pink h-[var(--app-header-height)]">
@@ -67,7 +68,7 @@ export function Header() {
             className={cn(
               "sm:hidden flex items-center justify-center",
               "w-10 h-10",
-              "border-2 border-[color:var(--foreground)]",
+              "border-2 border-[color:var(--border)]",
               "bg-bg-secondary text-fg",
               "shadow-[2px_2px_0_var(--foreground)]",
               "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
@@ -79,7 +80,7 @@ export function Header() {
         </div>
       </div>
 
-      <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+      <MobileNav isOpen={mobileNavOpen} onClose={closeMobileNav} />
     </header>
   );
 }

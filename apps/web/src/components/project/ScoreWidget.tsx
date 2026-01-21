@@ -28,7 +28,7 @@ export function ScoreWidget({
   const { voteState, submitVote, isVoting } = useVote(projectSlug);
 
   return (
-    <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
       <div className="bg-bg border-2 border-[color:var(--border)] p-4">
         {/* Vibe Score Section */}
         <div className="mb-6">
@@ -41,7 +41,7 @@ export function ScoreWidget({
           <h4 className="text-xs font-bold text-slop-purple mb-3 text-center">~~ COMMUNITY VOTES ~~</h4>
           <div className="flex flex-col gap-3">
             {/* People channel */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <span className="text-xs font-bold text-fg">People</span>
               <span className="text-[10px] text-muted">
                 +{normalUp} / -{normalDown}
@@ -55,7 +55,7 @@ export function ScoreWidget({
               />
             </div>
             {/* Dev channel */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <span className="text-xs font-bold text-fg">Devs</span>
               <span className="text-[10px] text-muted">
                 +{devUp} / -{devDown}

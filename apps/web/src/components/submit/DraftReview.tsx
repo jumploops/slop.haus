@@ -119,7 +119,7 @@ export function DraftReview({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <header className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <h1 className="text-xl font-bold text-slop-blue">★ REVIEW YOUR PROJECT ★</h1>
           <p className="text-xs text-muted mt-2">
@@ -129,7 +129,7 @@ export function DraftReview({
       </header>
 
       {draft.screenshot && (
-        <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+        <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
           <div className="bg-bg border-2 border-[color:var(--border)] p-4">
             <h2 className="text-sm font-bold text-slop-purple">SCREENSHOT</h2>
             <div className="mt-3">
@@ -139,7 +139,7 @@ export function DraftReview({
         </section>
       )}
 
-      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
           <h2 className="text-sm font-bold text-slop-purple">BASIC INFO</h2>
 
@@ -180,7 +180,7 @@ export function DraftReview({
         </div>
       </section>
 
-      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
           <div>
             <h2 className="text-sm font-bold text-slop-purple">LINKS</h2>
@@ -209,7 +209,7 @@ export function DraftReview({
         </div>
       </section>
 
-      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
           <div>
             <h2 className="text-sm font-bold text-slop-purple">TECHNOLOGIES</h2>
@@ -227,7 +227,7 @@ export function DraftReview({
         </div>
       </section>
 
-      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
           <div>
             <h2 className="text-sm font-bold text-slop-purple">VIBE SCORE</h2>
@@ -257,7 +257,7 @@ export function DraftReview({
         </div>
       )}
 
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3">
           <Button
             type="submit"

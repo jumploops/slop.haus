@@ -92,7 +92,7 @@ function SubmitForm() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <h1 className="text-2xl font-bold text-slop-blue mb-2">★ Submit a Project ★</h1>
           <p className="text-sm text-muted mb-3">
@@ -106,7 +106,7 @@ function SubmitForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
           <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
             <h2 className="text-sm font-bold text-slop-purple">~~ BASIC INFO ~~</h2>
             <Input
@@ -141,7 +141,7 @@ function SubmitForm() {
           </div>
         </div>
 
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
           <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
             <h2 className="text-sm font-bold text-slop-purple">~~ LINKS ~~</h2>
             <p className="text-xs text-muted">
@@ -171,7 +171,7 @@ function SubmitForm() {
           </div>
         </div>
 
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
           <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
             <h2 className="text-sm font-bold text-slop-purple">~~ VIBE SCORE ~~</h2>
             <VibeInput
@@ -185,14 +185,14 @@ function SubmitForm() {
           </div>
         </div>
 
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
           <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
             <h2 className="text-sm font-bold text-slop-purple">~~ TOOLS ~~</h2>
             <ToolsSelector selectedTools={tools} onToolsChange={setTools} />
           </div>
         </div>
 
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
           <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3">
             <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? "Submitting..." : "Submit Project"}

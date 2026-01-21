@@ -45,7 +45,7 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
         {selectedTools.map((tool) => (
           <span
             key={tool.slug}
-            className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-slop-yellow/40 border-2 border-[color:var(--foreground)]"
+            className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-slop-yellow/40 border-2 border-[color:var(--border)]"
           >
             {tool.name}
             <button
@@ -78,11 +78,11 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
               setTimeout(() => setIsOpen(false), 200);
             }}
             placeholder="Search to add..."
-            className="w-full px-2 py-1 text-sm bg-bg-secondary border-2 border-[color:var(--foreground)] shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)] focus:outline-none focus:border-accent"
+            className="w-full px-2 py-1 text-sm bg-bg-secondary border-2 border-[color:var(--border)] shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)] focus:outline-none focus:border-accent"
           />
 
           {isOpen && search && filteredTools.length > 0 && (
-            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--foreground)] bg-bg shadow-[2px_2px_0_var(--foreground)]">
+            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--border)] bg-bg shadow-[2px_2px_0_var(--foreground)]">
               {filteredTools.map((tool) => (
                 <button
                   key={tool.slug}
@@ -98,7 +98,7 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
           )}
 
           {isOpen && search && filteredTools.length === 0 && (
-            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--foreground)] bg-bg shadow-[2px_2px_0_var(--foreground)] px-2 py-2">
+            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--border)] bg-bg shadow-[2px_2px_0_var(--foreground)] px-2 py-2">
               <span className="text-xs text-muted">No matching tools</span>
             </div>
           )}

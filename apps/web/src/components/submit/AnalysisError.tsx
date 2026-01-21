@@ -72,7 +72,7 @@ export function AnalysisError({
 
   return (
     <div className="max-w-md mx-auto text-center">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <div className="flex justify-center mb-3 text-danger">
             <WarningIcon />

@@ -45,9 +45,14 @@ export default function RootLayout({
           <footer className="border-t-4 border-[color:var(--foreground)] bg-gradient-to-r from-slop-teal via-slop-purple to-slop-pink py-4">
             <div className="max-w-[var(--app-container-max)] mx-auto px-4 text-center">
               <div className="flex flex-col items-center gap-4">
-                <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-2">
+                <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-2">
                   <div className="bg-bg border-2 border-[color:var(--border)] p-3">
-                    <VisitorCounter />
+                    <div className="hidden sm:block">
+                      <VisitorCounter />
+                    </div>
+                    <div className="sm:hidden">
+                      <VisitorCounter compact />
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3 text-xs">

@@ -22,8 +22,8 @@ export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
           key={tab.id}
           type="button"
           className={cn(
-            "px-3 py-2 text-xs font-bold",
-            "border-2 border-[color:var(--foreground)]",
+            "px-3 py-2 text-xs font-bold min-h-10 sm:min-h-0",
+            "border-2 border-[color:var(--border)]",
             "shadow-[2px_2px_0_var(--foreground)]",
             "bg-bg-secondary cursor-pointer",
             "transition-colors duration-200",

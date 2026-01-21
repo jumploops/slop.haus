@@ -22,7 +22,7 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
 
   if (isLoading) {
     return (
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
           <Skeleton className="h-5 w-40" />
           <Skeleton className="h-4 w-full" />
@@ -35,7 +35,7 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
 
   if (!user?.hasGitHub) {
     return (
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <div className="bg-bg border-2 border-[color:var(--border)] p-5 text-center space-y-3">
           <div className="flex justify-center text-slop-blue">
             <GithubIcon />

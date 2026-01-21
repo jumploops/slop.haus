@@ -52,7 +52,7 @@ export default function RevisionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <h1 className="text-xl font-bold text-slop-blue">★ PENDING REVISIONS ★</h1>
         <p className="text-xs text-muted mt-1">
           Review and approve project edit requests.
@@ -62,7 +62,7 @@ export default function RevisionsPage() {
       {isLoading && (
         <div className="flex flex-col gap-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-bg-secondary border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)] p-4">
+            <div key={i} className="bg-bg-secondary border-2 border-[color:var(--border)] shadow-[2px_2px_0_var(--foreground)] p-4">
               <Skeleton className="h-4 w-[200px]" />
               <Skeleton className="h-4 w-full mt-2" />
             </div>
@@ -71,13 +71,13 @@ export default function RevisionsPage() {
       )}
 
       {error && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <p className="text-sm text-danger">Failed to load revisions</p>
         </div>
       )}
 
       {!isLoading && !error && revisions?.length === 0 && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <CheckIcon />
           <h3 className="text-fg mt-4 mb-1 font-bold">No pending revisions</h3>
           <p className="text-xs text-muted">All project edits have been reviewed.</p>
@@ -87,7 +87,7 @@ export default function RevisionsPage() {
       {!isLoading && !error && revisions && revisions.length > 0 && (
         <div className="flex flex-col gap-4">
           {revisions.map((revision) => (
-            <div key={revision.id} className="bg-bg-secondary border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)] p-1">
+            <div key={revision.id} className="bg-bg-secondary border-2 border-[color:var(--border)] shadow-[2px_2px_0_var(--foreground)] p-1">
               <div className="bg-bg border-2 border-[color:var(--border)] p-4">
                 <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
                   <Badge variant="warning">Pending Review</Badge>
@@ -98,19 +98,19 @@ export default function RevisionsPage() {
 
                 <div className="flex flex-col gap-3">
                   {revision.title && (
-                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--foreground)]">
+                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--border)]">
                       <label className="block text-[10px] text-muted mb-1">Title</label>
                       <p className="text-sm m-0">{revision.title}</p>
                     </div>
                   )}
                   {revision.tagline && (
-                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--foreground)]">
+                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--border)]">
                       <label className="block text-[10px] text-muted mb-1">Tagline</label>
                       <p className="text-sm m-0">{revision.tagline}</p>
                     </div>
                   )}
                   {revision.description && (
-                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--foreground)]">
+                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--border)]">
                       <label className="block text-[10px] text-muted mb-1">Description</label>
                       <p className="text-sm m-0 max-h-[150px] overflow-y-auto whitespace-pre-wrap">
                         {revision.description}
@@ -118,20 +118,20 @@ export default function RevisionsPage() {
                     </div>
                   )}
                   {revision.mainUrl && (
-                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--foreground)]">
+                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--border)]">
                       <label className="block text-[10px] text-muted mb-1">Main URL</label>
                       <p className="text-sm m-0">{revision.mainUrl}</p>
                     </div>
                   )}
                   {revision.repoUrl && (
-                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--foreground)]">
+                    <div className="p-3 bg-bg-secondary border-2 border-[color:var(--border)]">
                       <label className="block text-[10px] text-muted mb-1">Repo URL</label>
                       <p className="text-sm m-0">{revision.repoUrl}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="flex gap-2 pt-4 mt-4 border-t-2 border-[color:var(--foreground)]">
+                <div className="flex gap-2 pt-4 mt-4 border-t-2 border-[color:var(--border)]">
                   <Button
                     variant="primary"
                     onClick={() => handleApprove(revision)}

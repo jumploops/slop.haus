@@ -80,7 +80,7 @@ export function ThemeGenerator() {
   };
 
   return (
-    <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
       <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
         <div>
           <h3 className="text-sm font-bold text-slop-purple">GENERATE CUSTOM THEME</h3>

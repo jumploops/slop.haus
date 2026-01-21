@@ -27,7 +27,7 @@ export function CommentThread({ projectSlug }: CommentThreadProps) {
         💬 DISCUSSION ({comments?.length ?? 0} comments)
       </h3>
 
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1 mb-4">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1 mb-4">
         <div className="bg-bg border-2 border-[color:var(--border)] p-3">
           <CommentForm projectSlug={projectSlug} onSuccess={() => mutate()} />
         </div>
@@ -36,7 +36,7 @@ export function CommentThread({ projectSlug }: CommentThreadProps) {
       {isLoading && (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+            <div key={i} className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Skeleton variant="avatar" />
                 <Skeleton variant="text" className="w-24" />
@@ -49,13 +49,13 @@ export function CommentThread({ projectSlug }: CommentThreadProps) {
       )}
 
       {error && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <p className="text-sm text-slop-coral font-bold">Failed to load comments</p>
         </div>
       )}
 
       {!isLoading && !error && commentTree.length === 0 && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
           <p className="text-sm text-muted">No comments yet. Be the first to comment!</p>
         </div>
       )}

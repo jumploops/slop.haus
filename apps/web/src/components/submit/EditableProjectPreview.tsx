@@ -132,12 +132,12 @@ export function EditableProjectPreview({
   return (
     <div className="space-y-6">
       {/* Edit mode banner */}
-      <div className="bg-warning border-2 border-[color:var(--foreground)] px-4 py-2 text-xs font-bold text-fg text-center">
+      <div className="bg-warning border-2 border-[color:var(--border)] px-4 py-2 text-xs font-bold text-fg text-center">
         Review your project. Click any highlighted area to edit.
       </div>
 
       {/* Project preview - mirrors ProjectDetails structure */}
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Media section */}
@@ -224,7 +224,7 @@ export function EditableProjectPreview({
       <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
         <div className="space-y-6">
           {/* Description section */}
-          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
             <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
               <h3 className="text-sm font-bold text-slop-purple">~~ ABOUT THIS SLOP ~~</h3>
               <InlineEditTextarea
@@ -237,7 +237,7 @@ export function EditableProjectPreview({
           </div>
 
           {/* Tools section */}
-          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
             <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
               <h3 className="text-sm font-bold text-slop-purple">~~ BUILT WITH ~~</h3>
               {tools.length > 0 ? (
@@ -258,7 +258,7 @@ export function EditableProjectPreview({
 
         {/* Sidebar */}
         <div className="space-y-4">
-          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
             <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
               <h4 className="text-xs font-bold text-slop-purple text-center">~~ VIBE SCORE ~~</h4>
               <VibeMeter percent={vibePercent} showLabel />
@@ -273,7 +273,7 @@ export function EditableProjectPreview({
             </div>
           </div>
 
-          <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
             <div className="bg-bg border-2 border-[color:var(--border)] p-4">
               <h4 className="text-xs font-bold text-slop-purple text-center">~~ COMMUNITY VOTES ~~</h4>
               <div className="space-y-2 text-xs mt-3">
@@ -295,7 +295,7 @@ export function EditableProjectPreview({
       </div>
 
       {/* URL editors */}
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
           <h3 className="text-sm font-bold text-slop-purple">~~ PROJECT LINKS ~~</h3>
           <p className="text-[10px] text-muted">At least one URL is required</p>
@@ -322,18 +322,19 @@ export function EditableProjectPreview({
 
       {/* Error display */}
       {error && (
-        <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 text-center">
+        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 text-center">
           <p className="text-xs text-danger">{error}</p>
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <Button
           type="button"
           variant="primary"
           onClick={handleSubmit}
           disabled={isSubmitting || !hasRequiredFields}
+          className="w-full sm:w-auto"
         >
           {isSubmitting ? "Submitting..." : "Submit Project"}
         </Button>
@@ -342,6 +343,7 @@ export function EditableProjectPreview({
           variant="ghost"
           onClick={onStartOver}
           disabled={isSubmitting}
+          className="w-full sm:w-auto"
         >
           Start Over
         </Button>

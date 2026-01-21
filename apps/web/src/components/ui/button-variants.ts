@@ -10,7 +10,7 @@ export const buttonVariants = cva(
   [
     "inline-flex items-center justify-center gap-2",
     "font-bold transition-colors duration-200",
-    "border-2 border-[color:var(--foreground)]",
+    "border-2 border-[color:var(--border)]",
     "shadow-[2px_2px_0_var(--foreground)]",
     "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
@@ -29,14 +29,14 @@ export const buttonVariants = cva(
         ],
         ghost: [
           "bg-transparent text-fg border-transparent shadow-none",
-          "hover:bg-bg-secondary hover:border-[color:var(--foreground)]",
+          "hover:bg-bg-secondary hover:border-[color:var(--border)]",
         ],
         danger: [
           "bg-danger text-bg",
         ],
       },
       size: {
-        sm: "px-2 py-1 text-xs rounded-sm",
+        sm: "px-3 py-2 text-xs rounded-sm min-h-10 sm:min-h-0 sm:px-2 sm:py-1",
         md: "px-4 py-2 text-sm rounded-md",
         lg: "px-6 py-3 text-base rounded-md",
       },

@@ -69,7 +69,7 @@ export function VibeInput({
                 max="100"
                 value={vibePercent}
                 onChange={(e) => onVibePercentChange(Number(e.target.value))}
-                className="w-full h-3 bg-bg-secondary border-2 border-[color:var(--foreground)] appearance-none cursor-pointer accent-accent"
+                className="w-full h-3 bg-bg-secondary border-2 border-[color:var(--border)] appearance-none cursor-pointer accent-accent"
               />
               <div className="flex justify-between text-[10px] text-muted mt-2">
                 <span>0% Human</span>
@@ -98,11 +98,11 @@ export function VibeInput({
                   onChange={(e) =>
                     handleDetailChange(category.key, Number(e.target.value))
                   }
-                  className="w-full h-3 bg-bg-secondary border-2 border-[color:var(--foreground)] appearance-none cursor-pointer accent-accent"
+                  className="w-full h-3 bg-bg-secondary border-2 border-[color:var(--border)] appearance-none cursor-pointer accent-accent"
                 />
               </div>
             ))}
-            <div className="pt-4 border-t-2 border-[color:var(--foreground)] flex items-center justify-between">
+            <div className="pt-4 border-t-2 border-[color:var(--border)] flex items-center justify-between">
               <span className="text-xs text-muted">Average: {detailedAverage}%</span>
               <VibeScale percent={detailedAverage} size="sm" />
             </div>
@@ -126,7 +126,7 @@ function VibeScale({ percent, size = "md" }: { percent: number; size?: "sm" | "m
     <div className={cn("flex items-center gap-3", size === "sm" && "text-sm")}>
       <div
         className={cn(
-          "flex-1 bg-bg-secondary border-2 border-[color:var(--foreground)] overflow-hidden",
+          "flex-1 bg-bg-secondary border-2 border-[color:var(--border)] overflow-hidden",
           size === "sm" ? "h-2" : "h-3"
         )}
       >

@@ -5,7 +5,7 @@ const badgeVariants = cva(
   [
     "inline-flex items-center px-2 py-0.5",
     "rounded-sm text-[10px] font-bold",
-    "border-2 border-[color:var(--foreground)]",
+    "border-2 border-[color:var(--border)]",
   ],
   {
     variants: {

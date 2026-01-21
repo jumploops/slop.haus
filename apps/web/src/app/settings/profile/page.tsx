@@ -52,12 +52,12 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
+      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <h1 className="text-xl font-bold text-slop-blue">★ PROFILE ★</h1>
       </div>
 
       {/* Profile Header */}
-      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4">
           <div className="flex items-center gap-4">
             <Avatar src={user.image} alt={user.name} size="lg" />
@@ -75,7 +75,7 @@ export default function ProfilePage() {
       </section>
 
       {/* Display Name Section */}
-      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
           <h3 className="text-sm font-bold text-slop-purple">~~ DISPLAY NAME ~~</h3>
           <p className="text-xs text-muted">
@@ -106,7 +106,7 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <span className="px-2 py-1 text-sm border-2 border-[color:var(--foreground)] bg-bg-secondary">
+              <span className="px-2 py-1 text-sm border-2 border-[color:var(--border)] bg-bg-secondary">
                 {user.name}
               </span>
               <Button variant="secondary" onClick={handleEdit}>
@@ -118,7 +118,7 @@ export default function ProfilePage() {
       </section>
 
       {/* Avatar Section */}
-      <section className="border-2 border-[color:var(--foreground)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
+      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
         <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-2">
           <h3 className="text-sm font-bold text-slop-purple">~~ AVATAR ~~</h3>
           <p className="text-xs text-muted">
