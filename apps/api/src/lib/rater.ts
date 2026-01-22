@@ -4,7 +4,7 @@ import { getCookie, setCookie } from "hono/cookie";
 
 const RATER_COOKIE = "slop_rater";
 const DEV_RATER_COOKIE = "slop_dev_rater";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 2; // 2 years
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 400; // 400 days (Hono cookie limit)
 
 function getSecret(): string {
   const secret = process.env.AUTH_SECRET;

@@ -10,7 +10,6 @@ import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 
 type SortOption = "hot" | "new" | "top";
-type ChannelOption = "normal" | "dev";
 type WindowOption = "24h" | "7d" | "30d" | "all";
 
 const sortTabs = [
@@ -28,13 +27,12 @@ const windowOptions: { value: WindowOption; label: string }[] = [
 
 export default function FeedPage() {
   const [sort, setSort] = useState<SortOption>("hot");
-  const [channel, setChannel] = useState<ChannelOption>("normal");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [page, setPage] = useState(1);
 
   const { data, error, isLoading, mutate } = useSWR<FeedResponse>(
-    ["feed", sort, channel, timeWindow, page],
-    () => fetchFeed({ sort, channel, window: timeWindow, page, limit: 20 }),
+    ["feed", sort, timeWindow, page],
+    () => fetchFeed({ sort, window: timeWindow, page, limit: 20 }),
     {
       revalidateOnFocus: false,
       keepPreviousData: true,
@@ -43,11 +41,6 @@ export default function FeedPage() {
 
   const handleSortChange = (newSort: string) => {
     setSort(newSort as SortOption);
-    setPage(1);
-  };
-
-  const handleChannelChange = (newChannel: ChannelOption) => {
-    setChannel(newChannel);
     setPage(1);
   };
 
@@ -71,25 +64,6 @@ export default function FeedPage() {
           onTabChange={handleSortChange}
           className="mb-0 w-full sm:w-auto"
         />
-
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <Button
-            type="button"
-            variant={channel === "normal" ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => handleChannelChange("normal")}
-          >
-            Normal
-          </Button>
-          <Button
-            type="button"
-            variant={channel === "dev" ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => handleChannelChange("dev")}
-          >
-            Dev
-          </Button>
-        </div>
 
         {sort === "top" && (
           <select
@@ -144,7 +118,7 @@ export default function FeedPage() {
         <>
           <div className="space-y-3">
             {data.projects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} channel={channel} rank={index + 1} />
+              <ProjectCard key={project.id} project={project} rank={index + 1} />
             ))}
           </div>
 

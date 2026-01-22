@@ -20,11 +20,23 @@ export function CommentThread({ projectSlug }: CommentThreadProps) {
   );
 
   const commentTree = comments ? buildCommentTree(comments) : [];
+  const sortedCommentTree = [...commentTree].sort((a, b) => {
+    if (b.upvoteCount !== a.upvoteCount) {
+      return b.upvoteCount - a.upvoteCount;
+    }
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+  const reviewCount = comments
+    ? comments.filter(
+        (comment) =>
+          !comment.parentCommentId && comment.status !== "removed"
+      ).length
+    : 0;
 
   return (
     <section className="mt-8">
       <h3 className="text-sm font-bold text-slop-purple mb-4">
-        💬 DISCUSSION ({comments?.length ?? 0} comments)
+        ✍️ REVIEWS ({reviewCount} review{reviewCount === 1 ? "" : "s"})
       </h3>
 
       <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1 mb-4">
@@ -56,13 +68,13 @@ export function CommentThread({ projectSlug }: CommentThreadProps) {
 
       {!isLoading && !error && commentTree.length === 0 && (
         <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <p className="text-sm text-muted">No comments yet. Be the first to comment!</p>
+          <p className="text-sm text-muted">No reviews yet. Be the first to review!</p>
         </div>
       )}
 
-      {!isLoading && !error && commentTree.length > 0 && (
+      {!isLoading && !error && sortedCommentTree.length > 0 && (
         <div className="space-y-3">
-          {commentTree.map((comment) => (
+          {sortedCommentTree.map((comment) => (
             <CommentItem
               key={comment.id}
               comment={comment}

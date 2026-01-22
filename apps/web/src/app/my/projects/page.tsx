@@ -167,7 +167,7 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
             {project.lastEditedAt && (
               <span>Edited {formatRelativeTime(project.lastEditedAt)}</span>
             )}
-            <span>{project.commentCount} comment{project.commentCount !== 1 ? "s" : ""}</span>
+            <span>{project.reviewCount} review{project.reviewCount !== 1 ? "s" : ""}</span>
           </div>
         </div>
 

@@ -412,15 +412,19 @@ export function EditableProject({
 
               <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
                 <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-                  <h4 className="text-xs font-bold text-slop-purple text-center">~~ COMMUNITY VOTES ~~</h4>
+                  <h4 className="text-xs font-bold text-slop-purple text-center">~~ REVIEWS & LIKES ~~</h4>
                   <div className="flex flex-col gap-2 text-xs mt-3 opacity-60">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-fg">People</span>
-                      <span>+{project.normalUp} / -{project.normalDown}</span>
+                      <span className="font-bold text-fg">Slop score</span>
+                      <span>{project.reviewCount > 0 ? project.slopScore.toFixed(1) : "—"}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-fg">Devs</span>
-                      <span>+{project.devUp} / -{project.devDown}</span>
+                      <span className="font-bold text-fg">Reviews</span>
+                      <span>{project.reviewCount}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-fg">Likes</span>
+                      <span>{project.likeCount}</span>
                     </div>
                   </div>
                 </div>

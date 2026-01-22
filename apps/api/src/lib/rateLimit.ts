@@ -74,16 +74,30 @@ export function checkRateLimit(
   };
 }
 
-// Preset rate limiters for voting
-export const VOTE_RATE_LIMITS = {
-  // Max 30 votes per minute per rater
+// Preset rate limiters for likes
+export const LIKE_RATE_LIMITS = {
+  // Max 30 likes per minute per rater
   perRater: {
     windowMs: 60 * 1000,
     maxRequests: 30,
   },
-  // Max 10 vote changes per hour per project+rater
+  // Max 10 like changes per hour per project+rater
   perProjectRater: {
     windowMs: 60 * 60 * 1000,
     maxRequests: 10,
+  },
+};
+
+// Preset rate limiters for comment upvotes
+export const COMMENT_VOTE_RATE_LIMITS = {
+  // Max 60 comment votes per minute per user
+  perUser: {
+    windowMs: 60 * 1000,
+    maxRequests: 60,
+  },
+  // Max 20 vote changes per hour per comment+user
+  perCommentUser: {
+    windowMs: 60 * 60 * 1000,
+    maxRequests: 20,
   },
 };

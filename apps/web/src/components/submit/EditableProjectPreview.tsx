@@ -275,19 +275,23 @@ export function EditableProjectPreview({
 
           <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
             <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-              <h4 className="text-xs font-bold text-slop-purple text-center">~~ COMMUNITY VOTES ~~</h4>
+              <h4 className="text-xs font-bold text-slop-purple text-center">~~ REVIEWS & LIKES ~~</h4>
               <div className="space-y-2 text-xs mt-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-fg">People</span>
-                  <span className="text-muted">+0 / -0</span>
+                  <span className="font-bold text-fg">Slop score</span>
+                  <span className="text-muted">—</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-fg">Devs</span>
-                  <span className="text-muted">+0 / -0</span>
+                  <span className="font-bold text-fg">Reviews</span>
+                  <span className="text-muted">0</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-fg">Likes</span>
+                  <span className="text-muted">0</span>
                 </div>
               </div>
               <p className="text-[10px] text-muted mt-3">
-                Voting enabled after submission
+                Reviews and likes appear after submission
               </p>
             </div>
           </div>

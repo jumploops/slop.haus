@@ -30,6 +30,8 @@ projectCommentRoutes.get("/:slug/comments", async (c) => {
       body: comments.body,
       parentCommentId: comments.parentCommentId,
       depth: comments.depth,
+      reviewScore: comments.reviewScore,
+      upvoteCount: comments.upvoteCount,
       status: comments.status,
       createdAt: comments.createdAt,
       updatedAt: comments.updatedAt,
@@ -66,7 +68,7 @@ projectCommentRoutes.post("/:slug/comments", requireAuth(), async (c) => {
     return c.json({ error: "Validation failed", details: parsed.error.issues }, 400);
   }
 
-  const { body: commentBody, parentCommentId } = parsed.data;
+  const { body: commentBody, parentCommentId, reviewScore } = parsed.data;
 
   // Get project
   const [project] = await db
@@ -112,13 +114,21 @@ projectCommentRoutes.post("/:slug/comments", requireAuth(), async (c) => {
         parentCommentId: parentCommentId || null,
         depth,
         body: commentBody,
+        reviewScore: reviewScore ?? null,
       })
       .returning();
 
-    await tx
-      .update(projects)
-      .set({ commentCount: sql`${projects.commentCount} + 1` })
-      .where(eq(projects.id, project.id));
+    const updates: Record<string, unknown> = {
+      commentCount: sql`${projects.commentCount} + 1`,
+    };
+
+    if (!parentCommentId && reviewScore !== undefined) {
+      updates.reviewCount = sql`${projects.reviewCount} + 1`;
+      updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} + ${reviewScore}`;
+      updates.slopScore = sql`CASE WHEN (${projects.reviewCount} + 1) = 0 THEN 0 ELSE ((${projects.reviewScoreTotal} + ${reviewScore})::numeric / (${projects.reviewCount} + 1)) END`;
+    }
+
+    await tx.update(projects).set(updates).where(eq(projects.id, project.id));
 
     return [newComment];
   });

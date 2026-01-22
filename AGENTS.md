@@ -282,6 +282,16 @@ To preview errors without flooding the terminal:
 pnpm -F @slop/web exec tsc --noEmit 2>&1 | head -50
 ```
 
+## Database Workflow
+
+For local/dev environments, use Drizzle push (not migrate):
+
+```bash
+pnpm db:push
+```
+
+`pnpm db:migrate` is reserved for production/CI when applying tracked migrations.
+
 ## Environment
 
 - Node.js 20+

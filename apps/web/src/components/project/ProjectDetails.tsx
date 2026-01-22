@@ -149,12 +149,9 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
         <aside>
           <ScoreWidget
             projectSlug={project.slug}
-            normalUp={project.normalUp}
-            normalDown={project.normalDown}
-            normalScore={project.normalScore}
-            devUp={project.devUp}
-            devDown={project.devDown}
-            devScore={project.devScore}
+            likeCount={project.likeCount}
+            reviewCount={project.reviewCount}
+            slopScore={project.slopScore}
             vibePercent={project.vibePercent}
           />
         </aside>

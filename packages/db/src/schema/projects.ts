@@ -4,6 +4,7 @@ import {
   varchar,
   text,
   integer,
+  numeric,
   timestamp,
   pgEnum,
   jsonb,
@@ -56,12 +57,12 @@ export const projects = pgTable(
     vibeMode: vibeModeEnum("vibe_mode").notNull(),
     vibePercent: integer("vibe_percent").notNull(),
     vibeDetailsJson: jsonb("vibe_details_json"),
-    normalUp: integer("normal_up").default(0).notNull(),
-    normalDown: integer("normal_down").default(0).notNull(),
-    normalScore: integer("normal_score").default(0).notNull(),
-    devUp: integer("dev_up").default(0).notNull(),
-    devDown: integer("dev_down").default(0).notNull(),
-    devScore: integer("dev_score").default(0).notNull(),
+    likeCount: integer("like_count").default(0).notNull(),
+    reviewCount: integer("review_count").default(0).notNull(),
+    reviewScoreTotal: integer("review_score_total").default(0).notNull(),
+    slopScore: numeric("slop_score", { precision: 4, scale: 2 })
+      .default("0")
+      .notNull(),
     commentCount: integer("comment_count").default(0).notNull(),
     status: projectStatusEnum("status").default("published").notNull(),
     enrichmentStatus: enrichmentStatusEnum("enrichment_status")

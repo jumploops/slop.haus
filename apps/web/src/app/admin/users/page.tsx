@@ -37,7 +37,7 @@ export default function UsersPage() {
       <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
         <h1 className="text-xl font-bold text-slop-blue">★ VERIFIED DEVELOPERS ★</h1>
         <p className="text-xs text-muted mt-1">
-          Users with verified developer status can vote in the dev channel.
+          Verified status is kept for future review weighting and badges.
         </p>
       </div>
 

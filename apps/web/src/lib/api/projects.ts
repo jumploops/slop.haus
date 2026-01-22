@@ -30,12 +30,10 @@ export interface ProjectListItem {
   mainUrl: string | null;
   repoUrl: string | null;
   vibePercent: number;
-  normalUp: number;
-  normalDown: number;
-  normalScore: number;
-  devUp: number;
-  devDown: number;
-  devScore: number;
+  likeCount: number;
+  reviewCount: number;
+  reviewScoreTotal: number;
+  slopScore: number;
   commentCount: number;
   createdAt: string;
   author: ProjectAuthor;
@@ -59,12 +57,10 @@ export interface ProjectDetail {
   vibeMode: "overview" | "detailed";
   vibePercent: number;
   vibeDetailsJson: Record<string, number> | null;
-  normalUp: number;
-  normalDown: number;
-  normalScore: number;
-  devUp: number;
-  devDown: number;
-  devScore: number;
+  likeCount: number;
+  reviewCount: number;
+  reviewScoreTotal: number;
+  slopScore: number;
   commentCount: number;
   status: string;
   createdAt: string;
@@ -109,7 +105,6 @@ export interface ProjectRevision {
 export async function fetchFeed(query: Partial<FeedQuery> = {}): Promise<FeedResponse> {
   const params = new URLSearchParams();
   if (query.sort) params.set("sort", query.sort);
-  if (query.channel) params.set("channel", query.channel);
   if (query.window) params.set("window", query.window);
   if (query.page) params.set("page", String(query.page));
   if (query.limit) params.set("limit", String(query.limit));

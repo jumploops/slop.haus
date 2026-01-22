@@ -116,18 +116,25 @@ export const updateProjectSchema = z.object({
   tools: z.array(z.string()).optional(),
 });
 
-export const voteSchema = z.object({
-  channel: z.enum(["normal", "dev"]),
-  value: z.union([z.literal(1), z.literal(-1), z.literal(0)]),
+export const likeSchema = z.object({
+  value: z.union([z.literal(1), z.literal(0)]),
 });
 
 export const createCommentSchema = z.object({
   body: z.string().min(1).max(10000),
   parentCommentId: z.string().uuid().optional(),
-});
+  reviewScore: z.number().min(0).max(10).optional(),
+}).refine(
+  (data) => !data.parentCommentId || data.reviewScore === undefined,
+  { message: "reviewScore is only allowed on top-level reviews" }
+);
 
 export const updateCommentSchema = z.object({
   body: z.string().min(1).max(10000),
+});
+
+export const commentVoteSchema = z.object({
+  value: z.union([z.literal(1), z.literal(0)]),
 });
 
 export const createFlagSchema = z.object({
@@ -138,7 +145,6 @@ export const createFlagSchema = z.object({
 
 export const feedQuerySchema = z.object({
   sort: z.enum(["hot", "new", "top"]).default("hot"),
-  channel: z.enum(["normal", "dev"]).default("normal"),
   window: z.enum(["24h", "7d", "30d", "all"]).default("all"),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
@@ -166,9 +172,10 @@ export const submitDraftSchema = z.object({
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
-export type VoteInput = z.infer<typeof voteSchema>;
+export type LikeInput = z.infer<typeof likeSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
+export type CommentVoteInput = z.infer<typeof commentVoteSchema>;
 export type CreateFlagInput = z.infer<typeof createFlagSchema>;
 export type FeedQuery = z.infer<typeof feedQuerySchema>;
 export type AnalyzeUrlInput = z.infer<typeof analyzeUrlSchema>;

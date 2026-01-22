@@ -27,12 +27,10 @@ export interface Project {
   vibeMode: VibeMode;
   vibePercent: number;
   vibeDetailsJson: Record<string, number> | null;
-  normalUp: number;
-  normalDown: number;
-  normalScore: number;
-  devUp: number;
-  devDown: number;
-  devScore: number;
+  likeCount: number;
+  reviewCount: number;
+  reviewScoreTotal: number;
+  slopScore: number;
   commentCount: number;
   status: ProjectStatus;
   enrichmentStatus: EnrichmentStatus;
@@ -48,6 +46,8 @@ export interface Comment {
   parentCommentId: string | null;
   depth: number;
   body: string;
+  reviewScore: number | null;
+  upvoteCount: number;
   status: CommentStatus;
   createdAt: Date;
   updatedAt: Date;

@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPatch, apiDelete } from "../api";
-import type { CreateCommentInput, UpdateCommentInput } from "@slop/shared";
+import type { CommentVoteInput, CreateCommentInput, UpdateCommentInput } from "@slop/shared";
 
 export interface CommentAuthor {
   id: string;
@@ -13,6 +13,8 @@ export interface Comment {
   body: string;
   parentCommentId: string | null;
   depth: number;
+  reviewScore: number | null;
+  upvoteCount: number;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -46,6 +48,18 @@ export async function updateComment(
 
 export async function deleteComment(id: string): Promise<void> {
   await apiDelete(`/comments/${id}`);
+}
+
+export interface CommentVoteResult {
+  success: boolean;
+  upvoteCount: number;
+}
+
+export async function voteOnComment(
+  id: string,
+  data: CommentVoteInput
+): Promise<CommentVoteResult> {
+  return apiPost<CommentVoteResult>(`/comments/${id}/vote`, data);
 }
 
 // Build a tree structure from flat comments

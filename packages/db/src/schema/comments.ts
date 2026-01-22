@@ -29,6 +29,8 @@ export const comments = pgTable(
     parentCommentId: uuid("parent_comment_id").references((): any => comments.id),
     depth: integer("depth").default(0).notNull(),
     body: text("body").notNull(),
+    reviewScore: integer("review_score"),
+    upvoteCount: integer("upvote_count").default(0).notNull(),
     status: commentStatusEnum("status").default("visible").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

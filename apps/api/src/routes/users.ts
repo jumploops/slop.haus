@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { db } from "@slop/db";
 import { favorites, projects, user, projectMedia } from "@slop/db/schema";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { requireAuth } from "../middleware/auth";
 
 const userRoutes = new Hono();
@@ -36,8 +36,10 @@ userRoutes.get("/me/favorites", requireAuth(), async (c) => {
       mainUrl: projects.mainUrl,
       repoUrl: projects.repoUrl,
       vibePercent: projects.vibePercent,
-      normalScore: projects.normalScore,
-      devScore: projects.devScore,
+      likeCount: projects.likeCount,
+      reviewCount: projects.reviewCount,
+      reviewScoreTotal: projects.reviewScoreTotal,
+      slopScore: sql<number>`${projects.slopScore}::float`,
       commentCount: projects.commentCount,
       createdAt: projects.createdAt,
       author: {
@@ -103,12 +105,10 @@ userRoutes.get("/me/projects", requireAuth(), async (c) => {
       mainUrl: projects.mainUrl,
       repoUrl: projects.repoUrl,
       vibePercent: projects.vibePercent,
-      normalUp: projects.normalUp,
-      normalDown: projects.normalDown,
-      normalScore: projects.normalScore,
-      devUp: projects.devUp,
-      devDown: projects.devDown,
-      devScore: projects.devScore,
+      likeCount: projects.likeCount,
+      reviewCount: projects.reviewCount,
+      reviewScoreTotal: projects.reviewScoreTotal,
+      slopScore: sql<number>`${projects.slopScore}::float`,
       commentCount: projects.commentCount,
       status: projects.status,
       createdAt: projects.createdAt,

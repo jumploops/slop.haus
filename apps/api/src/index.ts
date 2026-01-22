@@ -8,7 +8,7 @@ import { auth } from "./lib/auth";
 import { authRoutes } from "./routes/auth";
 import { projectRoutes } from "./routes/projects";
 import { toolRoutes } from "./routes/tools";
-import { voteRoutes } from "./routes/votes";
+import { likeRoutes } from "./routes/likes";
 import { commentRoutes } from "./routes/comments";
 import { projectCommentRoutes } from "./routes/projectComments";
 import { favoriteRoutes } from "./routes/favorites";
@@ -64,7 +64,7 @@ app.on(["GET", "POST"], "/api/auth/*", (c) => {
 // API v1 routes
 app.route("/api/v1/auth", authRoutes);
 app.route("/api/v1/projects", projectRoutes);
-app.route("/api/v1/projects", voteRoutes); // Vote routes under projects
+app.route("/api/v1/projects", likeRoutes); // Like routes under projects
 app.route("/api/v1/projects", projectCommentRoutes); // Comment list/create under projects
 app.route("/api/v1/projects", favoriteRoutes); // Favorite routes under projects
 app.route("/api/v1/comments", commentRoutes); // Comment edit/delete by ID

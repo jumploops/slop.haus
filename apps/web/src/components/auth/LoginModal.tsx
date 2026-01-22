@@ -26,7 +26,7 @@ export function LoginModal() {
     <Modal isOpen={isOpen} onClose={closeLoginModal} title="Sign In">
       <div className="py-4">
         <p className="text-muted mb-6 text-center">
-          Sign in to submit projects, vote, comment, and save your favorites.
+          Sign in to submit projects, like, review, and save your favorites.
         </p>
 
         <div className="flex flex-col gap-3">

@@ -37,12 +37,10 @@ async function fetchCompleteProject(projectId: string) {
       vibeMode: projects.vibeMode,
       vibePercent: projects.vibePercent,
       vibeDetailsJson: projects.vibeDetailsJson,
-      normalUp: projects.normalUp,
-      normalDown: projects.normalDown,
-      normalScore: projects.normalScore,
-      devUp: projects.devUp,
-      devDown: projects.devDown,
-      devScore: projects.devScore,
+      likeCount: projects.likeCount,
+      reviewCount: projects.reviewCount,
+      reviewScoreTotal: projects.reviewScoreTotal,
+      slopScore: sql<number>`${projects.slopScore}::float`,
       commentCount: projects.commentCount,
       status: projects.status,
       createdAt: projects.createdAt,
@@ -111,7 +109,7 @@ function getTimeWindowFilter(window: string) {
 // List projects (feed)
 projectRoutes.get("/", async (c) => {
   const query = feedQuerySchema.parse(c.req.query());
-  const { sort, channel, window, page, limit } = query;
+  const { sort, window, page, limit } = query;
 
   const offset = (page - 1) * limit;
   const timeFilter = getTimeWindowFilter(window);
@@ -133,8 +131,7 @@ projectRoutes.get("/", async (c) => {
   if (sort === "new") {
     orderBy = desc(projects.createdAt);
   } else if (sort === "top") {
-    orderBy =
-      channel === "dev" ? desc(projects.devScore) : desc(projects.normalScore);
+    orderBy = desc(projects.slopScore);
   } else {
     // hot - we'll sort in memory after fetching
     orderBy = desc(projects.createdAt);
@@ -149,12 +146,10 @@ projectRoutes.get("/", async (c) => {
       mainUrl: projects.mainUrl,
       repoUrl: projects.repoUrl,
       vibePercent: projects.vibePercent,
-      normalUp: projects.normalUp,
-      normalDown: projects.normalDown,
-      normalScore: projects.normalScore,
-      devUp: projects.devUp,
-      devDown: projects.devDown,
-      devScore: projects.devScore,
+      likeCount: projects.likeCount,
+      reviewCount: projects.reviewCount,
+      reviewScoreTotal: projects.reviewScoreTotal,
+      slopScore: sql<number>`${projects.slopScore}::float`,
       commentCount: projects.commentCount,
       createdAt: projects.createdAt,
       author: {
@@ -180,10 +175,7 @@ projectRoutes.get("/", async (c) => {
   if (sort === "hot") {
     const scored = projectList.map((p) => ({
       ...p,
-      hotScore: computeHotScore(
-        channel === "dev" ? p.devScore : p.normalScore,
-        p.createdAt
-      ),
+      hotScore: computeHotScore(p.slopScore, p.createdAt),
     }));
     scored.sort((a, b) => b.hotScore - a.hotScore);
     result = scored.slice(offset, offset + limit);
@@ -238,12 +230,10 @@ projectRoutes.get("/:slug", async (c) => {
       vibeMode: projects.vibeMode,
       vibePercent: projects.vibePercent,
       vibeDetailsJson: projects.vibeDetailsJson,
-      normalUp: projects.normalUp,
-      normalDown: projects.normalDown,
-      normalScore: projects.normalScore,
-      devUp: projects.devUp,
-      devDown: projects.devDown,
-      devScore: projects.devScore,
+      likeCount: projects.likeCount,
+      reviewCount: projects.reviewCount,
+      reviewScoreTotal: projects.reviewScoreTotal,
+      slopScore: sql<number>`${projects.slopScore}::float`,
       commentCount: projects.commentCount,
       status: projects.status,
       createdAt: projects.createdAt,

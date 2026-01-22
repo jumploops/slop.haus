@@ -29,6 +29,10 @@ flagRoutes.post("/", requireAuth(), async (c) => {
     return c.json({ error: "Invalid reason" }, 400);
   }
 
+  let targetComment:
+    | { id: string; projectId: string; status: string; parentCommentId: string | null; reviewScore: number | null }
+    | null = null;
+
   // Check target exists
   if (targetType === "project") {
     const [project] = await db
@@ -40,12 +44,19 @@ flagRoutes.post("/", requireAuth(), async (c) => {
     }
   } else {
     const [comment] = await db
-      .select()
+      .select({
+        id: comments.id,
+        projectId: comments.projectId,
+        status: comments.status,
+        parentCommentId: comments.parentCommentId,
+        reviewScore: comments.reviewScore,
+      })
       .from(comments)
       .where(eq(comments.id, targetId));
     if (!comment) {
       return c.json({ error: "Comment not found" }, 404);
     }
+    targetComment = comment;
   }
 
   // Check if already flagged by this user
@@ -91,10 +102,38 @@ flagRoutes.post("/", requireAuth(), async (c) => {
         .set({ status: "hidden", updatedAt: new Date() })
         .where(eq(projects.id, targetId));
     } else {
-      await db
-        .update(comments)
-        .set({ status: "hidden", updatedAt: new Date() })
-        .where(eq(comments.id, targetId));
+      if (!targetComment) {
+        return c.json({ error: "Comment not found" }, 404);
+      }
+
+      const isVisible = targetComment.status === "visible";
+      const isReview =
+        targetComment.parentCommentId === null &&
+        targetComment.reviewScore !== null;
+
+      await db.transaction(async (tx) => {
+        await tx
+          .update(comments)
+          .set({ status: "hidden", updatedAt: new Date() })
+          .where(eq(comments.id, targetId));
+
+        if (isVisible) {
+          const updates: Record<string, unknown> = {
+            commentCount: sql`${projects.commentCount} - 1`,
+          };
+
+          if (isReview) {
+            updates.reviewCount = sql`${projects.reviewCount} - 1`;
+            updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} - ${targetComment.reviewScore}`;
+            updates.slopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${targetComment.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+          }
+
+          await tx
+            .update(projects)
+            .set(updates)
+            .where(eq(projects.id, targetComment.projectId));
+        }
+      });
     }
   }
 

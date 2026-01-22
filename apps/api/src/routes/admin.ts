@@ -318,10 +318,30 @@ adminRoutes.post("/comments/:id/approve", requireMod(), async (c) => {
     return c.json({ error: "Comment not found" }, 404);
   }
 
-  await db
-    .update(comments)
-    .set({ status: "visible", updatedAt: new Date() })
-    .where(eq(comments.id, commentId));
+  const isVisible = comment.status === "visible";
+  const isReview =
+    comment.parentCommentId === null && comment.reviewScore !== null;
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(comments)
+      .set({ status: "visible", updatedAt: new Date() })
+      .where(eq(comments.id, commentId));
+
+    if (!isVisible) {
+      const updates: Record<string, unknown> = {
+        commentCount: sql`${projects.commentCount} + 1`,
+      };
+
+      if (isReview) {
+        updates.reviewCount = sql`${projects.reviewCount} + 1`;
+        updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} + ${comment.reviewScore}`;
+        updates.slopScore = sql`CASE WHEN (${projects.reviewCount} + 1) = 0 THEN 0 ELSE ((${projects.reviewScoreTotal} + ${comment.reviewScore})::numeric / (${projects.reviewCount} + 1)) END`;
+      }
+
+      await tx.update(projects).set(updates).where(eq(projects.id, comment.projectId));
+    }
+  });
 
   // Clear flags
   await db
@@ -344,10 +364,30 @@ adminRoutes.post("/comments/:id/remove", requireMod(), async (c) => {
     return c.json({ error: "Comment not found" }, 404);
   }
 
-  await db
-    .update(comments)
-    .set({ status: "removed", updatedAt: new Date() })
-    .where(eq(comments.id, commentId));
+  const isVisible = comment.status === "visible";
+  const isReview =
+    comment.parentCommentId === null && comment.reviewScore !== null;
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(comments)
+      .set({ status: "removed", updatedAt: new Date() })
+      .where(eq(comments.id, commentId));
+
+    if (isVisible) {
+      const updates: Record<string, unknown> = {
+        commentCount: sql`${projects.commentCount} - 1`,
+      };
+
+      if (isReview) {
+        updates.reviewCount = sql`${projects.reviewCount} - 1`;
+        updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} - ${comment.reviewScore}`;
+        updates.slopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${comment.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+      }
+
+      await tx.update(projects).set(updates).where(eq(projects.id, comment.projectId));
+    }
+  });
 
   return c.json({ success: true, message: "Comment removed" });
 });

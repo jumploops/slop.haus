@@ -1,74 +1,71 @@
 "use client";
 
-import { VoteButtons } from "./VoteButtons";
+import { useEffect, useMemo, useState } from "react";
+import { LikeButton } from "./LikeButton";
 import { VibeMeter } from "./VibeMeter";
-import { useVote } from "@/hooks/useVote";
+import { useLike } from "@/hooks/useLike";
 
 interface ScoreWidgetProps {
   projectSlug: string;
-  normalUp: number;
-  normalDown: number;
-  normalScore: number;
-  devUp: number;
-  devDown: number;
-  devScore: number;
+  likeCount: number;
+  reviewCount: number;
+  slopScore: number;
   vibePercent: number;
 }
 
 export function ScoreWidget({
   projectSlug,
-  normalUp,
-  normalDown,
-  normalScore,
-  devUp,
-  devDown,
-  devScore,
+  likeCount,
+  reviewCount,
+  slopScore,
   vibePercent,
 }: ScoreWidgetProps) {
-  const { voteState, submitVote, isVoting } = useVote(projectSlug);
+  const [localLikeCount, setLocalLikeCount] = useState(likeCount);
+  const { likeState, submitLike, isLiking } = useLike(projectSlug, {
+    onLikeSuccess: (result) => setLocalLikeCount(result.likeCount),
+  });
+
+  useEffect(() => {
+    setLocalLikeCount(likeCount);
+  }, [likeCount]);
+
+  const displayScore = useMemo(() => {
+    if (reviewCount === 0) return "—";
+    return slopScore.toFixed(1);
+  }, [reviewCount, slopScore]);
 
   return (
     <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-      <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-        {/* Vibe Score Section */}
-        <div className="mb-6">
-          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ VIBE SCORE ~~</h4>
-          <VibeMeter percent={vibePercent} showLabel />
+      <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-6">
+        {/* Slop Score Section */}
+        <div>
+          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ SLOP SCORE ~~</h4>
+          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 text-center">
+            <div className="text-3xl font-bold text-fg">{displayScore}</div>
+            <p className="text-[10px] text-muted mt-1">
+              {reviewCount} review{reviewCount === 1 ? "" : "s"}
+            </p>
+          </div>
         </div>
 
-        {/* Community Votes Section */}
+        {/* Like Section */}
         <div>
-          <h4 className="text-xs font-bold text-slop-purple mb-3 text-center">~~ COMMUNITY VOTES ~~</h4>
-          <div className="flex flex-col gap-3">
-            {/* People channel */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <span className="text-xs font-bold text-fg">People</span>
-              <span className="text-[10px] text-muted">
-                +{normalUp} / -{normalDown}
-              </span>
-              <VoteButtons
-                score={normalScore}
-                currentVote={voteState?.normal ?? null}
-                onVote={(value) => submitVote("normal", value)}
-                disabled={isVoting}
-                size="sm"
-              />
-            </div>
-            {/* Dev channel */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <span className="text-xs font-bold text-fg">Devs</span>
-              <span className="text-[10px] text-muted">
-                +{devUp} / -{devDown}
-              </span>
-              <VoteButtons
-                score={devScore}
-                currentVote={voteState?.dev ?? null}
-                onVote={(value) => submitVote("dev", value)}
-                disabled={isVoting || !voteState?.hasDevCredential}
-                size="sm"
-              />
-            </div>
+          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ LIKES ~~</h4>
+          <div className="flex justify-center">
+            <LikeButton
+              count={localLikeCount}
+              liked={likeState?.liked ?? false}
+              onToggle={submitLike}
+              disabled={isLiking}
+              size="md"
+            />
           </div>
+        </div>
+
+        {/* Vibe Score Section */}
+        <div>
+          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ VIBE PERCENTILE ~~</h4>
+          <VibeMeter percent={vibePercent} showLabel />
         </div>
       </div>
     </div>

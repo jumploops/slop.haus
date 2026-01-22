@@ -22,7 +22,7 @@ export function DeleteProjectModal({
     <Modal isOpen={isOpen} onClose={onClose} title={`Delete "${projectTitle}"?`}>
       <div className="max-w-[400px]">
         <p className="mb-3 leading-relaxed">
-          This will hide your project from public view. Comments and votes will be preserved.
+          This will hide your project from public view. Reviews and likes will be preserved.
         </p>
         <p className="text-muted text-sm mb-3">
           If you need to restore a deleted project, please contact support.

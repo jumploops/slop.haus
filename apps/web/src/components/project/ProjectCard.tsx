@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { MessageCircle, ExternalLink } from "lucide-react";
-import { VoteButtons } from "./VoteButtons";
+import { LikeButton } from "./LikeButton";
 import { Button } from "@/components/ui/Button";
-import { useVote } from "@/hooks/useVote";
+import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
+import { useEffect, useState } from "react";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import type { ProjectListItem } from "@/lib/api/projects";
 
 interface ProjectCardProps {
   project: ProjectListItem;
-  channel?: "normal" | "dev";
   showFavoriteButton?: boolean;
   onFavoriteChange?: () => void;
   rank?: number;
@@ -19,24 +19,27 @@ interface ProjectCardProps {
 
 export function ProjectCard({
   project,
-  channel = "normal",
   showFavoriteButton,
   onFavoriteChange,
   rank,
 }: ProjectCardProps) {
-  const { voteState, submitVote, isVoting } = useVote(project.slug);
+  const [localLikeCount, setLocalLikeCount] = useState(project.likeCount);
+  const { likeState, submitLike, isLiking } = useLike(project.slug, {
+    onLikeSuccess: (result) => setLocalLikeCount(result.likeCount),
+  });
+
+  useEffect(() => {
+    setLocalLikeCount(project.likeCount);
+  }, [project.likeCount]);
   const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavorite(
     project.slug,
     { onSuccess: onFavoriteChange }
   );
 
-  const score = channel === "dev" ? project.devScore : project.normalScore;
-  const currentVote = voteState?.[channel] ?? null;
 
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
   const isNew = Date.now() - new Date(project.createdAt).getTime() < 2 * 24 * 60 * 60 * 1000;
-  const scoreLabel = channel === "dev" ? "DEV" : "SLOP";
-  const scoreColor = channel === "dev" ? "bg-slop-purple" : "bg-slop-green";
+  const slopScore = project.reviewCount === 0 ? "—" : project.slopScore.toFixed(1);
   const visitUrl = project.mainUrl || project.repoUrl;
 
   return (
@@ -86,7 +89,7 @@ export function ProjectCard({
             <span className="text-muted/70">•</span>
             <span className="flex items-center gap-1 text-muted">
               <MessageCircle className="h-3 w-3" />
-              {project.commentCount}
+              {project.reviewCount}
             </span>
             {visitUrl && (
               <a
@@ -109,12 +112,12 @@ export function ProjectCard({
                 "w-12 h-12 flex items-center justify-center",
                 "border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)]",
                 "text-accent-foreground font-bold text-lg",
-                scoreColor
+                "bg-slop-green"
               )}
             >
-              {score}
+              {slopScore}
             </div>
-            <span className="text-[9px] font-bold text-slop-purple mt-0.5">{scoreLabel}</span>
+            <span className="text-[9px] font-bold text-slop-purple mt-0.5">SLOP</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="w-12 h-12 flex items-center justify-center border-2 border-[color:var(--foreground)] shadow-[2px_2px_0_var(--foreground)] bg-slop-coral text-accent-foreground font-bold text-lg">
@@ -134,11 +137,11 @@ export function ProjectCard({
                 <HeartIcon filled={isFavorited} />
               </Button>
             )}
-            <VoteButtons
-              score={score}
-              currentVote={currentVote}
-              onVote={(value) => submitVote(channel, value)}
-              disabled={isVoting}
+            <LikeButton
+              count={localLikeCount}
+              liked={likeState?.liked ?? false}
+              onToggle={(value) => submitLike(value)}
+              disabled={isLiking}
               size="sm"
             />
           </div>
