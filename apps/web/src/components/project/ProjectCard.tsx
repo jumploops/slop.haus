@@ -51,6 +51,11 @@ export function ProjectCard({
         "hover:border-primary hover:shadow-lg"
       )}
     >
+      <Link
+        href={`/p/${project.slug}`}
+        aria-label={`View ${project.title}`}
+        className="absolute inset-0 z-0"
+      />
       {rank && (
         <div className="absolute -left-2 -top-2 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
           {rank}
@@ -62,7 +67,7 @@ export function ProjectCard({
         onClick={() => submitLike(likeState?.liked ? 0 : 1)}
         disabled={isLiking}
         className={cn(
-          "flex h-16 w-14 flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors",
+          "relative z-10 flex h-16 w-14 flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors",
           likeState?.liked
             ? "border-primary bg-primary/10 text-primary"
             : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
@@ -74,15 +79,21 @@ export function ProjectCard({
         <span className="font-mono text-sm font-bold">{localLikeCount}</span>
       </button>
 
-      <Link href={`/p/${project.slug}`} className="relative hidden h-16 w-24 flex-shrink-0 overflow-hidden border-2 border-border sm:block">
+      <Link
+        href={`/p/${project.slug}`}
+        className="relative z-10 hidden h-16 w-24 flex-shrink-0 overflow-hidden border-2 border-border sm:block"
+      >
         <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
         <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
       </Link>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <Link href={`/p/${project.slug}`} className="no-underline hover:no-underline">
+            <Link
+              href={`/p/${project.slug}`}
+              className="pointer-events-auto no-underline hover:no-underline"
+            >
               <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
                 <span className="truncate">{project.title}</span>
                 <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
@@ -125,7 +136,7 @@ export function ProjectCard({
               href={visitUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
+              className="pointer-events-auto font-mono text-[10px] uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
             >
               visit
             </a>
@@ -133,7 +144,7 @@ export function ProjectCard({
         </div>
 
         {showFavoriteButton && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pointer-events-auto">
             <Button
               variant={isFavorited ? "secondary" : "ghost"}
               size="sm"

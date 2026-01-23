@@ -82,26 +82,6 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           <MobileNavLink href="/submit" active={pathname === "/submit"}>
             Submit
           </MobileNavLink>
-          {session?.user && (
-            <MobileNavLink href="/favorites" active={pathname === "/favorites"}>
-              Favorites
-            </MobileNavLink>
-          )}
-          {session?.user && (
-            <MobileNavLink href="/my/projects" active={pathname.startsWith("/my/projects")}>
-              My Projects
-            </MobileNavLink>
-          )}
-          {session?.user && (
-            <MobileNavLink href="/settings/profile" active={pathname.startsWith("/settings")}>
-              Settings
-            </MobileNavLink>
-          )}
-          {session?.user && (session.user.role === "admin" || session.user.role === "mod") && (
-            <MobileNavLink href="/admin" active={pathname.startsWith("/admin")}>
-              Admin
-            </MobileNavLink>
-          )}
         </div>
 
         {/* Auth section */}

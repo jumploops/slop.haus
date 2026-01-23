@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import { Header } from "@/components/layout/Header";
+import { VisitorCounter } from "@/components/layout/VisitorCounter";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
@@ -49,6 +50,9 @@ export default function RootLayout({
           </main>
           <footer className="border-t-2 border-dashed border-border bg-card py-4">
             <div className="mx-auto max-w-5xl px-4 text-center">
+              <div className="mb-4 flex justify-center">
+                <VisitorCounter />
+              </div>
               <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
                 <span>webmaster@slop.haus</span>
                 <span>|</span>

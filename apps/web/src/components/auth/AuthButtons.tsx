@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { Monitor, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { signOut, useSession } from "@/lib/auth-client";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
@@ -9,6 +11,8 @@ import { useLoginModal } from "@/hooks/useLoginModal";
 
 export function AuthButtons() {
   const { data: session, isPending } = useSession();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const { openLoginModal } = useLoginModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -23,6 +27,22 @@ export function AuthButtons() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const cycleTheme = () => {
+    if (theme === "system") {
+      setTheme("light");
+    } else if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("system");
+    }
+  };
+
+  const themeLabel = mounted ? getThemeLabel(theme) : "System";
 
   if (isPending) {
     return (
@@ -53,7 +73,6 @@ export function AuthButtons() {
             alt={session.user.name ?? "User"}
             size="sm"
           />
-          <span>{session.user.name}</span>
           <ChevronIcon open={isDropdownOpen} />
         </Button>
 
@@ -69,6 +88,14 @@ export function AuthButtons() {
                 Favorites
               </Link>
               <Link
+                href="/my/projects"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground no-underline transition-colors hover:bg-muted hover:text-primary"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                <FolderIcon />
+                My Projects
+              </Link>
+              <Link
                 href="/settings"
                 className="flex items-center gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground no-underline transition-colors hover:bg-muted hover:text-primary"
                 onClick={() => setIsDropdownOpen(false)}
@@ -76,6 +103,17 @@ export function AuthButtons() {
                 <SettingsIcon />
                 Settings
               </Link>
+              <button
+                type="button"
+                onClick={cycleTheme}
+                className="flex items-center justify-between gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground bg-transparent border-none cursor-pointer transition-colors hover:bg-muted hover:text-primary"
+              >
+                <span className="flex items-center gap-2">
+                  <ThemeIcon theme={theme} />
+                  Theme
+                </span>
+                <span className="text-[10px]">{themeLabel}</span>
+              </button>
               {showAdminLink && (
                 <Link
                   href="/admin"
@@ -142,6 +180,30 @@ function SettingsIcon() {
       <path fillRule="evenodd" d="M6.5 1.5a1.5 1.5 0 00-1.415 1H4a2 2 0 00-2 2v.085A1.5 1.5 0 001 6v4a1.5 1.5 0 001 1.415V12a2 2 0 002 2h1.085A1.5 1.5 0 006.5 15h3a1.5 1.5 0 001.415-1H12a2 2 0 002-2v-.585A1.5 1.5 0 0015 10V6a1.5 1.5 0 00-1-1.415V4.5a2 2 0 00-2-2h-.085A1.5 1.5 0 0010.5 1.5h-4zM4.5 4.5h7v7h-7v-7z" clipRule="evenodd" />
     </svg>
   );
+}
+
+function FolderIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M1.5 4A1.5 1.5 0 013 2.5h3l1.5 1.5H13A1.5 1.5 0 0114.5 5.5v6A1.5 1.5 0 0113 13H3A1.5 1.5 0 011.5 11.5v-7zM3 4a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5H6.5L5 3H3z" />
+    </svg>
+  );
+}
+
+function ThemeIcon({ theme }: { theme?: string }) {
+  if (theme === "light") {
+    return <Sun className="h-4 w-4" />;
+  }
+  if (theme === "dark") {
+    return <Moon className="h-4 w-4" />;
+  }
+  return <Monitor className="h-4 w-4" />;
+}
+
+function getThemeLabel(theme?: string) {
+  if (theme === "light") return "Light";
+  if (theme === "dark") return "Dark";
+  return "System";
 }
 
 function ShieldIcon() {
