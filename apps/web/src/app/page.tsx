@@ -10,9 +10,11 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
+import { LayoutGrid, List, ListOrdered } from "lucide-react";
 
 type SortOption = "hot" | "new" | "top";
 type WindowOption = "24h" | "7d" | "30d" | "all";
+type DisplayMode = "list-sm" | "list-lg" | "grid";
 
 const sortTabs = [
   { id: "hot", label: "Hot" },
@@ -33,12 +35,30 @@ export default function FeedPage() {
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [page, setPage] = useState(1);
   const [showIntro, setShowIntro] = useState(false);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const dismissed = window.localStorage.getItem("slop:feedIntroDismissed");
     setShowIntro(dismissed !== "true");
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("slop:feedDisplayMode");
+    if (stored === "list-sm" || stored === "list-lg" || stored === "grid") {
+      if (stored === "list-lg" && !window.matchMedia("(min-width: 640px)").matches) {
+        setDisplayMode("list-sm");
+      } else {
+        setDisplayMode(stored);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("slop:feedDisplayMode", displayMode);
+  }, [displayMode]);
 
   const { data, error, isLoading, mutate } = useSWR<FeedResponse>(
     ["feed", sort, timeWindow, page],
@@ -57,6 +77,17 @@ export default function FeedPage() {
   const handleWindowChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTimeWindow(e.target.value as WindowOption);
     setPage(1);
+  };
+
+  const handleDisplayModeChange = (mode: DisplayMode) => {
+    if (mode === "list-lg" && typeof window !== "undefined") {
+      const isDesktop = window.matchMedia("(min-width: 640px)").matches;
+      if (!isDesktop) {
+        setDisplayMode("list-sm");
+        return;
+      }
+    }
+    setDisplayMode(mode);
   };
 
   const loadMore = () => {
@@ -102,33 +133,80 @@ export default function FeedPage() {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <Tabs
-          tabs={sortTabs}
-          activeTab={sort}
-          onTabChange={handleSortChange}
-          className="mb-0 w-full sm:w-auto"
-        />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Tabs
+            tabs={sortTabs}
+            activeTab={sort}
+            onTabChange={handleSortChange}
+            className="mb-0 w-full sm:w-auto"
+          />
 
-        {sort === "top" && (
-          <select
-            value={timeWindow}
-            onChange={handleWindowChange}
+          {sort === "top" && (
+            <select
+              value={timeWindow}
+              onChange={handleWindowChange}
+              className={cn(
+                "w-full sm:w-auto",
+                "min-h-10 sm:min-h-0 px-3 py-2 sm:py-1 text-xs font-bold font-mono uppercase tracking-wide",
+                "bg-background text-foreground",
+                "border-2 border-dashed border-border",
+                "focus:outline-none focus:border-primary"
+              )}
+            >
+              {windowOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end gap-1">
+          <button
+            type="button"
+            onClick={() => handleDisplayModeChange("list-sm")}
+            aria-label="List view (small screenshots)"
+            title="List (small)"
             className={cn(
-              "w-full sm:w-auto",
-              "min-h-10 sm:min-h-0 px-3 py-2 sm:py-1 text-xs font-bold font-mono uppercase tracking-wide",
-              "bg-background text-foreground",
-              "border-2 border-dashed border-border",
-              "focus:outline-none focus:border-primary"
+              "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              displayMode === "list-sm"
+                ? "bg-primary/10 text-primary border-primary"
+                : "bg-card text-muted-foreground border-border hover:text-primary"
             )}
           >
-            {windowOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        )}
+            <List className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDisplayModeChange("list-lg")}
+            aria-label="List view (large screenshots)"
+            title="List (large)"
+            className={cn(
+              "hidden sm:inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              displayMode === "list-lg"
+                ? "bg-primary/10 text-primary border-primary"
+                : "bg-card text-muted-foreground border-border hover:text-primary"
+            )}
+          >
+            <ListOrdered className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDisplayModeChange("grid")}
+            aria-label="Grid view"
+            title="Grid"
+            className={cn(
+              "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              displayMode === "grid"
+                ? "bg-primary/10 text-primary border-primary"
+                : "bg-card text-muted-foreground border-border hover:text-primary"
+            )}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -161,9 +239,22 @@ export default function FeedPage() {
 
       {data && data.projects.length > 0 && (
         <>
-          <div className="space-y-3">
+          <div
+            className={cn(
+              displayMode === "grid"
+                ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                : displayMode === "list-lg"
+                ? "space-y-4"
+                : "space-y-3"
+            )}
+          >
             {data.projects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} rank={index + 1} />
+              <ProjectCard
+                key={project.id}
+                project={project}
+                rank={index + 1}
+                variant={displayMode}
+              />
             ))}
           </div>
 

@@ -90,6 +90,8 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **URL validation feedback** - Show real-time validation as user types URL (debounced), not just on submit.
 
+- [ ] **Display mode A/B test** - Randomize default feed display mode and measure engagement.
+
 ---
 
 ## Monitoring & Observability
