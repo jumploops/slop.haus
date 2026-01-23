@@ -25,7 +25,7 @@ export function CommentForm({
   const { data: session, isPending } = useSession();
   const { showToast } = useToast();
   const [body, setBody] = useState("");
-  const [reviewScore, setReviewScore] = useState(5);
+  const [reviewScore, setReviewScore] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isTopLevel = !parentCommentId;
 
@@ -45,15 +45,20 @@ export function CommentForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim() || isSubmitting) return;
+    if (isTopLevel && reviewScore === null) {
+      showToast("Select a slop score to post your review", "error");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
       await createComment(projectSlug, {
         body: body.trim(),
         parentCommentId,
-        reviewScore: isTopLevel ? reviewScore : undefined,
+        reviewScore: isTopLevel ? reviewScore ?? undefined : undefined,
       });
       setBody("");
+      setReviewScore(null);
       showToast(isTopLevel ? "Review posted" : "Reply posted", "success");
       onSuccess?.();
     } catch (error) {
@@ -86,24 +91,29 @@ export function CommentForm({
             Your Slop Score
           </label>
           <div className="flex items-center gap-4">
-            <input
-              type="range"
-              min={0}
-              max={10}
-              step={1}
-              value={reviewScore}
-              onChange={(e) => setReviewScore(Number(e.target.value))}
-              className="h-2 flex-1 cursor-pointer appearance-none rounded-none bg-muted [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rotate-3 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:bg-card"
-            />
+              <input
+                type="range"
+                min={0}
+                max={10}
+                step={1}
+                value={reviewScore ?? 5}
+                onChange={(e) => setReviewScore(Number(e.target.value))}
+                className="h-2 flex-1 cursor-pointer appearance-none rounded-none bg-muted [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rotate-3 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:bg-card"
+              />
             <div className="flex w-24 flex-col items-center">
-              <span className={`font-mono text-2xl font-black ${getScoreColor(reviewScore)}`}>
-                {reviewScore}
+              <span
+                className={`font-mono text-2xl font-black ${reviewScore === null ? "text-muted-foreground" : getScoreColor(reviewScore)}`}
+              >
+                {reviewScore ?? "—"}
               </span>
               <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                {getScoreLabel(reviewScore)}
+                {reviewScore === null ? "SELECT SCORE" : getScoreLabel(reviewScore)}
               </span>
             </div>
           </div>
+          {reviewScore === null && (
+            <p className="text-[10px] text-muted-foreground">Pick a score to enable posting.</p>
+          )}
           <p className="text-[10px] text-muted-foreground">Rate the app from 0–10.</p>
         </div>
       )}
@@ -120,7 +130,7 @@ export function CommentForm({
         <Button
           type="submit"
           loading={isSubmitting}
-          disabled={!body.trim()}
+          disabled={!body.trim() || (isTopLevel && reviewScore === null)}
           className="w-full sm:w-auto"
         >
           {isTopLevel ? "Post Review" : "Reply"}
@@ -131,11 +141,11 @@ export function CommentForm({
 }
 
 function getScoreLabel(score: number) {
-  if (score >= 9) return "CERTIFIED SLOP";
-  if (score >= 8) return "FRESH SLOP";
+  if (score >= 10) return "IMMACULATE SLOP";
+  if (score >= 8) return "SOLID SLOP";
   if (score >= 6) return "DECENT SLOP";
   if (score >= 4) return "STALE SLOP";
-  return "ROTTEN SLOP";
+  return "SLOPPY SLOP";
 }
 
 function getScoreColor(score: number) {
