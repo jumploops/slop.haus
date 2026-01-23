@@ -72,7 +72,7 @@ export function CommentForm({
     <form onSubmit={handleSubmit} className="border-2 border-border bg-card p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-mono text-sm font-bold text-foreground">
-          {isTopLevel ? "Write a Review" : "Write a Reply"}
+          {isTopLevel ? "Your Slop Score" : "Write a Reply"}
         </h3>
         {onCancel && (
           <button
@@ -87,29 +87,31 @@ export function CommentForm({
 
       {isTopLevel && (
         <div className="space-y-2">
-          <label className="mb-2 block font-mono text-sm text-muted-foreground">
-            Your Slop Score
-          </label>
-          <div className="flex items-center gap-4">
-              <input
-                type="range"
-                min={0}
-                max={10}
-                step={1}
-                value={reviewScore ?? 5}
-                onChange={(e) => setReviewScore(Number(e.target.value))}
-                className="h-2 flex-1 cursor-pointer appearance-none rounded-none bg-muted [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rotate-3 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:bg-card"
-              />
-            <div className="flex w-24 flex-col items-center">
+          <div className="relative pt-12 mt-4">
+            <div
+              className="absolute top-0 flex flex-col items-center rounded-sm border-2 border-border bg-card px-2 py-1 shadow-sm -translate-x-1/2 -translate-y-1"
+              style={{
+                left: `${Math.min(96, Math.max(4, ((reviewScore ?? 5) / 10) * 100))}%`,
+              }}
+            >
               <span
-                className={`font-mono text-2xl font-black ${reviewScore === null ? "text-muted-foreground" : getScoreColor(reviewScore)}`}
+                className={`font-mono text-lg font-black leading-none ${reviewScore === null ? "text-muted-foreground" : getScoreColor(reviewScore)}`}
               >
                 {reviewScore ?? "—"}
               </span>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <span className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">
                 {reviewScore === null ? "SELECT SCORE" : getScoreLabel(reviewScore)}
               </span>
             </div>
+            <input
+              type="range"
+              min={0}
+              max={10}
+              step={1}
+              value={reviewScore ?? 5}
+              onChange={(e) => setReviewScore(Number(e.target.value))}
+              className="h-2 w-full cursor-pointer appearance-none rounded-none bg-muted [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rotate-3 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:bg-card"
+            />
           </div>
           {reviewScore === null && (
             <p className="text-[10px] text-muted-foreground">Pick a score to enable posting.</p>

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import { signIn, signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -15,6 +16,8 @@ interface MobileNavProps {
 export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   // Close on route change
   useEffect(() => {
@@ -32,6 +35,25 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const cycleTheme = () => {
+    if (theme === "system") {
+      setTheme("light");
+    } else if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("system");
+    }
+  };
+
+  const isAdmin = session?.user?.role === "admin";
+  const isMod = session?.user?.role === "mod";
+  const showAdminLink = isAdmin || isMod;
+  const themeLabel = mounted ? getThemeLabel(theme) : "System";
 
   return (
     <>
@@ -82,6 +104,24 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           <MobileNavLink href="/submit" active={pathname === "/submit"}>
             Submit
           </MobileNavLink>
+          {session?.user && (
+            <>
+              <MobileNavLink href="/favorites" active={pathname === "/favorites"}>
+                Favorites
+              </MobileNavLink>
+              <MobileNavLink href="/my/projects" active={pathname === "/my/projects"}>
+                My Projects
+              </MobileNavLink>
+              <MobileNavLink href="/settings" active={pathname === "/settings"}>
+                Settings
+              </MobileNavLink>
+              {showAdminLink && (
+                <MobileNavLink href="/admin" active={pathname?.startsWith("/admin") ?? false}>
+                  {isAdmin ? "Admin" : "Mod Queue"}
+                </MobileNavLink>
+              )}
+            </>
+          )}
         </div>
 
         {/* Auth section */}
@@ -91,6 +131,14 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           ) : session?.user ? (
             <>
               <span className="text-sm text-muted-foreground truncate">{session.user.name}</span>
+              <Button
+                variant="secondary"
+                onClick={cycleTheme}
+                className="w-full justify-between"
+              >
+                <span>Theme</span>
+                <span className="text-[10px] uppercase tracking-wide">{themeLabel}</span>
+              </Button>
               <Button variant="secondary" onClick={() => signOut()} className="w-full">
                 Sign Out
               </Button>
@@ -117,6 +165,12 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       </nav>
     </>
   );
+}
+
+function getThemeLabel(theme?: string) {
+  if (theme === "light") return "Light";
+  if (theme === "dark") return "Dark";
+  return "System";
 }
 
 function MobileNavLink({

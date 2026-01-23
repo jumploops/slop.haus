@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { Tabs } from "@/components/ui/Tabs";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { ProjectCardSkeleton } from "@/components/ui/Skeleton";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/auth-client";
 
 type SortOption = "hot" | "new" | "top";
 type WindowOption = "24h" | "7d" | "30d" | "all";
@@ -26,15 +28,17 @@ const windowOptions: { value: WindowOption; label: string }[] = [
 ];
 
 export default function FeedPage() {
+  const { data: session } = useSession();
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [page, setPage] = useState(1);
-  const formattedDate = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const [showIntro, setShowIntro] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const dismissed = window.localStorage.getItem("slop:feedIntroDismissed");
+    setShowIntro(dismissed !== "true");
+  }, []);
 
   const { data, error, isLoading, mutate } = useSWR<FeedResponse>(
     ["feed", sort, timeWindow, page],
@@ -63,28 +67,40 @@ export default function FeedPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col items-center text-center">
-        <div className="mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3">
-          <h1 className="font-mono text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-            Fresh Slop Daily
-          </h1>
+      {showIntro && (
+        <div className="flex flex-col items-center text-center pt-6">
+          <div className="relative mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3">
+            <h1 className="font-mono text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+              Confess your slop
+            </h1>
+            <button
+              type="button"
+              onClick={() => {
+                window.localStorage.setItem("slop:feedIntroDismissed", "true");
+                setShowIntro(false);
+              }}
+              aria-label="Dismiss intro"
+              className="absolute -top-7 -right-6 inline-flex h-8 w-8 items-center justify-center border-2 border-border bg-muted font-mono text-sm leading-none text-muted-foreground transition-colors hover:border-primary hover:bg-card hover:text-foreground rotate-4"
+            >
+              ×
+            </button>
+          </div>
+          <p className="max-w-md text-muted-foreground">
+            This is the one place slop is encouraged — share your funny/useful/useless machinations even if they barely function.
+          </p>
+          <div className="mt-4 flex w-full max-w-md items-center justify-center">
+            <Link
+              href="/submit"
+              className={cn(
+                buttonVariants({ variant: "primary", size: "md" }),
+                "justify-self-center"
+              )}
+            >
+              Submit your slop
+            </Link>
+          </div>
         </div>
-        <p className="max-w-md text-muted-foreground">
-          The premier destination for rating vibecoded apps.{" "}
-          <span className="mx-1 bg-slop-lime px-1 font-mono text-foreground">Upvote</span>
-          the best.{" "}
-          <span className="mx-1 bg-slop-pink px-1 font-mono text-foreground">Review</span>
-          the rest.
-        </p>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="rotate-1 bg-foreground px-3 py-1 font-mono text-xs font-bold uppercase tracking-wide text-background">
-          {formattedDate}
-        </span>
-        <div className="h-px flex-1 bg-border" />
-      </div>
+      )}
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <Tabs
@@ -163,6 +179,18 @@ export default function FeedPage() {
             Showing {data.projects.length} of {data.pagination.total} projects
           </div>
         </>
+      )}
+      {session?.user?.role === "admin" && (
+        <button
+          type="button"
+          onClick={() => {
+            window.localStorage.removeItem("slop:feedIntroDismissed");
+            setShowIntro(true);
+          }}
+          className="fixed bottom-4 right-4 z-50 border-2 border-dashed border-border bg-card px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+        >
+          Reset intro
+        </button>
       )}
     </div>
   );
