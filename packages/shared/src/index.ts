@@ -5,4 +5,3 @@ export * from "./moderation";
 export * from "./url-detection";
 export * from "./url-validation";
 export * from "./draft-types";
-export * from "./theme-schema";

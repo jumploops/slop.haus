@@ -66,11 +66,10 @@ function ToastContainer({
           key={toast.id}
           className={cn(
             "flex items-center gap-3 px-3 py-2 text-xs font-bold",
-            "bg-bg-secondary border-2 border-[color:var(--border)] shadow-[2px_2px_0_var(--foreground)]",
-            "text-fg",
-            "animate-slide-in",
-            toast.type === "success" && "border-accent",
-            toast.type === "error" && "border-danger",
+            "bg-card border-2 border-border",
+            "text-foreground",
+            toast.type === "success" && "border-primary",
+            toast.type === "error" && "border-destructive",
             toast.type === "info" && "border-border"
           )}
           role="alert"
@@ -79,7 +78,7 @@ function ToastContainer({
           <button
             type="button"
             onClick={() => onDismiss(toast.id)}
-            className="text-muted hover:text-slop-coral text-lg leading-none bg-transparent border-none cursor-pointer"
+            className="text-muted-foreground hover:text-primary text-lg leading-none bg-transparent border-none cursor-pointer"
             aria-label="Dismiss"
           >
             &times;

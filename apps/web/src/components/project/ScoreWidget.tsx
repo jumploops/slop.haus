@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { LikeButton } from "./LikeButton";
 import { VibeMeter } from "./VibeMeter";
 import { useLike } from "@/hooks/useLike";
+import { cn } from "@/lib/utils";
 
 interface ScoreWidgetProps {
   projectSlug: string;
@@ -35,39 +36,60 @@ export function ScoreWidget({
   }, [reviewCount, slopScore]);
 
   return (
-    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-      <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-6">
-        {/* Slop Score Section */}
+    <div className="border-2 border-border bg-card p-4 space-y-6">
+      {/* Slop Score Section */}
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ SLOP SCORE ~~</h4>
-          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 text-center">
-            <div className="text-3xl font-bold text-fg">{displayScore}</div>
-            <p className="text-[10px] text-muted mt-1">
-              {reviewCount} review{reviewCount === 1 ? "" : "s"}
-            </p>
+          <p className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+            Slop Score
+          </p>
+          <p className="font-mono text-xs text-muted-foreground">
+            {reviewCount} review{reviewCount === 1 ? "" : "s"}
+          </p>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <div
+            className={cn(
+              "flex h-12 w-12 rotate-3 items-center justify-center rounded-sm font-mono text-lg font-black shadow-md",
+              getSlopTone(slopScore, reviewCount)
+            )}
+          >
+            {displayScore}
           </div>
         </div>
+      </div>
 
-        {/* Like Section */}
-        <div>
-          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ LIKES ~~</h4>
-          <div className="flex justify-center">
-            <LikeButton
-              count={localLikeCount}
-              liked={likeState?.liked ?? false}
-              onToggle={submitLike}
-              disabled={isLiking}
-              size="md"
-            />
-          </div>
-        </div>
+      {/* Like Section */}
+      <div className="space-y-2">
+        <p className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+          Likes
+        </p>
+        <LikeButton
+          count={localLikeCount}
+          liked={likeState?.liked ?? false}
+          onToggle={submitLike}
+          disabled={isLiking}
+          size="md"
+        />
+      </div>
 
-        {/* Vibe Score Section */}
-        <div>
-          <h4 className="text-xs font-bold text-slop-purple mb-2 text-center">~~ VIBE PERCENTILE ~~</h4>
-          <VibeMeter percent={vibePercent} showLabel />
-        </div>
+      {/* Vibe Score Section */}
+      <div className="space-y-2">
+        <p className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+          Vibe Percentile
+        </p>
+        <VibeMeter percent={vibePercent} showLabel />
       </div>
     </div>
   );
+}
+
+function getSlopTone(score: number, reviewCount: number) {
+  if (reviewCount === 0) {
+    return "bg-muted text-muted-foreground";
+  }
+  if (score >= 80) return "bg-primary text-primary-foreground";
+  if (score >= 60) return "bg-slop-lime text-foreground";
+  if (score >= 40) return "bg-slop-orange text-foreground";
+  return "bg-destructive text-destructive-foreground";
 }

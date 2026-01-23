@@ -3,63 +3,36 @@
 import { useCallback, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { AuthButtons } from "@/components/auth/AuthButtons";
 import { MobileNav } from "./MobileNav";
-import { Star } from "lucide-react";
 
 export function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
-  const { data: session } = useSession();
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
   return (
-    <header className="sticky top-0 z-50 border-b-4 border-[color:var(--foreground)] bg-gradient-to-r from-slop-teal via-slop-purple to-slop-pink h-[var(--app-header-height)]">
-      <div className="max-w-[var(--app-container-max)] mx-auto px-4 h-full flex items-center justify-between">
+    <header className="sticky top-0 z-50 border-b-2 border-dashed border-border bg-card">
+      <div className="mx-auto flex h-full max-w-5xl items-center justify-between px-4 py-4">
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-1 text-xl font-bold drop-shadow-[2px_2px_0_var(--foreground)] no-underline hover:no-underline"
-        >
-          <Star className="h-4 w-4 text-slop-yellow motion-safe:animate-[spinSlow_6s_linear_infinite]" />
-          <span className="text-accent-foreground">SlOp</span>
-          <span className="text-slop-yellow">.HaUs</span>
+        <Link href="/" className="group flex items-baseline gap-1 no-underline hover:no-underline">
+          <span className="font-mono text-2xl font-black tracking-tighter text-foreground transition-transform group-hover:-rotate-2">
+            slop
+          </span>
+          <span className="font-mono text-2xl font-light text-primary">.haus</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden sm:flex items-center gap-6">
-          <NavLink href="/" active={pathname === "/"}>
-            Feed
-          </NavLink>
-          <NavLink href="/submit" active={pathname === "/submit"}>
-            Submit
-          </NavLink>
-          {session?.user && (
-            <NavLink href="/favorites" active={pathname === "/favorites"}>
-              Favorites
-            </NavLink>
-          )}
-          {session?.user && (
-            <NavLink href="/my/projects" active={pathname.startsWith("/my/projects")}>
-              My Projects
-            </NavLink>
-          )}
-          {session?.user && (
-            <NavLink href="/settings/profile" active={pathname.startsWith("/settings")}>
-              Settings
-            </NavLink>
-          )}
-          {session?.user && (session.user.role === "admin" || session.user.role === "mod") && (
-            <NavLink href="/admin" active={pathname.startsWith("/admin")}>
-              Admin
-            </NavLink>
-          )}
-        </nav>
-
-        {/* Right side - auth buttons + mobile trigger */}
+        {/* Right side */}
         <div className="flex items-center gap-3">
+          <nav className="hidden sm:flex items-center gap-6 pr-4">
+            <NavLink href="/" active={pathname === "/"}>
+              New
+            </NavLink>
+            <NavLink href="/submit" active={pathname === "/submit"}>
+              Submit
+            </NavLink>
+          </nav>
           <div className="hidden sm:block">
             <AuthButtons />
           </div>
@@ -67,11 +40,10 @@ export function Header() {
             onClick={() => setMobileNavOpen(true)}
             className={cn(
               "sm:hidden flex items-center justify-center",
-              "w-10 h-10",
-              "border-2 border-[color:var(--border)]",
-              "bg-bg-secondary text-fg",
-              "shadow-[2px_2px_0_var(--foreground)]",
-              "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              "h-10 w-10",
+              "border-2 border-dashed border-border",
+              "bg-muted text-foreground",
+              "transition-transform active:translate-x-[1px] active:translate-y-[1px]"
             )}
             aria-label="Open navigation"
           >
@@ -98,9 +70,9 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "text-accent-foreground hover:text-slop-yellow transition-colors duration-200",
-        "no-underline hover:no-underline",
-        active && "text-slop-yellow"
+        "font-mono text-sm uppercase tracking-wide text-muted-foreground transition-colors",
+        "no-underline hover:no-underline hover:text-primary",
+        active && "text-primary"
       )}
     >
       {children}

@@ -5,8 +5,7 @@
 
    These are the "source of truth" values that:
    1. Define the default theme
-   2. Can be overridden by presets (via [data-theme="..."])
-   3. Can be overridden by user themes (via runtime CSS injection)
+   2. Can be overridden by light/dark mode selectors
 
    Using OKLCH color space for better perceptual uniformity.
    ============================================ */

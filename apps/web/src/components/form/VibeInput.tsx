@@ -44,8 +44,10 @@ export function VibeInput({
   return (
     <div className="mb-6">
       <div className="mb-4">
-        <label className="block text-xs font-bold text-slop-purple mb-1">Vibe Score</label>
-        <p className="text-xs text-muted">
+        <label className="block text-xs font-bold font-mono uppercase tracking-wide text-foreground mb-1">
+          Vibe Score
+        </label>
+        <p className="text-xs text-muted-foreground">
           How much of this project was "vibecoded" (AI-assisted)?
         </p>
       </div>
@@ -69,11 +71,11 @@ export function VibeInput({
                 max="100"
                 value={vibePercent}
                 onChange={(e) => onVibePercentChange(Number(e.target.value))}
-                className="w-full h-3 bg-bg-secondary border-2 border-[color:var(--border)] appearance-none cursor-pointer accent-accent"
+                className="w-full h-3 bg-muted border-2 border-border appearance-none cursor-pointer accent-primary"
               />
-              <div className="flex justify-between text-[10px] text-muted mt-2">
+              <div className="flex justify-between text-[10px] text-muted-foreground mt-2">
                 <span>0% Human</span>
-                <span className="font-bold text-fg">{vibePercent}%</span>
+                <span className="font-bold text-foreground">{vibePercent}%</span>
                 <span>100% AI</span>
               </div>
             </div>
@@ -84,12 +86,12 @@ export function VibeInput({
             {VIBE_CATEGORIES.map((category) => (
               <div key={category.key}>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="text-xs font-bold">{category.label}</label>
-                  <span className="text-xs text-muted">
+                  <label className="text-xs font-bold text-foreground">{category.label}</label>
+                  <span className="text-xs text-muted-foreground">
                     {vibeDetails[category.key] ?? 50}%
                   </span>
                 </div>
-                <p className="text-[10px] text-muted mb-2">{category.description}</p>
+                <p className="text-[10px] text-muted-foreground mb-2">{category.description}</p>
                 <input
                   type="range"
                   min="0"
@@ -98,12 +100,12 @@ export function VibeInput({
                   onChange={(e) =>
                     handleDetailChange(category.key, Number(e.target.value))
                   }
-                  className="w-full h-3 bg-bg-secondary border-2 border-[color:var(--border)] appearance-none cursor-pointer accent-accent"
+                  className="w-full h-3 bg-muted border-2 border-border appearance-none cursor-pointer accent-primary"
                 />
               </div>
             ))}
-            <div className="pt-4 border-t-2 border-[color:var(--border)] flex items-center justify-between">
-              <span className="text-xs text-muted">Average: {detailedAverage}%</span>
+            <div className="pt-4 border-t-2 border-border flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Average: {detailedAverage}%</span>
               <VibeScale percent={detailedAverage} size="sm" />
             </div>
           </div>
@@ -126,16 +128,16 @@ function VibeScale({ percent, size = "md" }: { percent: number; size?: "sm" | "m
     <div className={cn("flex items-center gap-3", size === "sm" && "text-sm")}>
       <div
         className={cn(
-          "flex-1 bg-bg-secondary border-2 border-[color:var(--border)] overflow-hidden",
+          "flex-1 bg-muted border-2 border-border overflow-hidden",
           size === "sm" ? "h-2" : "h-3"
         )}
       >
         <div
-          className="h-full bg-gradient-to-r from-slop-teal to-slop-green transition-[width] duration-300"
+          className="h-full bg-gradient-to-r from-slop-pink to-slop-lime transition-[width] duration-300"
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="text-xs text-muted whitespace-nowrap">{getVibeLabel(percent)}</span>
+      <span className="text-xs text-muted-foreground whitespace-nowrap">{getVibeLabel(percent)}</span>
     </div>
   );
 }

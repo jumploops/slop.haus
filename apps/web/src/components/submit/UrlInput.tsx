@@ -51,12 +51,12 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
   const displayError = error || validationError;
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto text-center">
+    <form onSubmit={handleSubmit} className="mx-auto max-w-xl text-center">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slop-blue mb-2">
-          ★ Share your vibecoded project ★
+        <h1 className="font-mono text-2xl font-black text-foreground mb-2">
+          Share your vibecoded project
         </h1>
-        <p className="text-xs text-muted">
+        <p className="text-xs text-muted-foreground">
           Enter a URL and we'll extract the details for you
         </p>
       </div>
@@ -69,17 +69,16 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
           placeholder="https://github.com/user/project or any live URL"
           disabled={isLoading}
           className={cn(
-            "w-full px-3 py-2 text-sm",
-            "bg-bg-secondary text-fg",
-            "border-2 border-[color:var(--border)]",
-            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
-            "placeholder:text-muted focus:outline-none focus:border-accent",
-            displayError && "border-danger"
+            "w-full px-3 py-2 text-sm font-mono",
+            "bg-background text-foreground",
+            "border-2 border-border",
+            "placeholder:text-muted-foreground focus:outline-none focus:border-primary",
+            displayError && "border-destructive"
           )}
           autoFocus
         />
         {displayError && (
-          <p className="text-xs text-danger mt-2">{displayError}</p>
+          <p className="text-xs text-destructive mt-2">{displayError}</p>
         )}
       </div>
 
@@ -95,7 +94,7 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
       </Button>
 
       <div className="mt-4">
-        <p className="text-[10px] text-muted">
+        <p className="text-[10px] text-muted-foreground">
           Supported: GitHub, GitLab, npm, live websites, Chrome Web Store, Steam
         </p>
       </div>

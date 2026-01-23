@@ -9,36 +9,35 @@ export const buttonVariants = cva(
   // Base styles
   [
     "inline-flex items-center justify-center gap-2",
-    "font-bold transition-colors duration-200",
-    "border-2 border-[color:var(--border)]",
-    "shadow-[2px_2px_0_var(--foreground)]",
-    "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+    "font-mono font-bold transition-colors duration-200",
+    "border-2 border-border rounded-none",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     "disabled:opacity-50 disabled:cursor-not-allowed",
   ],
   {
     variants: {
       variant: {
         primary: [
-          "bg-gradient-to-b from-accent via-accent-dim to-accent",
-          "text-accent-foreground",
+          "bg-primary text-primary-foreground",
+          "hover:bg-primary/90",
         ],
         secondary: [
-          "bg-gradient-to-b from-bg-secondary via-bg to-border",
-          "text-fg",
+          "bg-muted text-muted-foreground",
+          "hover:border-primary hover:text-foreground",
         ],
         ghost: [
-          "bg-transparent text-fg border-transparent shadow-none",
-          "hover:bg-bg-secondary hover:border-[color:var(--border)]",
+          "bg-transparent text-muted-foreground border-transparent",
+          "hover:text-primary hover:border-border",
         ],
         danger: [
-          "bg-danger text-bg",
+          "bg-destructive text-destructive-foreground",
+          "hover:bg-destructive/90",
         ],
       },
       size: {
-        sm: "px-3 py-2 text-xs rounded-sm min-h-10 sm:min-h-0 sm:px-2 sm:py-1",
-        md: "px-4 py-2 text-sm rounded-md",
-        lg: "px-6 py-3 text-base rounded-md",
+        sm: "px-3 py-2 text-xs min-h-10 sm:min-h-0 sm:px-2 sm:py-1",
+        md: "px-4 py-2 text-sm",
+        lg: "px-6 py-3 text-base",
       },
     },
     defaultVariants: {

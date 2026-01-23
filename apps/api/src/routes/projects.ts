@@ -131,7 +131,7 @@ projectRoutes.get("/", async (c) => {
   if (sort === "new") {
     orderBy = desc(projects.createdAt);
   } else if (sort === "top") {
-    orderBy = desc(projects.slopScore);
+    orderBy = desc(projects.likeCount);
   } else {
     // hot - we'll sort in memory after fetching
     orderBy = desc(projects.createdAt);

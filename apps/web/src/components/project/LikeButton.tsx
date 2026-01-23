@@ -35,12 +35,12 @@ export function LikeButton({
         disabled={disabled}
         className={cn(
           "flex items-center justify-center transition-colors",
-          "border-2 border-[color:var(--border)]",
-          "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]",
+          "border-2 border-border",
+          "bg-muted text-muted-foreground",
           buttonSize,
           "cursor-pointer",
-          "text-fg hover:bg-bg",
-          liked && "bg-accent text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none",
+          "hover:border-primary hover:text-primary",
+          liked && "bg-primary/10 text-primary border-primary",
           disabled && "opacity-50 cursor-not-allowed"
         )}
         aria-label={liked ? "Unlike" : "Like"}
@@ -51,10 +51,10 @@ export function LikeButton({
       {showCount && (
         <span
           className={cn(
-            "min-w-[2.25rem] text-center text-sm sm:text-xs font-bold",
-            "border-2 border-[color:var(--border)]",
-            "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] px-1 py-0.5",
-            count > 0 && "text-accent"
+            "min-w-[2.25rem] text-center text-sm sm:text-xs font-bold font-mono",
+            "border-2 border-border",
+            "bg-card px-1 py-0.5",
+            count > 0 ? "text-primary" : "text-muted-foreground"
           )}
         >
           {count}

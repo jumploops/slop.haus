@@ -4,20 +4,21 @@ import { cn } from "@/lib/utils";
 const badgeVariants = cva(
   [
     "inline-flex items-center px-2 py-0.5",
-    "rounded-sm text-[10px] font-bold",
-    "border-2 border-[color:var(--border)]",
+    "rounded-none text-[10px] font-bold",
+    "font-mono uppercase tracking-wide",
+    "border-2 border-border",
   ],
   {
     variants: {
       variant: {
-        default: "bg-bg-secondary text-fg",
-        secondary: "bg-bg text-muted",
-        success: "bg-slop-green/20 text-slop-green",
-        warning: "bg-slop-yellow/40 text-fg",
-        danger: "bg-danger/20 text-danger",
-        dev: "bg-slop-purple/20 text-slop-purple",
-        admin: "bg-danger/20 text-danger",
-        mod: "bg-warning/20 text-warning",
+        default: "bg-secondary text-secondary-foreground",
+        secondary: "bg-muted text-muted-foreground",
+        success: "bg-slop-lime/30 text-foreground",
+        warning: "bg-slop-orange/30 text-foreground",
+        danger: "bg-destructive/20 text-destructive",
+        dev: "bg-slop-pink/30 text-foreground",
+        admin: "bg-destructive/20 text-destructive",
+        mod: "bg-slop-orange/20 text-foreground",
       },
     },
     defaultVariants: {

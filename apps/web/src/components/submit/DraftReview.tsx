@@ -86,14 +86,14 @@ export function DraftReview({
     <span className="flex items-center gap-2">
       <span>{label}</span>
       {savingField === field && (
-        <span className="text-[10px] text-muted">Saving...</span>
+        <span className="text-[10px] text-muted-foreground">Saving...</span>
       )}
     </span>
   );
 
   const countHelper = (count: number, max: number, warnAt: number) => (
     <span
-      className={`block text-right ${count > warnAt ? "text-warning" : ""}`}
+      className={`block text-right ${count > warnAt ? "text-slop-orange" : "text-muted-foreground"}`}
     >
       {count}/{max}
     </span>
@@ -119,29 +119,24 @@ export function DraftReview({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-          <h1 className="text-xl font-bold text-slop-blue">★ REVIEW YOUR PROJECT ★</h1>
-          <p className="text-xs text-muted mt-2">
+      <header className="border-2 border-dashed border-border bg-card p-4">
+          <h1 className="font-mono text-xl font-black text-foreground">Review Your Project</h1>
+          <p className="text-xs text-muted-foreground mt-2">
             We&apos;ve extracted these details from {draft.inputUrl}. Edit anything that looks wrong.
           </p>
-        </div>
       </header>
 
       {draft.screenshot && (
-        <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-            <h2 className="text-sm font-bold text-slop-purple">SCREENSHOT</h2>
+        <section className="border-2 border-border bg-card p-4">
+            <h2 className="font-mono text-sm font-bold text-foreground">Screenshot</h2>
             <div className="mt-3">
               <ScreenshotPreview url={draft.screenshot} />
             </div>
-          </div>
         </section>
       )}
 
-      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
-          <h2 className="text-sm font-bold text-slop-purple">BASIC INFO</h2>
+      <section className="border-2 border-border bg-card p-4 space-y-4">
+          <h2 className="font-mono text-sm font-bold text-foreground">Basic Info</h2>
 
           <Input
             id="title"
@@ -180,11 +175,10 @@ export function DraftReview({
         </div>
       </section>
 
-      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
+      <section className="border-2 border-border bg-card p-4 space-y-4">
           <div>
-            <h2 className="text-sm font-bold text-slop-purple">LINKS</h2>
-            <p className="text-xs text-muted mt-1">At least one URL is required.</p>
+            <h2 className="font-mono text-sm font-bold text-foreground">Links</h2>
+            <p className="text-xs text-muted-foreground mt-1">At least one URL is required.</p>
           </div>
 
           <Input
@@ -209,11 +203,10 @@ export function DraftReview({
         </div>
       </section>
 
-      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+      <section className="border-2 border-border bg-card p-4 space-y-3">
           <div>
-            <h2 className="text-sm font-bold text-slop-purple">TECHNOLOGIES</h2>
-            <p className="text-xs text-muted mt-1">
+            <h2 className="font-mono text-sm font-bold text-foreground">Technologies</h2>
+            <p className="text-xs text-muted-foreground mt-1">
               We detected these tools. Add or remove as needed.
             </p>
           </div>
@@ -224,14 +217,12 @@ export function DraftReview({
               handleFieldBlur("tools", newTools);
             }}
           />
-        </div>
       </section>
 
-      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+      <section className="border-2 border-border bg-card p-4 space-y-3">
           <div>
-            <h2 className="text-sm font-bold text-slop-purple">VIBE SCORE</h2>
-            <p className="text-xs text-muted mt-1">
+            <h2 className="font-mono text-sm font-bold text-foreground">Vibe Score</h2>
+            <p className="text-xs text-muted-foreground mt-1">
               How much AI was involved in creating this project?
             </p>
           </div>
@@ -246,19 +237,15 @@ export function DraftReview({
             vibeDetails={vibeDetails}
             onVibeDetailsChange={setVibeDetails}
           />
-        </div>
       </section>
 
       {error && (
-        <div className="border-2 border-danger bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-          <div className="bg-bg border-2 border-danger/70 p-3">
-            <p className="text-danger font-bold text-sm">{error}</p>
-          </div>
+        <div className="border-2 border-destructive bg-card p-3">
+            <p className="text-destructive font-bold text-sm">{error}</p>
         </div>
       )}
 
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3">
+      <div className="border-2 border-dashed border-border bg-card p-4 flex flex-col gap-3">
           <Button
             type="submit"
             variant="primary"
@@ -275,7 +262,6 @@ export function DraftReview({
           >
             Start Over
           </Button>
-        </div>
       </div>
 
       <Modal
@@ -285,7 +271,7 @@ export function DraftReview({
       >
         <div className="max-w-[400px]">
           <p className="mb-3 leading-relaxed">You&apos;ll lose all changes and need to re-analyze the URL.</p>
-          <p className="text-muted text-sm mb-3">This action cannot be undone.</p>
+          <p className="text-muted-foreground text-sm mb-3">This action cannot be undone.</p>
           <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-border">
             <Button
               variant="ghost"

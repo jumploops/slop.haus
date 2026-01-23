@@ -71,19 +71,18 @@ export function AnalysisError({
   };
 
   return (
-    <div className="max-w-md mx-auto text-center">
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-          <div className="flex justify-center mb-3 text-danger">
+    <div className="mx-auto max-w-md text-center">
+      <div className="border-2 border-border bg-card p-6">
+          <div className="flex justify-center mb-3 text-destructive">
             <WarningIcon />
           </div>
 
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-danger mb-2">Analysis Failed</h3>
-            <p className="text-sm text-fg">{errorMessage}</p>
+            <h3 className="text-lg font-bold text-destructive mb-2">Analysis Failed</h3>
+            <p className="text-sm text-foreground">{errorMessage}</p>
 
             {recovery.message !== errorMessage && (
-              <p className="text-xs text-muted mt-2">{recovery.message}</p>
+              <p className="text-xs text-muted-foreground mt-2">{recovery.message}</p>
             )}
           </div>
 
@@ -102,7 +101,6 @@ export function AnalysisError({
               </Button>
             )}
           </div>
-        </div>
       </div>
     </div>
   );

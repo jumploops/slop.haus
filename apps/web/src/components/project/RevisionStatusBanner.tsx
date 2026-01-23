@@ -37,23 +37,23 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
     (field) => fieldLabels[field] || field
   );
 
-  const bannerStyles = isPending ? "bg-warning/20" : "bg-danger/10";
-  const titleColor = isPending ? "text-warning" : "text-danger";
-  const iconColor = isPending ? "text-warning" : "text-danger";
+  const bannerStyles = isPending ? "bg-warning/10" : "bg-destructive/10";
+  const titleColor = isPending ? "text-warning" : "text-destructive";
+  const iconColor = isPending ? "text-warning" : "text-destructive";
 
   return (
-    <div className={`p-4 mb-4 border-2 border-[color:var(--border)] ${bannerStyles}`}>
+    <div className={`p-4 mb-4 border-2 border-dashed border-border ${bannerStyles}`}>
       <div className="flex gap-3 items-start">
         <div className={`shrink-0 mt-0.5 ${iconColor}`}>
           {isPending ? <ClockIcon /> : <AlertIcon />}
         </div>
         <div className="flex-1">
-          <p className={`font-bold mb-1 ${titleColor}`}>
+          <p className={`font-mono font-bold mb-1 ${titleColor}`}>
             {isPending
               ? "Your recent edits are pending review"
               : "Your recent edits were not approved"}
           </p>
-          <p className="text-muted text-xs">
+          <p className="text-muted-foreground text-xs">
             {isPending
               ? "A moderator will review your changes shortly. The project shows the previous version until approved."
               : "Please review the feedback below and make corrections."}
@@ -62,7 +62,7 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
         {onDismiss && isRejected && (
           <button
             type="button"
-            className="shrink-0 bg-transparent border-none text-muted cursor-pointer p-1 hover:text-fg hover:bg-bg-secondary"
+            className="shrink-0 bg-transparent border-none text-muted-foreground cursor-pointer p-1 transition-colors hover:text-foreground hover:bg-muted"
             onClick={onDismiss}
             aria-label="Dismiss"
           >
@@ -74,7 +74,7 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
       {(isRejected || changedFields.length > 0) && (
         <button
           type="button"
-          className="flex items-center gap-2 bg-transparent border-none text-muted text-xs cursor-pointer py-2 mt-2 hover:text-fg"
+          className="flex items-center gap-2 bg-transparent border-none text-muted-foreground text-xs cursor-pointer py-2 mt-2 transition-colors hover:text-foreground"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           {isExpanded ? "Hide details" : "Show details"}
@@ -83,10 +83,12 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
       )}
 
       {isExpanded && (
-        <div className="mt-3 pt-3 border-t-2 border-[color:var(--border)]">
+        <div className="mt-3 pt-3 border-t-2 border-border">
           {changedFields.length > 0 && (
             <div className="mb-3">
-              <p className="text-[10px] text-muted uppercase tracking-wide mb-2">Fields changed:</p>
+              <p className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground mb-2">
+                Fields changed:
+              </p>
               <ul className="list-disc ml-4 text-xs">
                 {changedFields.map((field) => (
                   <li key={field}>{field}</li>
@@ -97,12 +99,14 @@ export function RevisionStatusBanner({ revision, onDismiss }: RevisionStatusBann
 
           {isRejected && revision.reason && (
             <div className="mb-3">
-              <p className="text-[10px] text-muted uppercase tracking-wide mb-2">Reason:</p>
-              <p className="text-xs p-2 border-2 border-[color:var(--border)] bg-bg-secondary">{revision.reason}</p>
+              <p className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground mb-2">
+                Reason:
+              </p>
+              <p className="text-xs p-2 border-2 border-border bg-muted">{revision.reason}</p>
             </div>
           )}
 
-          <p className="text-[10px] text-muted">
+          <p className="text-[10px] text-muted-foreground">
             Submitted {formatRelativeTime(revision.submittedAt)}
           </p>
         </div>

@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { EditableProject } from "@/components/project/EditableProject";
 import { DeleteProjectModal } from "@/components/project/DeleteProjectModal";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useSession } from "@/lib/auth-client";
 import { fetchProject, updateProject, deleteProject, fetchProjectRevisions } from "@/lib/api/projects";
 
@@ -41,8 +42,8 @@ export default function EditProjectPage({ params }: Props) {
   if (!project || sessionPending) {
     return (
       <RequireAuth>
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4">
-          <div className="skeleton" style={{ width: "100%", height: "400px" }} />
+        <div className="border-2 border-dashed border-border bg-card p-4">
+          <Skeleton className="h-[400px] w-full" />
         </div>
       </RequireAuth>
     );
@@ -52,8 +53,8 @@ export default function EditProjectPage({ params }: Props) {
   if (error) {
     return (
       <RequireAuth>
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <p className="text-sm text-danger">Failed to load project. Please try again.</p>
+        <div className="border-2 border-destructive bg-card p-6 text-center">
+          <p className="text-sm text-destructive">Failed to load project. Please try again.</p>
         </div>
       </RequireAuth>
     );

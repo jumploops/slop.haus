@@ -22,14 +22,13 @@ export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
           key={tab.id}
           type="button"
           className={cn(
-            "px-3 py-2 text-xs font-bold min-h-10 sm:min-h-0",
-            "border-2 border-[color:var(--border)]",
-            "shadow-[2px_2px_0_var(--foreground)]",
-            "bg-bg-secondary cursor-pointer",
+            "px-3 py-2 text-xs font-bold font-mono uppercase tracking-wide min-h-10 sm:min-h-0",
+            "border-2 border-dashed border-border",
+            "bg-card cursor-pointer",
             "transition-colors duration-200",
             activeTab === tab.id
-              ? "bg-accent text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none"
-              : "text-fg hover:bg-bg"
+              ? "bg-primary/10 text-primary border-primary"
+              : "text-muted-foreground hover:text-primary"
           )}
           onClick={() => onTabChange(tab.id)}
         >

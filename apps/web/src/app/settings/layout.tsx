@@ -18,8 +18,10 @@ export default function SettingsLayout({
   return (
     <RequireAuth>
       <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 min-h-[calc(100vh-200px)]">
-        <aside className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-          <h2 className="text-sm font-bold text-slop-purple mb-3">~~ SETTINGS ~~</h2>
+        <aside className="border-2 border-dashed border-border bg-card p-4">
+          <h2 className="font-mono text-sm font-bold uppercase tracking-wide text-foreground mb-3">
+            Settings
+          </h2>
           <SettingsNav />
         </aside>
         <div className="max-w-2xl">{children}</div>
@@ -38,13 +40,13 @@ function SettingsNav() {
           key={item.href}
           href={item.href}
           className={cn(
-            "px-3 py-2 text-xs font-bold transition-colors no-underline hover:no-underline",
-            "border-2 border-[color:var(--border)]",
-            "bg-bg shadow-[2px_2px_0_var(--foreground)]",
+            "px-3 py-2 text-xs font-bold font-mono uppercase tracking-wide transition-colors no-underline hover:no-underline",
+            "border-2 border-dashed border-border",
+            "bg-card",
             "flex-1 md:flex-none text-center md:text-left",
             pathname === item.href
-              ? "bg-accent text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none"
-              : "text-fg hover:bg-bg-secondary"
+              ? "bg-primary/10 text-primary border-primary"
+              : "text-muted-foreground hover:text-primary"
           )}
         >
           {item.label}

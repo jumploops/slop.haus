@@ -25,13 +25,11 @@ function FavoritesContent() {
 
   return (
     <div className="space-y-6">
-      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-          <h1 className="text-xl font-bold text-slop-blue">★ FAVORITES ★</h1>
-          <p className="text-xs text-muted mt-1">
-            Projects you&apos;ve saved for later.
-          </p>
-        </div>
+      <header className="border-2 border-dashed border-border bg-card p-4">
+        <h1 className="font-mono text-xl font-black text-foreground">Favorites</h1>
+        <p className="text-xs text-muted-foreground mt-1">
+          Projects you&apos;ve saved for later.
+        </p>
       </header>
 
       {isLoading && (
@@ -43,30 +41,26 @@ function FavoritesContent() {
       )}
 
       {error && (
-        <div className="border-2 border-danger bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
-          <div className="bg-bg border-2 border-danger/70 p-4">
-            <p className="text-danger font-bold text-sm">Failed to load favorites</p>
-          </div>
+        <div className="border-2 border-destructive bg-card p-4 text-center">
+          <p className="text-destructive font-bold text-sm">Failed to load favorites</p>
         </div>
       )}
 
       {!isLoading && !error && favorites?.length === 0 && (
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-6">
-            <div className="flex justify-center text-slop-coral">
-              <EmptyHeartIcon />
-            </div>
-            <h3 className="text-base font-bold text-slop-purple mt-3">No favorites yet</h3>
-            <p className="text-xs text-muted mt-2">
-              Browse the feed and click the heart on projects you love.
-            </p>
-            <Link
-              href="/"
-              className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline mt-4")}
-            >
-              Back to Feed
-            </Link>
+        <div className="border-2 border-dashed border-border p-6 text-center">
+          <div className="flex justify-center text-muted-foreground">
+            <EmptyHeartIcon />
           </div>
+          <h3 className="text-base font-bold text-foreground mt-3">No favorites yet</h3>
+          <p className="text-xs text-muted-foreground mt-2">
+            Browse the feed and click the heart on projects you love.
+          </p>
+          <Link
+            href="/"
+            className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline mt-4")}
+          >
+            Back to Feed
+          </Link>
         </div>
       )}
 

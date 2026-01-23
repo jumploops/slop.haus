@@ -31,13 +31,13 @@ export function UrlChangeModal({
         </p>
 
         {isMainUrl && (
-          <p className="text-muted text-sm mb-3">
+          <p className="text-muted-foreground text-sm mb-3">
             This will capture a new screenshot from the updated URL.
           </p>
         )}
 
         {!isMainUrl && (
-          <p className="text-muted text-sm mb-3">
+          <p className="text-muted-foreground text-sm mb-3">
             This will refresh the README and project metadata from the new repository.
           </p>
         )}

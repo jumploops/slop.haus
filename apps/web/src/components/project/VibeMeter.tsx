@@ -19,18 +19,18 @@ export function VibeMeter({
     <div className={className}>
       <div
         className={cn(
-          "w-full bg-bg-secondary border-2 border-[color:var(--border)] overflow-hidden",
+          "w-full bg-muted border-2 border-border overflow-hidden",
           size === "sm" ? "h-2" : "h-3"
         )}
       >
         <div
-          className="h-full bg-gradient-to-r from-slop-teal to-slop-green transition-[width] duration-300"
+          className="h-full bg-gradient-to-r from-slop-pink to-slop-lime transition-[width] duration-300"
           style={{ width: `${clampedPercent}%` }}
         />
       </div>
       {showLabel && (
-        <div className="flex justify-between text-[10px] text-muted mt-1">
-          <span className="font-bold text-slop-purple">Vibe</span>
+        <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+          <span className="font-mono font-bold uppercase tracking-wide text-foreground">Vibe</span>
           <span>{clampedPercent}%</span>
         </div>
       )}

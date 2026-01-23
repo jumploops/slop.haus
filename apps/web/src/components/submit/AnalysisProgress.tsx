@@ -54,12 +54,13 @@ export function AnalysisProgress({
   };
 
   return (
-    <div className="max-w-md mx-auto text-center">
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+    <div className="mx-auto max-w-md text-center">
+      <div className="border-2 border-border bg-card p-6">
           <div className="mb-4">
-            <h2 className="text-xl font-bold text-slop-blue mb-2">★ ANALYZING YOUR PROJECT ★</h2>
-            <p className="text-muted text-xs break-all">{inputUrl}</p>
+            <h2 className="font-mono text-xl font-black text-foreground mb-2">
+              Analyzing your project
+            </h2>
+            <p className="text-muted-foreground text-xs break-all">{inputUrl}</p>
           </div>
 
           <div className="mb-4">
@@ -72,12 +73,12 @@ export function AnalysisProgress({
           </div>
 
           <div className="mb-4">
-            <p className="text-xs text-muted animate-pulse">{message}</p>
+            <p className="text-xs text-muted-foreground animate-pulse">{message}</p>
           </div>
 
           {error && (
             <div className="mb-4">
-              <p className="text-xs text-danger mb-3">{error}</p>
+              <p className="text-xs text-destructive mb-3">{error}</p>
               <Button onClick={onCancel} variant="secondary">
                 Try Again
               </Button>
@@ -89,7 +90,6 @@ export function AnalysisProgress({
               Cancel
             </Button>
           )}
-        </div>
       </div>
     </div>
   );
@@ -106,9 +106,9 @@ function ProgressStep({ label, status }: ProgressStepProps) {
       <span
         className={cn(
           "flex items-center justify-center w-6 h-6",
-          status === "completed" && "text-slop-green",
-          status === "in_progress" && "text-slop-blue",
-          status === "pending" && "text-muted"
+          status === "completed" && "text-primary",
+          status === "in_progress" && "text-foreground",
+          status === "pending" && "text-muted-foreground"
         )}
       >
         {status === "completed" && <CheckIcon />}
@@ -118,9 +118,9 @@ function ProgressStep({ label, status }: ProgressStepProps) {
       <span
         className={cn(
           "text-xs",
-          status === "completed" && "text-fg",
-          status === "in_progress" && "text-fg",
-          status === "pending" && "text-muted"
+          status === "completed" && "text-foreground",
+          status === "in_progress" && "text-foreground",
+          status === "pending" && "text-muted-foreground"
         )}
       >
         {label}

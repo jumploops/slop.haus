@@ -34,9 +34,9 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <h1 className="text-xl font-bold text-slop-blue">★ VERIFIED DEVELOPERS ★</h1>
-        <p className="text-xs text-muted mt-1">
+      <div className="border-2 border-dashed border-border bg-card p-4">
+        <h1 className="font-mono text-xl font-black text-foreground">Verified Developers</h1>
+        <p className="text-xs text-muted-foreground mt-1">
           Verified status is kept for future review weighting and badges.
         </p>
       </div>
@@ -46,7 +46,7 @@ export default function UsersPage() {
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3"
+              className="border-2 border-border bg-card p-3"
             >
               <div className="flex items-center gap-3">
                 <Skeleton variant="avatar" />
@@ -58,14 +58,14 @@ export default function UsersPage() {
       )}
 
       {error && (
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <p className="text-sm text-danger">Failed to load users</p>
+        <div className="border-2 border-destructive bg-card p-6 text-center">
+          <p className="text-sm text-destructive">Failed to load users</p>
         </div>
       )}
 
       {!isLoading && !error && users?.length === 0 && (
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <p className="text-sm text-muted">No verified developers yet.</p>
+        <div className="border-2 border-dashed border-border p-6 text-center">
+          <p className="text-sm text-muted-foreground">No verified developers yet.</p>
         </div>
       )}
 
@@ -74,14 +74,14 @@ export default function UsersPage() {
           {users.map((user) => (
             <div
               key={user.id}
-              className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
+              className="border-2 border-border bg-card p-4"
             >
-              <div className="bg-bg border-2 border-[color:var(--border)] p-3 flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
                   <Avatar src={user.image} alt={user.name} size="md" />
                   <div>
-                    <h3 className="text-sm font-bold">{user.name}</h3>
-                    <p className="text-xs text-muted">{user.email}</p>
+                    <h3 className="text-sm font-bold text-foreground">{user.name}</h3>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
