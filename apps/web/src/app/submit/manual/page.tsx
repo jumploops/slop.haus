@@ -91,24 +91,26 @@ function SubmitForm() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-          <h1 className="text-2xl font-bold text-slop-blue mb-2">★ Submit a Project ★</h1>
-          <p className="text-sm text-muted mb-3">
-            Share your vibecoded creation with the community. Projects go through a
-            brief moderation review before being published.
-          </p>
-          <Link href="/submit" className="text-xs text-slop-blue hover:text-slop-coral">
-            Or let us extract details from a URL
-          </Link>
-        </div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div className="border-2 border-dashed border-border bg-card p-6">
+        <h1 className="font-mono text-2xl font-black text-foreground mb-2">
+          Submit a Project
+        </h1>
+        <p className="text-sm text-muted-foreground mb-3">
+          Share your vibecoded creation with the community. Projects go through a
+          brief moderation review before being published.
+        </p>
+        <Link
+          href="/submit"
+          className="font-mono text-xs uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
+        >
+          Or let us extract details from a URL
+        </Link>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
-            <h2 className="text-sm font-bold text-slop-purple">~~ BASIC INFO ~~</h2>
+        <div className="border-2 border-border bg-card p-4 space-y-4">
+            <h2 className="font-mono text-sm font-bold text-foreground">Basic Info</h2>
             <Input
               label="Title"
               value={title}
@@ -138,13 +140,11 @@ function SubmitForm() {
               maxLength={10000}
               placeholder="Tell the story of your project. What problem does it solve? How did you build it? What AI tools did you use?"
             />
-          </div>
         </div>
 
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
-            <h2 className="text-sm font-bold text-slop-purple">~~ LINKS ~~</h2>
-            <p className="text-xs text-muted">
+        <div className="border-2 border-border bg-card p-4 space-y-4">
+            <h2 className="font-mono text-sm font-bold text-foreground">Links</h2>
+            <p className="text-xs text-muted-foreground">
               At least one URL (live site or repository) is required
             </p>
             <Input
@@ -166,14 +166,12 @@ function SubmitForm() {
             />
 
             {errors.form && (
-              <p className="text-xs text-danger">{errors.form}</p>
+              <p className="text-xs text-destructive">{errors.form}</p>
             )}
-          </div>
         </div>
 
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
-            <h2 className="text-sm font-bold text-slop-purple">~~ VIBE SCORE ~~</h2>
+        <div className="border-2 border-border bg-card p-4 space-y-4">
+            <h2 className="font-mono text-sm font-bold text-foreground">Vibe Score</h2>
             <VibeInput
               mode={vibeMode}
               onModeChange={setVibeMode}
@@ -182,26 +180,21 @@ function SubmitForm() {
               vibeDetails={vibeDetails}
               onVibeDetailsChange={setVibeDetails}
             />
-          </div>
         </div>
 
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-4">
-            <h2 className="text-sm font-bold text-slop-purple">~~ TOOLS ~~</h2>
+        <div className="border-2 border-border bg-card p-4 space-y-4">
+            <h2 className="font-mono text-sm font-bold text-foreground">Tools</h2>
             <ToolsSelector selectedTools={tools} onToolsChange={setTools} />
-          </div>
         </div>
 
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3">
+        <div className="border-2 border-dashed border-border bg-card p-4 flex flex-col gap-3">
             <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? "Submitting..." : "Submit Project"}
             </Button>
-            <p className="text-[10px] text-muted">
+            <p className="text-[10px] text-muted-foreground">
               By submitting, you confirm that you have the rights to share this
               project and agree to our community guidelines.
             </p>
-          </div>
         </div>
       </form>
     </div>

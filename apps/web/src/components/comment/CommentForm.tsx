@@ -36,8 +36,8 @@ export function CommentForm({
 
   if (!session?.user) {
     return (
-      <div className="py-2 text-center">
-        <p className="text-muted text-sm">Sign in to leave a review</p>
+      <div className="border-2 border-dashed border-border bg-card p-4 text-center">
+        <p className="text-muted-foreground text-sm font-mono">Sign in to leave a review</p>
       </div>
     );
   }
@@ -64,17 +64,28 @@ export function CommentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <p className="text-[10px] font-bold text-slop-purple">
-        {isTopLevel ? "📝 ADD YOUR REVIEW:" : "💬 ADD YOUR REPLY:"}
-      </p>
+    <form onSubmit={handleSubmit} className="border-2 border-border bg-card p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-mono text-sm font-bold text-foreground">
+          {isTopLevel ? "Write a Review" : "Write a Reply"}
+        </h3>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="font-mono text-xs text-muted-foreground hover:text-foreground"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+
       {isTopLevel && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-[10px] font-bold text-muted">
-            <span>Slop</span>
-            <span>Solid</span>
-          </div>
-          <div className="flex items-center gap-3">
+          <label className="mb-2 block font-mono text-sm text-muted-foreground">
+            Your Slop Score
+          </label>
+          <div className="flex items-center gap-4">
             <input
               type="range"
               min={0}
@@ -82,15 +93,21 @@ export function CommentForm({
               step={1}
               value={reviewScore}
               onChange={(e) => setReviewScore(Number(e.target.value))}
-              className="w-full accent-[color:var(--accent)]"
+              className="h-2 flex-1 cursor-pointer appearance-none rounded-none bg-muted [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rotate-3 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:bg-card"
             />
-            <span className="text-sm font-bold text-fg w-8 text-right">
-              {reviewScore}
-            </span>
+            <div className="flex w-24 flex-col items-center">
+              <span className={`font-mono text-2xl font-black ${getScoreColor(reviewScore)}`}>
+                {reviewScore}
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                {getScoreLabel(reviewScore)}
+              </span>
+            </div>
           </div>
-          <p className="text-[10px] text-muted">Rate the app from 0–10.</p>
+          <p className="text-[10px] text-muted-foreground">Rate the app from 0–10.</p>
         </div>
       )}
+
       <Textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
@@ -98,12 +115,8 @@ export function CommentForm({
         rows={3}
         className="min-h-[90px]"
       />
+
       <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
-        {onCancel && (
-          <Button type="button" variant="ghost" onClick={onCancel} className="w-full sm:w-auto">
-            Cancel
-          </Button>
-        )}
         <Button
           type="submit"
           loading={isSubmitting}
@@ -115,4 +128,19 @@ export function CommentForm({
       </div>
     </form>
   );
+}
+
+function getScoreLabel(score: number) {
+  if (score >= 9) return "CERTIFIED SLOP";
+  if (score >= 8) return "FRESH SLOP";
+  if (score >= 6) return "DECENT SLOP";
+  if (score >= 4) return "STALE SLOP";
+  return "ROTTEN SLOP";
+}
+
+function getScoreColor(score: number) {
+  if (score >= 8) return "text-primary";
+  if (score >= 6) return "text-slop-lime";
+  if (score >= 4) return "text-slop-orange";
+  return "text-destructive";
 }

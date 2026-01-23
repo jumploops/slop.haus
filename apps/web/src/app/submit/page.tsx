@@ -114,21 +114,22 @@ function SubmitFlow() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="mx-auto max-w-2xl space-y-6">
         {step === "input" && (
           <>
-            <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-              <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-                <UrlInput
-                  onAnalyze={handleAnalyze}
-                  isLoading={isLoading}
-                  error={error?.message ?? null}
-                />
-                <div className="mt-4 text-center">
-                  <Link href="/submit/manual" className="text-xs text-slop-blue hover:text-slop-coral">
-                    Or enter details manually
-                  </Link>
-                </div>
+            <div className="border-2 border-dashed border-border bg-card p-6">
+              <UrlInput
+                onAnalyze={handleAnalyze}
+                isLoading={isLoading}
+                error={error?.message ?? null}
+              />
+              <div className="mt-4 text-center">
+                <Link
+                  href="/submit/manual"
+                  className="font-mono text-xs uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
+                >
+                  Or enter details manually
+                </Link>
               </div>
             </div>
           </>

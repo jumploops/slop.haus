@@ -6,13 +6,6 @@ interface VisitorCounterProps {
   compact?: boolean;
 }
 
-const digitStyle = {
-  backgroundColor: "#000",
-  color: "#4ade80",
-  borderColor: "#4b5563",
-  textShadow: "0 0 5px #00ff00",
-};
-
 export function VisitorCounter({ compact = false }: VisitorCounterProps) {
   const [count, setCount] = useState(0);
 
@@ -30,13 +23,12 @@ export function VisitorCounter({ compact = false }: VisitorCounterProps) {
   if (compact) {
     return (
       <div className="flex items-center gap-1">
-        <span className="text-[10px] text-accent-foreground/80">#</span>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">#</span>
         <div className="flex">
           {digits.map((digit, i) => (
             <div
               key={i}
-              className="w-4 h-5 flex items-center justify-center font-mono text-xs font-bold border-y first:border-l last:border-r first:rounded-l last:rounded-r"
-              style={digitStyle}
+              className="flex h-5 w-4 items-center justify-center border border-border bg-card font-mono text-[10px] font-bold text-foreground shadow-inner"
             >
               {digit}
             </div>
@@ -47,22 +39,21 @@ export function VisitorCounter({ compact = false }: VisitorCounterProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="text-xs font-bold text-center">
-        <span className="text-slop-blue">YOU ARE VISITOR #</span>
-      </div>
+    <div className="inline-flex flex-col items-center gap-1">
+      <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        Visitors
+      </span>
       <div className="flex gap-0.5">
         {digits.map((digit, i) => (
           <div
             key={i}
-            className="w-6 h-8 flex items-center justify-center font-mono text-lg font-bold border"
-            style={digitStyle}
+            className="flex h-6 w-5 items-center justify-center border border-border bg-card font-mono text-sm font-bold text-foreground shadow-inner"
           >
             {digit}
           </div>
         ))}
       </div>
-      <div className="text-[10px] text-muted">Since Jan 1, 1999</div>
+      <div className="text-[10px] text-muted-foreground">Since Jan 1, 1999</div>
     </div>
   );
 }

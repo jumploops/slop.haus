@@ -45,13 +45,13 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
         {selectedTools.map((tool) => (
           <span
             key={tool.slug}
-            className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-slop-yellow/40 border-2 border-[color:var(--border)]"
+            className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold font-mono uppercase tracking-wide bg-secondary text-secondary-foreground border-2 border-border"
           >
             {tool.name}
             <button
               type="button"
               onClick={() => handleRemove(tool.slug)}
-              className="ml-1 text-xs font-bold text-slop-coral"
+              className="ml-1 text-xs font-bold text-muted-foreground hover:text-primary"
               aria-label={`Remove ${tool.name}`}
             >
               &times;
@@ -59,7 +59,7 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
           </span>
         ))}
         {selected.length === 0 && (
-          <span className="text-xs text-muted">No technologies selected</span>
+          <span className="text-xs text-muted-foreground">No technologies selected</span>
         )}
       </div>
 
@@ -78,18 +78,18 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
               setTimeout(() => setIsOpen(false), 200);
             }}
             placeholder="Search to add..."
-            className="w-full px-2 py-1 text-sm bg-bg-secondary border-2 border-[color:var(--border)] shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)] focus:outline-none focus:border-accent"
+            className="w-full px-2 py-1 text-sm font-mono bg-background border-2 border-border focus:outline-none focus:border-primary"
           />
 
           {isOpen && search && filteredTools.length > 0 && (
-            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--border)] bg-bg shadow-[2px_2px_0_var(--foreground)]">
+            <div className="absolute z-10 mt-1 w-full border-2 border-border bg-card shadow-lg">
               {filteredTools.map((tool) => (
                 <button
                   key={tool.slug}
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => handleAdd(tool.slug)}
-                  className="w-full text-left px-2 py-1 text-xs font-bold hover:bg-bg-secondary"
+                  className="w-full text-left px-2 py-1 text-xs font-bold font-mono hover:bg-muted"
                 >
                   {tool.name}
                 </button>
@@ -98,14 +98,14 @@ export function TagEditor({ selected, onChange, maxTags = 10 }: TagEditorProps) 
           )}
 
           {isOpen && search && filteredTools.length === 0 && (
-            <div className="absolute z-10 mt-1 w-full border-2 border-[color:var(--border)] bg-bg shadow-[2px_2px_0_var(--foreground)] px-2 py-2">
-              <span className="text-xs text-muted">No matching tools</span>
+            <div className="absolute z-10 mt-1 w-full border-2 border-border bg-card shadow-lg px-2 py-2">
+              <span className="text-xs text-muted-foreground">No matching tools</span>
             </div>
           )}
         </div>
       )}
 
-      <p className="text-[10px] text-muted">
+      <p className="text-[10px] text-muted-foreground">
         {selected.length}/{maxTags} technologies
       </p>
     </div>

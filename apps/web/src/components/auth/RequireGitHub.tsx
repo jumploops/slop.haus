@@ -22,8 +22,8 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
 
   if (isLoading) {
     return (
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
+      <div className="border-2 border-dashed border-border bg-card p-4">
+        <div className="space-y-3">
           <Skeleton className="h-5 w-40" />
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-4/5" />
@@ -35,20 +35,20 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
 
   if (!user?.hasGitHub) {
     return (
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-5 text-center space-y-3">
-          <div className="flex justify-center text-slop-blue">
-            <GithubIcon />
-          </div>
-          <h3 className="text-base font-bold text-slop-purple">GitHub Connection Required</h3>
-          <p className="text-xs text-muted">
-            To submit a project, you need to link your GitHub account. This helps verify
-            project ownership and enables repo integration features.
-          </p>
-          <Button variant="primary" onClick={handleLinkGitHub}>
-            <GithubIcon /> Link GitHub Account
-          </Button>
+      <div className="border-2 border-dashed border-border bg-card p-6 text-center space-y-3">
+        <div className="mx-auto flex h-10 w-10 items-center justify-center border-2 border-border bg-muted text-foreground">
+          <GithubIcon />
         </div>
+        <h3 className="text-sm font-mono font-bold uppercase tracking-wide text-foreground">
+          GitHub Connection Required
+        </h3>
+        <p className="text-xs text-muted-foreground">
+          To submit a project, you need to link your GitHub account. This helps verify project
+          ownership and enables repo integration features.
+        </p>
+        <Button variant="primary" onClick={handleLinkGitHub}>
+          <GithubIcon /> Link GitHub Account
+        </Button>
       </div>
     );
   }

@@ -45,22 +45,20 @@ function MyProjectsContent() {
   };
 
   return (
-    <div className="max-w-[900px] mx-auto space-y-6">
-      <header className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-slop-blue">★ MY PROJECTS ★</h1>
-            <p className="text-xs text-muted mt-1">
-              Manage your submitted projects.
-            </p>
-          </div>
-          <Link
-            href="/submit"
-            className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline")}
-          >
-            <PlusIcon /> Submit New
-          </Link>
+    <div className="mx-auto max-w-[900px] space-y-6">
+      <header className="border-2 border-dashed border-border bg-card p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="font-mono text-xl font-black text-foreground">My Projects</h1>
+          <p className="text-xs text-muted-foreground mt-1">
+            Manage your submitted projects.
+          </p>
         </div>
+        <Link
+          href="/submit"
+          className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline")}
+        >
+          <PlusIcon /> Submit New
+        </Link>
       </header>
 
       {isLoading && (
@@ -72,30 +70,26 @@ function MyProjectsContent() {
       )}
 
       {error && (
-        <div className="border-2 border-danger bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
-          <div className="bg-bg border-2 border-danger/70 p-4">
-            <p className="text-danger font-bold text-sm">Failed to load projects</p>
-          </div>
+        <div className="border-2 border-destructive bg-card p-4 text-center">
+          <p className="text-destructive font-bold text-sm">Failed to load projects</p>
         </div>
       )}
 
       {!isLoading && !error && projects?.length === 0 && (
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 text-center">
-          <div className="bg-bg border-2 border-[color:var(--border)] p-6">
-            <div className="flex justify-center text-slop-coral">
-              <EmptyBoxIcon />
-            </div>
-            <h3 className="text-base font-bold text-slop-purple mt-3">No projects yet</h3>
-            <p className="text-xs text-muted mt-2">
-              Submit your first project to get started.
-            </p>
-            <Link
-              href="/submit"
-              className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline mt-4")}
-            >
-              Submit Project
-            </Link>
+        <div className="border-2 border-dashed border-border p-6 text-center">
+          <div className="flex justify-center text-muted-foreground">
+            <EmptyBoxIcon />
           </div>
+          <h3 className="text-base font-bold text-foreground mt-3">No projects yet</h3>
+          <p className="text-xs text-muted-foreground mt-2">
+            Submit your first project to get started.
+          </p>
+          <Link
+            href="/submit"
+            className={cn(buttonVariants({ variant: "primary", size: "sm" }), "no-underline mt-4")}
+          >
+            Submit Project
+          </Link>
         </div>
       )}
 
@@ -138,11 +132,10 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
   const statusBadge = getStatusBadge(project.status);
 
   return (
-    <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]">
-      <div className="bg-bg border-2 border-[color:var(--border)] p-3 flex gap-3 flex-col sm:flex-row">
+    <div className="border-2 border-border bg-card p-4 flex gap-3 flex-col sm:flex-row">
         <Link
           href={`/p/${project.slug}`}
-          className="shrink-0 w-full sm:w-[120px] h-[90px] border-2 border-[color:var(--border)] bg-bg-secondary overflow-hidden no-underline"
+          className="shrink-0 w-full sm:w-[120px] h-[90px] border-2 border-border bg-background overflow-hidden no-underline"
         >
           <img src={imageUrl} alt={project.title} className="w-full h-full object-cover" />
         </Link>
@@ -151,7 +144,7 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/p/${project.slug}`}
-              className="font-bold text-slop-blue hover:text-slop-coral no-underline truncate"
+              className="font-mono font-bold text-foreground hover:text-primary no-underline truncate"
             >
               {project.title}
             </Link>
@@ -160,9 +153,9 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
             )}
           </div>
 
-          <p className="text-xs text-muted line-clamp-2 mt-1">{project.tagline}</p>
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{project.tagline}</p>
 
-          <div className="flex flex-wrap gap-2 text-[10px] text-muted mt-2">
+          <div className="flex flex-wrap gap-2 text-[10px] text-muted-foreground mt-2">
             <span>Submitted {formatRelativeTime(project.createdAt)}</span>
             {project.lastEditedAt && (
               <span>Edited {formatRelativeTime(project.lastEditedAt)}</span>
@@ -183,10 +176,9 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
             </>
           )}
           {project.status === "removed" && (
-            <span className="text-xs text-muted italic">Deleted</span>
+            <span className="text-xs text-muted-foreground italic">Deleted</span>
           )}
         </div>
-      </div>
     </div>
   );
 }

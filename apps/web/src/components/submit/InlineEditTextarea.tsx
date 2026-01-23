@@ -120,22 +120,21 @@ export function InlineEditTextarea({
           rows={minRows}
           aria-label={placeholder}
           className={cn(
-            "w-full px-2 py-1 text-sm resize-none",
-            "bg-bg-secondary text-fg",
-            "border-2 border-[color:var(--border)]",
-            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
-            "focus:outline-none focus:border-accent"
+            "w-full px-2 py-1 text-sm font-mono resize-none",
+            "bg-background text-foreground",
+            "border-2 border-border",
+            "focus:outline-none focus:border-primary"
           )}
         />
         <div className="flex justify-between mt-1">
-          <span className="text-[10px] text-muted">
+          <span className="text-[10px] text-muted-foreground">
             Press Escape to cancel, Cmd+Enter to save
           </span>
           {maxLength && (
             <span
               className={cn(
                 "text-[10px]",
-                editValue.length > maxLength * 0.9 ? "text-warning" : "text-muted"
+                editValue.length > maxLength * 0.9 ? "text-slop-orange" : "text-muted-foreground"
               )}
             >
               {editValue.length}/{maxLength}
@@ -151,11 +150,11 @@ export function InlineEditTextarea({
   return (
     <div
       className={cn(
-        "px-2 py-1 text-sm",
-        "border-2 border-[color:var(--border)]",
-        "bg-bg-secondary cursor-pointer transition-colors",
-        "hover:bg-bg",
-        isEmpty && "text-muted italic",
+        "px-2 py-1 text-sm font-mono",
+        "border-2 border-dashed border-border",
+        "bg-muted cursor-pointer transition-colors",
+        "hover:border-primary hover:text-foreground",
+        isEmpty && "text-muted-foreground italic",
         className
       )}
       onClick={handleClick}

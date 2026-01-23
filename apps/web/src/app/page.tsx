@@ -29,6 +29,12 @@ export default function FeedPage() {
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [page, setPage] = useState(1);
+  const formattedDate = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   const { data, error, isLoading, mutate } = useSWR<FeedResponse>(
     ["feed", sort, timeWindow, page],
@@ -56,7 +62,30 @@ export default function FeedPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3">
+          <h1 className="font-mono text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+            Fresh Slop Daily
+          </h1>
+        </div>
+        <p className="max-w-md text-muted-foreground">
+          The premier destination for rating vibecoded apps.{" "}
+          <span className="mx-1 bg-slop-lime px-1 font-mono text-foreground">Upvote</span>
+          the best.{" "}
+          <span className="mx-1 bg-slop-pink px-1 font-mono text-foreground">Review</span>
+          the rest.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-border" />
+        <span className="rotate-1 bg-foreground px-3 py-1 font-mono text-xs font-bold uppercase tracking-wide text-background">
+          {formattedDate}
+        </span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <Tabs
           tabs={sortTabs}
@@ -71,10 +100,10 @@ export default function FeedPage() {
             onChange={handleWindowChange}
             className={cn(
               "w-full sm:w-auto",
-              "min-h-10 sm:min-h-0 px-2 py-2 sm:py-1 text-xs font-bold",
-              "bg-bg text-fg",
-              "border-2 border-[color:var(--border)]",
-              "shadow-[2px_2px_0_var(--foreground)]"
+              "min-h-10 sm:min-h-0 px-3 py-2 sm:py-1 text-xs font-bold font-mono uppercase tracking-wide",
+              "bg-background text-foreground",
+              "border-2 border-dashed border-border",
+              "focus:outline-none focus:border-primary"
             )}
           >
             {windowOptions.map((opt) => (
@@ -87,9 +116,9 @@ export default function FeedPage() {
       </div>
 
       {error && (
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <h3 className="text-lg font-bold text-slop-coral mb-2">Failed to load feed</h3>
-          <p className="text-sm text-muted">Please try again later.</p>
+        <div className="border-2 border-border bg-card p-6 text-center">
+          <h3 className="text-lg font-bold text-destructive mb-2">Failed to load feed</h3>
+          <p className="text-sm text-muted-foreground">Please try again later.</p>
           <Button onClick={() => mutate()} className="mt-4">
             Retry
           </Button>
@@ -105,9 +134,9 @@ export default function FeedPage() {
       )}
 
       {data && data.projects.length === 0 && (
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <h3 className="text-lg font-bold text-slop-purple mb-2">No projects yet</h3>
-          <p className="text-sm text-muted">Be the first to submit a project!</p>
+        <div className="border-2 border-dashed border-border p-6 text-center">
+          <h3 className="text-lg font-bold text-foreground mb-2">No projects yet</h3>
+          <p className="text-sm text-muted-foreground">Be the first to submit a project!</p>
           <Button onClick={() => (window.location.href = "/submit")} className="mt-4">
             Submit a Project
           </Button>
@@ -130,7 +159,7 @@ export default function FeedPage() {
             </div>
           )}
 
-          <div className="text-center text-muted text-xs mt-4">
+          <div className="text-center text-muted-foreground text-xs mt-4">
             Showing {data.projects.length} of {data.pagination.total} projects
           </div>
         </>

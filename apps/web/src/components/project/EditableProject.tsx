@@ -238,10 +238,10 @@ export function EditableProject({
   return (
     <div className="max-w-[900px] mx-auto space-y-6">
       {/* Edit mode header */}
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="border-2 border-dashed border-border bg-card p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <Link
           href={`/p/${project.slug}`}
-          className="inline-flex items-center gap-2 text-xs font-bold text-slop-blue no-underline hover:text-slop-coral hover:no-underline"
+          className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground no-underline transition-colors hover:text-primary hover:no-underline"
           onClick={(e) => {
             if (isDirty && !window.confirm("You have unsaved changes. Discard and leave?")) {
               e.preventDefault();
@@ -252,14 +252,14 @@ export function EditableProject({
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
           <Button
-            variant="ghost"
+            variant="danger"
             onClick={onDelete}
-            className="text-danger hover:bg-danger/10 w-full sm:w-auto"
+            className="w-full sm:w-auto"
           >
             Delete
           </Button>
           {isDirty && (
-            <Button variant="ghost" onClick={handleDiscard} className="w-full sm:w-auto">
+            <Button variant="secondary" onClick={handleDiscard} className="w-full sm:w-auto">
               Discard
             </Button>
           )}
@@ -284,15 +284,15 @@ export function EditableProject({
 
       {/* Error display */}
       {error && (
-        <div className="border-2 border-[color:var(--border)] bg-danger/10 shadow-[2px_2px_0_var(--foreground)] p-4">
-          <p className="text-danger text-sm m-0">{error}</p>
+        <div className="border-2 border-destructive bg-card p-4">
+          <p className="text-destructive text-sm m-0">{error}</p>
         </div>
       )}
 
       {/* Project preview - mirrors ProjectDetails structure */}
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="border-2 border-border bg-card p-6">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Media section - editable screenshot */}
             <div className="w-full">
               <ScreenshotEditor
@@ -314,7 +314,7 @@ export function EditableProject({
                 maxLength={255}
                 required
                 as="h1"
-                className="text-2xl text-slop-blue"
+                className="text-2xl font-mono font-black text-foreground"
               />
 
               <InlineEditTextarea
@@ -323,12 +323,12 @@ export function EditableProject({
                 placeholder="One-sentence description"
                 maxLength={500}
                 minRows={2}
-                className="text-sm text-muted font-normal"
+                className="text-sm text-muted-foreground font-normal"
               />
 
               {/* Author info (read-only) */}
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary p-2 text-xs flex flex-wrap gap-3">
-                <span className="flex items-center gap-2 font-bold text-slop-purple">
+              <div className="border-2 border-border bg-muted p-2 text-xs flex flex-wrap gap-3">
+                <span className="flex items-center gap-2 font-mono text-foreground">
                   <Avatar
                     src={project.author.image}
                     alt={project.author.name}
@@ -337,9 +337,13 @@ export function EditableProject({
                   {project.author.name}
                 </span>
                 {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
-                <span className="text-muted">Submitted {formatRelativeTime(project.createdAt)}</span>
+                <span className="text-muted-foreground">
+                  Submitted {formatRelativeTime(project.createdAt)}
+                </span>
                 {project.lastEditedAt && (
-                  <span className="text-muted">Last edited {formatRelativeTime(project.lastEditedAt)}</span>
+                  <span className="text-muted-foreground">
+                    Last edited {formatRelativeTime(project.lastEditedAt)}
+                  </span>
                 )}
               </div>
 
@@ -372,60 +376,64 @@ export function EditableProject({
           <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
             <div className="space-y-6 min-w-0">
               {/* Description section */}
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-                <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-                  <h3 className="text-sm font-bold text-slop-purple">~~ ABOUT THIS SLOP ~~</h3>
-                  <InlineEditTextarea
-                    value={description}
-                    onSave={handleDescriptionChange}
-                    placeholder="Add a description..."
-                    maxLength={10000}
-                  />
-                </div>
+              <div className="border-2 border-border bg-card p-4 space-y-3">
+                <h3 className="font-mono text-sm font-bold text-foreground">About this slop</h3>
+                <InlineEditTextarea
+                  value={description}
+                  onSave={handleDescriptionChange}
+                  placeholder="Add a description..."
+                  maxLength={10000}
+                />
               </div>
 
               {/* Tools section */}
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-                <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-                  <h3 className="text-sm font-bold text-slop-purple">~~ BUILT WITH ~~</h3>
-                  <TagEditor selected={tools} onChange={handleToolsChange} />
-                </div>
+              <div className="border-2 border-border bg-card p-4 space-y-3">
+                <h3 className="font-mono text-sm font-bold text-foreground">Built with</h3>
+                <TagEditor selected={tools} onChange={handleToolsChange} />
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-4">
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-                <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-                  <h4 className="text-xs font-bold text-slop-purple text-center">~~ VIBE SCORE ~~</h4>
-                  <VibeMeter percent={vibePercent} showLabel />
-                  <VibeInput
-                    mode={vibeMode}
-                    onModeChange={handleVibeModeChange}
-                    vibePercent={vibePercent}
-                    onVibePercentChange={handleVibePercentChange}
-                    vibeDetails={vibeDetails}
-                    onVibeDetailsChange={handleVibeDetailsChange}
-                  />
-                </div>
+              <div className="border-2 border-border bg-card p-4 space-y-3">
+                <h4 className="font-mono text-xs font-bold uppercase tracking-wide text-foreground text-center">
+                  Vibe score
+                </h4>
+                <VibeMeter percent={vibePercent} showLabel />
+                <VibeInput
+                  mode={vibeMode}
+                  onModeChange={handleVibeModeChange}
+                  vibePercent={vibePercent}
+                  onVibePercentChange={handleVibePercentChange}
+                  vibeDetails={vibeDetails}
+                  onVibeDetailsChange={handleVibeDetailsChange}
+                />
               </div>
 
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-                <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-                  <h4 className="text-xs font-bold text-slop-purple text-center">~~ REVIEWS & LIKES ~~</h4>
-                  <div className="flex flex-col gap-2 text-xs mt-3 opacity-60">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-fg">Slop score</span>
-                      <span>{project.reviewCount > 0 ? project.slopScore.toFixed(1) : "—"}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-fg">Reviews</span>
-                      <span>{project.reviewCount}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-fg">Likes</span>
-                      <span>{project.likeCount}</span>
-                    </div>
+              <div className="border-2 border-border bg-card p-4">
+                <h4 className="font-mono text-xs font-bold uppercase tracking-wide text-foreground text-center">
+                  Reviews & likes
+                </h4>
+                <div className="flex flex-col gap-2 text-xs mt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Slop score
+                    </span>
+                    <span className="font-mono text-xs text-foreground">
+                      {project.reviewCount > 0 ? project.slopScore.toFixed(1) : "—"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Reviews
+                    </span>
+                    <span className="font-mono text-xs text-foreground">{project.reviewCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Likes
+                    </span>
+                    <span className="font-mono text-xs text-foreground">{project.likeCount}</span>
                   </div>
                 </div>
               </div>
@@ -435,26 +443,24 @@ export function EditableProject({
       </div>
 
       {/* URL editors */}
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-          <h3 className="text-sm font-bold text-slop-purple">~~ PROJECT LINKS ~~</h3>
-          <p className="text-[10px] text-muted">At least one URL is required</p>
-          <div className="space-y-3">
-            <Input
-              label="Live URL"
-              type="url"
-              value={mainUrl}
-              onChange={(e) => setMainUrl(e.target.value)}
-              placeholder="https://your-app.com"
-            />
-            <Input
-              label="Repository URL"
-              type="url"
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-              placeholder="https://github.com/user/repo"
-            />
-          </div>
+      <div className="border-2 border-border bg-card p-4 space-y-3">
+        <h3 className="font-mono text-sm font-bold text-foreground">Project links</h3>
+        <p className="text-[10px] text-muted-foreground">At least one URL is required</p>
+        <div className="space-y-3">
+          <Input
+            label="Live URL"
+            type="url"
+            value={mainUrl}
+            onChange={(e) => setMainUrl(e.target.value)}
+            placeholder="https://your-app.com"
+          />
+          <Input
+            label="Repository URL"
+            type="url"
+            value={repoUrl}
+            onChange={(e) => setRepoUrl(e.target.value)}
+            placeholder="https://github.com/user/repo"
+          />
         </div>
       </div>
 

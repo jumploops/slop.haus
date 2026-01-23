@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.92 0.01 90);
+  --foreground: oklch(0.2 0.02 280);
+  --card: oklch(0.99 0.005 90);
+  --card-foreground: oklch(0.2 0.02 280);
+  --popover: oklch(0.99 0.005 90);
+  --popover-foreground: oklch(0.2 0.02 280);
+  --primary: oklch(0.55 0.25 145);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0.02 80);
+  --secondary-foreground: oklch(0.3 0.02 280);
+  --muted: oklch(0.95 0.01 90);
+  --muted-foreground: oklch(0.5 0.02 280);
+  --accent: oklch(0.75 0.18 25);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.88 0.02 90);
+  --input: oklch(0.92 0.01 90);
+  --ring: oklch(0.55 0.25 145);
+  --chart-1: oklch(0.55 0.25 145);
+  --chart-2: oklch(0.75 0.18 25);
+  --chart-3: oklch(0.65 0.2 280);
+  --chart-4: oklch(0.8 0.15 85);
+  --chart-5: oklch(0.6 0.2 200);
+  --radius: 0.5rem;
+  --slop-lime: oklch(0.85 0.25 130);
+  --slop-orange: oklch(0.75 0.18 55);
+  --slop-pink: oklch(0.8 0.15 350);
+
+  /* Legacy slop palette (temporary compatibility) */
+  --slop-green: oklch(0.55 0.3 145);
+  --slop-coral: oklch(0.6 0.3 30);
+  --slop-blue: oklch(0.5 0.25 260);
+  --slop-yellow: oklch(0.85 0.2 95);
+  --slop-teal: oklch(0.55 0.2 190);
+  --slop-purple: oklch(0.5 0.3 300);
+
+  /* Legacy variables used in shadows/containers */
+  --background-secondary: var(--card);
+  --accent-dim: var(--primary);
+  --app-container-max: 1200px;
+  --app-header-height: 60px;
+  --app-sidebar-width: 200px;
+}
+
+.dark {
+  --background: oklch(0.12 0.01 280);
+  --foreground: oklch(0.95 0.005 90);
+  --card: oklch(0.2 0.015 280);
+  --card-foreground: oklch(0.95 0.005 90);
+  --popover: oklch(0.2 0.015 280);
+  --popover-foreground: oklch(0.95 0.005 90);
+  --primary: oklch(0.7 0.22 145);
+  --primary-foreground: oklch(0.12 0.01 280);
+  --secondary: oklch(0.26 0.02 280);
+  --secondary-foreground: oklch(0.9 0.005 90);
+  --muted: oklch(0.24 0.015 280);
+  --muted-foreground: oklch(0.65 0.01 90);
+  --accent: oklch(0.7 0.16 55);
+  --accent-foreground: oklch(0.14 0 0);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.95 0 0);
+  --border: oklch(0.28 0.02 280);
+  --input: oklch(0.25 0.01 280);
+  --ring: oklch(0.7 0.22 145);
+  --chart-1: oklch(0.7 0.22 145);
+  --chart-2: oklch(0.7 0.16 55);
+  --chart-3: oklch(0.7 0.18 280);
+  --chart-4: oklch(0.75 0.12 85);
+  --chart-5: oklch(0.65 0.18 200);
+  --slop-lime: oklch(0.75 0.22 130);
+  --slop-orange: oklch(0.7 0.16 55);
+  --slop-pink: oklch(0.72 0.14 350);
+
+  /* Legacy slop palette (temporary compatibility) */
+  --slop-green: oklch(0.7 0.22 145);
+  --slop-coral: oklch(0.7 0.2 30);
+  --slop-blue: oklch(0.65 0.18 260);
+  --slop-yellow: oklch(0.8 0.15 85);
+  --slop-teal: oklch(0.65 0.18 190);
+  --slop-purple: oklch(0.65 0.2 300);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
+  --color-slop-lime: var(--slop-lime);
+  --color-slop-orange: var(--slop-orange);
+  --color-slop-pink: var(--slop-pink);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Legacy token aliases (remove after migration) */
+  --color-bg: var(--background);
+  --color-bg-secondary: var(--card);
+  --color-fg: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--primary);
+  --color-accent-dim: var(--primary);
+  --color-accent-foreground: var(--primary-foreground);
+  --color-danger: var(--destructive);
+  --color-warning: var(--slop-orange);
+  --color-success: var(--slop-lime);
+  --color-slop-green: var(--slop-green);
+  --color-slop-coral: var(--slop-coral);
+  --color-slop-blue: var(--slop-blue);
+  --color-slop-yellow: var(--slop-yellow);
+  --color-slop-teal: var(--slop-teal);
+  --color-slop-purple: var(--slop-purple);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

@@ -83,9 +83,9 @@ export default function ModQueuePage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <h1 className="text-xl font-bold text-slop-blue">★ MOD QUEUE ★</h1>
-        <p className="text-xs text-muted mt-1">
+      <div className="border-2 border-dashed border-border bg-card p-4">
+        <h1 className="font-mono text-xl font-black text-foreground">Mod Queue</h1>
+        <p className="text-xs text-muted-foreground mt-1">
           Review flagged and hidden content awaiting moderation.
         </p>
       </div>
@@ -104,7 +104,7 @@ export default function ModQueuePage() {
         {isLoading && (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="p-4 border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]">
+              <div key={i} className="p-4 border-2 border-border bg-card">
                 <Skeleton variant="text" className="w-3/5" />
                 <Skeleton variant="text" className="w-full mt-2" />
               </div>
@@ -113,110 +113,108 @@ export default function ModQueuePage() {
         )}
 
         {error && (
-          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-            <p className="text-sm text-danger">Failed to load mod queue</p>
+          <div className="border-2 border-destructive bg-card p-6 text-center">
+            <p className="text-sm text-destructive">Failed to load mod queue</p>
           </div>
         )}
 
         {!isLoading && !error && items?.length === 0 && (
-          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
+          <div className="border-2 border-dashed border-border p-6 text-center">
             <CheckIcon />
             <h3 className="text-lg font-bold mt-4 mb-1">Queue is empty</h3>
-            <p className="text-xs text-muted">No items awaiting moderation.</p>
+            <p className="text-xs text-muted-foreground">No items awaiting moderation.</p>
           </div>
         )}
 
         {!isLoading && !error && items && items.length > 0 && (
           <div className="space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-                <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={item.type === "project" ? "default" : "secondary"}>
-                        {item.type}
-                      </Badge>
-                      <Badge variant="warning">{item.status}</Badge>
-                      {item.flagCount > 0 && (
-                        <Badge variant="danger">{item.flagCount} flags</Badge>
+              <div key={item.id} className="border-2 border-border bg-card p-4">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <Badge variant={item.type === "project" ? "default" : "secondary"}>
+                      {item.type}
+                    </Badge>
+                    <Badge variant="warning">{item.status}</Badge>
+                    {item.flagCount > 0 && (
+                      <Badge variant="danger">{item.flagCount} flags</Badge>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">
+                    {formatRelativeTime(item.createdAt)}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="mb-3">
+                  {item.type === "project" && (
+                    <h3 className="font-mono font-bold text-sm text-foreground">
+                      {item.slug ? (
+                        <Link href={`/p/${item.slug}`} className="hover:text-primary">
+                          {item.title}
+                        </Link>
+                      ) : (
+                        item.title
                       )}
-                    </div>
-                    <span className="text-[10px] text-muted">
-                      {formatRelativeTime(item.createdAt)}
-                    </span>
-                  </div>
+                    </h3>
+                  )}
+                  {item.type === "comment" && (
+                    <p className="text-sm text-foreground line-clamp-3">{item.body}</p>
+                  )}
+                </div>
 
-                  {/* Content */}
-                  <div className="mb-3">
-                    {item.type === "project" && (
-                      <h3 className="font-bold text-sm">
-                        {item.slug ? (
-                          <Link href={`/p/${item.slug}`} className="hover:text-slop-coral">
-                            {item.title}
-                          </Link>
-                        ) : (
-                          item.title
-                        )}
-                      </h3>
-                    )}
-                    {item.type === "comment" && (
-                      <p className="text-sm text-fg line-clamp-3">{item.body}</p>
-                    )}
-                  </div>
+                {/* Author */}
+                <div className="flex items-center gap-2 mb-4">
+                  <Avatar src={item.author.image} alt={item.author.name} size="sm" />
+                  <span className="text-xs text-muted-foreground">{item.author.name}</span>
+                </div>
 
-                  {/* Author */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <Avatar src={item.author.image} alt={item.author.name} size="sm" />
-                    <span className="text-xs text-muted">{item.author.name}</span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 flex-wrap">
-                    {item.type === "project" && (
-                      <>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleApproveProject(item)}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => handleHideProject(item)}
-                        >
-                          Hide
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveProject(item)}
-                        >
-                          Remove
-                        </Button>
-                      </>
-                    )}
-                    {item.type === "comment" && (
-                      <>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleApproveComment(item)}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveComment(item)}
-                        >
-                          Remove
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                {/* Actions */}
+                <div className="flex gap-2 flex-wrap">
+                  {item.type === "project" && (
+                    <>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleApproveProject(item)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleHideProject(item)}
+                      >
+                        Hide
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveProject(item)}
+                      >
+                        Remove
+                      </Button>
+                    </>
+                  )}
+                  {item.type === "comment" && (
+                    <>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleApproveComment(item)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveComment(item)}
+                      >
+                        Remove
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -229,7 +227,7 @@ export default function ModQueuePage() {
 
 function CheckIcon() {
   return (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto text-slop-green">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto text-primary">
       <path d="M20 6L9 17l-5-5" />
     </svg>
   );

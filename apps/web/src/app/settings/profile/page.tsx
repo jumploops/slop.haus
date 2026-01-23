@@ -52,33 +52,30 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <h1 className="text-xl font-bold text-slop-blue">★ PROFILE ★</h1>
+      <div className="border-2 border-dashed border-border bg-card p-4">
+        <h1 className="font-mono text-xl font-black text-foreground">Profile</h1>
       </div>
 
       {/* Profile Header */}
-      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-          <div className="flex items-center gap-4">
-            <Avatar src={user.image} alt={user.name} size="lg" />
-            <div>
-              <h2 className="text-lg font-bold text-slop-blue">{user.name}</h2>
-              <p className="text-muted text-xs">{user.email}</p>
-              <div className="flex gap-2 mt-2">
-                {user.devVerified && <Badge variant="dev">Verified Dev</Badge>}
-                {user.role === "admin" && <Badge variant="admin">Admin</Badge>}
-                {user.role === "mod" && <Badge variant="mod">Moderator</Badge>}
-              </div>
+      <section className="border-2 border-border bg-card p-4">
+        <div className="flex items-center gap-4">
+          <Avatar src={user.image} alt={user.name} size="lg" />
+          <div>
+            <h2 className="font-mono text-lg font-bold text-foreground">{user.name}</h2>
+            <p className="text-muted-foreground text-xs">{user.email}</p>
+            <div className="flex gap-2 mt-2">
+              {user.devVerified && <Badge variant="dev">Verified Dev</Badge>}
+              {user.role === "admin" && <Badge variant="admin">Admin</Badge>}
+              {user.role === "mod" && <Badge variant="mod">Moderator</Badge>}
             </div>
           </div>
         </div>
       </section>
 
       {/* Display Name Section */}
-      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-          <h3 className="text-sm font-bold text-slop-purple">~~ DISPLAY NAME ~~</h3>
-          <p className="text-xs text-muted">
+      <section className="border-2 border-border bg-card p-4 space-y-3">
+          <h3 className="font-mono text-sm font-bold text-foreground">Display Name</h3>
+          <p className="text-xs text-muted-foreground">
             This is the name displayed on your comments and submissions.
           </p>
 
@@ -106,7 +103,7 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <span className="px-2 py-1 text-sm border-2 border-[color:var(--border)] bg-bg-secondary">
+              <span className="px-2 py-1 text-sm border-2 border-border bg-muted font-mono">
                 {user.name}
               </span>
               <Button variant="secondary" onClick={handleEdit}>
@@ -114,18 +111,15 @@ export default function ProfilePage() {
               </Button>
             </div>
           )}
-        </div>
       </section>
 
       {/* Avatar Section */}
-      <section className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-2">
-          <h3 className="text-sm font-bold text-slop-purple">~~ AVATAR ~~</h3>
-          <p className="text-xs text-muted">
+      <section className="border-2 border-border bg-card p-4 space-y-2">
+          <h3 className="font-mono text-sm font-bold text-foreground">Avatar</h3>
+          <p className="text-xs text-muted-foreground">
             Your avatar is imported from your OAuth provider (GitHub or Google).
             To change it, update your profile picture on the connected service.
           </p>
-        </div>
       </section>
     </div>
   );

@@ -23,129 +23,125 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   const imageUrl = primaryMedia?.url || getPlaceholderImage(project.title);
 
   return (
-    <div>
-      {/* Header Section */}
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1 mb-8">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Media */}
-            <div className="md:w-[420px] flex-shrink-0">
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary">
-                <img
-                  src={imageUrl}
-                  alt={project.title}
-                  className="w-full object-cover aspect-video"
-                />
+    <div className="space-y-8">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeftIcon />
+        back to the slop
+      </Link>
+
+      <div className="relative overflow-hidden border-2 border-border">
+        <img
+          src={imageUrl}
+          alt={project.title}
+          className="w-full object-cover aspect-video"
+        />
+        <div className="absolute -right-1 -top-1 h-8 w-8 rotate-12 bg-slop-lime" />
+        <div className="absolute -bottom-1 -left-1 h-6 w-6 -rotate-12 bg-slop-orange" />
+      </div>
+
+      <div className="border-2 border-border bg-card p-6">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex-1">
+            {project.tools.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-2">
+                {project.tools.map((tool) => (
+                  <span
+                    key={tool.id}
+                    className="bg-secondary px-2 py-0.5 font-mono text-xs uppercase text-secondary-foreground"
+                  >
+                    {tool.name}
+                  </span>
+                ))}
               </div>
+            )}
+
+            <h1 className="mb-2 font-mono text-3xl font-black text-foreground break-words">
+              {project.title}
+            </h1>
+
+            <p className="mb-4 text-lg text-muted-foreground">
+              {project.tagline}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-2 font-mono">
+                <Avatar src={project.author.image} alt={project.author.name} size="sm" />
+                {project.author.name}
+              </span>
+              {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
+              <span className="font-mono">Submitted {formatRelativeTime(project.createdAt)}</span>
+              {project.lastEditedAt && (
+                <span className="font-mono">Last edited {formatRelativeTime(project.lastEditedAt)}</span>
+              )}
+              {project.mainUrl && (
+                <a
+                  href={project.mainUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-mono text-primary underline-offset-2 hover:underline"
+                >
+                  Visit site
+                  <ExternalLinkIcon />
+                </a>
+              )}
             </div>
 
-            {/* Info */}
-            <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold text-slop-blue mb-2 break-words">
-                ★ {project.title} ★
-              </h1>
-              <p className="text-sm text-muted mb-4">{project.tagline}</p>
-
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary p-2 mb-4 text-xs flex flex-wrap gap-3">
-                <span className="flex items-center gap-2 font-bold text-slop-purple">
-                  <Avatar src={project.author.image} alt={project.author.name} size="sm" />
-                  {project.author.name}
-                </span>
-                {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
-                <span className="text-muted">Submitted {formatRelativeTime(project.createdAt)}</span>
-                {project.lastEditedAt && (
-                  <span className="text-muted">Last edited {formatRelativeTime(project.lastEditedAt)}</span>
-                )}
-              </div>
-
-              {/* Action Links */}
-              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
-                {project.mainUrl && (
-                  <a
-                    href={project.mainUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      buttonVariants({ variant: "primary", size: "sm" }),
-                      "no-underline hover:no-underline w-full sm:w-auto"
-                    )}
-                  >
-                    <ExternalLinkIcon /> Visit Site
-                  </a>
-                )}
-                {project.repoUrl && (
-                  <a
-                    href={project.repoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      buttonVariants({ variant: "secondary", size: "sm" }),
-                      "no-underline hover:no-underline w-full sm:w-auto"
-                    )}
-                  >
-                    <GithubIcon /> View Repo
-                  </a>
-                )}
-                <Button
-                  variant={isFavorited ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={toggleFavorite}
-                  disabled={favoriteLoading}
-                  className="w-full sm:w-auto"
+            <div className="mt-5 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+              {project.repoUrl && (
+                <a
+                  href={project.repoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    buttonVariants({ variant: "secondary", size: "sm" }),
+                    "no-underline hover:no-underline w-full sm:w-auto"
+                  )}
                 >
-                  <HeartIcon filled={isFavorited} /> {isFavorited ? "Favorited" : "Favorite"}
-                </Button>
-                {isAuthor && (
-                  <Link
-                    href={`/p/${project.slug}/edit`}
-                    className={cn(
-                      buttonVariants({ variant: "secondary", size: "sm" }),
-                      "no-underline hover:no-underline w-full sm:w-auto"
-                    )}
-                  >
-                    <PencilIcon /> Edit
-                  </Link>
-                )}
-              </div>
+                  <GithubIcon /> View Repo
+                </a>
+              )}
+              <Button
+                variant={isFavorited ? "secondary" : "ghost"}
+                size="sm"
+                onClick={toggleFavorite}
+                disabled={favoriteLoading}
+                className="w-full sm:w-auto"
+              >
+                <HeartIcon filled={isFavorited} /> {isFavorited ? "Favorited" : "Favorite"}
+              </Button>
+              {isAuthor && (
+                <Link
+                  href={`/p/${project.slug}/edit`}
+                  className={cn(
+                    buttonVariants({ variant: "secondary", size: "sm" }),
+                    "no-underline hover:no-underline w-full sm:w-auto"
+                  )}
+                >
+                  <PencilIcon /> Edit
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Body Section */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
-        {/* Main content */}
-        <div>
+        <div className="space-y-6">
           {project.description && (
-            <section className="mb-8">
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-                <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-                  <h3 className="text-sm font-bold text-slop-purple mb-3">~~ ABOUT THIS SLOP ~~</h3>
-                  <p className="text-sm text-fg leading-relaxed whitespace-pre-wrap">{project.description}</p>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {project.tools.length > 0 && (
-            <section className="mb-8">
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-                <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-                  <h3 className="text-sm font-bold text-slop-purple mb-3">~~ BUILT WITH ~~</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tools.map((tool) => (
-                      <Badge key={tool.id} variant="default">
-                        #{tool.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
+            <section className="border-2 border-border bg-card p-4">
+              <h3 className="mb-3 font-mono text-sm font-bold text-foreground">
+                About this slop
+              </h3>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                {project.description}
+              </p>
             </section>
           )}
         </div>
 
-        {/* Sidebar */}
         <aside>
           <ScoreWidget
             projectSlug={project.slug}
@@ -195,6 +191,15 @@ function PencilIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
       <path d="M11.85 2.15a.5.5 0 0 1 .7 0l1.3 1.3a.5.5 0 0 1 0 .7l-8.5 8.5a.5.5 0 0 1-.2.12l-2.5.75a.5.5 0 0 1-.62-.62l.75-2.5a.5.5 0 0 1 .12-.2l8.5-8.5zm.35 1.4L11 2.35 3.5 9.85l-.45 1.5 1.5-.45L12.2 3.55z" />
+    </svg>
+  );
+}
+
+function ArrowLeftIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M9.5 3.5L5 8l4.5 4.5" />
+      <path d="M5 8h7" />
     </svg>
   );
 }

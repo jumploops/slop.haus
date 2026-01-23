@@ -70,9 +70,9 @@ export default function ConnectionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-3">
-        <h1 className="text-xl font-bold text-slop-blue">★ CONNECTIONS ★</h1>
-        <p className="text-xs text-muted mt-1">
+      <div className="border-2 border-dashed border-border bg-card p-4">
+        <h1 className="font-mono text-xl font-black text-foreground">Connections</h1>
+        <p className="text-xs text-muted-foreground mt-1">
           Manage your linked accounts. You need at least one account to sign in.
         </p>
       </div>
@@ -85,16 +85,16 @@ export default function ConnectionsPage() {
           return (
             <div
               key={provider.id}
-              className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1"
+              className="border-2 border-border bg-card p-4"
             >
-              <div className="bg-bg border-2 border-[color:var(--border)] p-4 flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center border-2 border-[color:var(--border)] bg-bg-secondary">
+                  <div className="w-10 h-10 flex items-center justify-center border-2 border-border bg-muted">
                     <Icon />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold">{provider.name}</h3>
-                    <p className="text-xs text-muted">{provider.description}</p>
+                    <h3 className="font-mono text-sm font-bold text-foreground">{provider.name}</h3>
+                    <p className="text-xs text-muted-foreground">{provider.description}</p>
                   </div>
                 </div>
 
@@ -129,8 +129,8 @@ export default function ConnectionsPage() {
       </div>
 
       {!user?.hasGitHub && (
-        <div className="border-2 border-[color:var(--border)] bg-warning/20 shadow-[2px_2px_0_var(--foreground)] p-4">
-          <p className="text-xs">
+        <div className="border-2 border-dashed border-border bg-slop-orange/15 p-4">
+          <p className="text-xs text-foreground">
             <strong>Note:</strong> A GitHub account is required to submit projects.
             Link your GitHub account to enable project submissions.
           </p>

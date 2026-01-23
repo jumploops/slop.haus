@@ -153,8 +153,8 @@ function DraftReviewContent({ draftId }: { draftId: string }) {
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <p className="text-sm text-muted">Loading draft...</p>
+        <div className="border-2 border-dashed border-border bg-card p-6 text-center">
+          <p className="text-sm text-muted-foreground">Loading draft...</p>
         </div>
       </div>
     );
@@ -163,9 +163,9 @@ function DraftReviewContent({ draftId }: { draftId: string }) {
   if (error && !draft) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-          <h2 className="text-lg font-bold text-danger mb-2">Error</h2>
-          <p className="text-sm text-fg mb-4">{error}</p>
+        <div className="border-2 border-destructive bg-card p-6 text-center">
+          <h2 className="text-lg font-bold text-destructive mb-2">Error</h2>
+          <p className="text-sm text-foreground mb-4">{error}</p>
           <Button onClick={() => router.push("/submit")} variant="primary">
             Start Over
           </Button>

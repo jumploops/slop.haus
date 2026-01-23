@@ -24,7 +24,7 @@ export function DeleteProjectModal({
         <p className="mb-3 leading-relaxed">
           This will hide your project from public view. Reviews and likes will be preserved.
         </p>
-        <p className="text-muted text-sm mb-3">
+        <p className="text-muted-foreground text-sm mb-3">
           If you need to restore a deleted project, please contact support.
         </p>
         <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-border">

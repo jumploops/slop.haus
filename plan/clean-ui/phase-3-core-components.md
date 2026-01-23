@@ -1,6 +1,6 @@
 # Phase 3: Core Layout + Shared Components
 
-**Status:** Pending
+**Status:** Completed (2026-01-22)
 
 ## Goals
 
@@ -52,8 +52,13 @@
 
 ## Verification Checklist
 
-- [ ] Header matches clean-ui visual structure and spacing.
-- [ ] Theme toggle cycles system/light/dark.
-- [ ] UI primitives render with new tokens and no legacy classes.
-- [ ] Project cards match clean-ui layout and interaction states.
-- [ ] Visitor counter uses tokens and renders correctly in light/dark.
+- [x] Header matches clean-ui visual structure and spacing.
+- [x] Theme toggle cycles system/light/dark.
+- [x] UI primitives render with new tokens and no legacy classes.
+- [x] Project cards match clean-ui layout and interaction states.
+- [x] Visitor counter uses tokens and renders correctly in light/dark.
+
+## Implementation Notes
+
+- Keep temporary legacy token aliases in `apps/web/src/app/globals.css` until all components are migrated.
+- `ThemeSwitcher` has been repurposed to a clean-ui style `ThemeToggle` while keeping the legacy export name for now.

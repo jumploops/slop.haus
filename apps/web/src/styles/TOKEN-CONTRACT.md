@@ -11,11 +11,8 @@ The theming system uses a two-layer CSS variable pattern:
 └── BASE variables (--bg, --fg, --accent, etc.)
     └── Mapped to Tailwind via @theme inline
 
-presets.css
-└── [data-theme="name"] overrides BASE variables
-
-Runtime themes (user-generated)
-└── Injected CSS overrides BASE variables
+.dark
+└── Overrides base variables for dark mode
 ```
 
 ## Color Tokens
@@ -127,19 +124,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 | File | Purpose |
 |------|---------|
 | `src/styles/theme.css` | `@theme` token definitions + Tailwind mapping |
-| `src/styles/presets.css` | Preset theme overrides (cyberpunk, warm, etc.) |
 | `src/app/globals.css` | Page-specific layouts + legacy CSS (being migrated) |
-
-## Preset Themes
-
-| ID | Name | Description |
-|----|------|-------------|
-| `default` | Default | The classic slop.haus look |
-| `cyberpunk` | Cyberpunk | Neon cyan on dark blue |
-| `warm` | Warm | Cozy orange tones |
-| `light` | Light | Clean light mode |
-| `midnight` | Midnight | Elegant purple accent |
-| `forest` | Forest | Natural green tones |
 
 ## Usage Guidelines
 
@@ -169,6 +154,5 @@ As of the retro reskin:
 
 1. Add to `:root` in `globals.css` (base value)
 2. Add to `@theme` block in `theme.css` (Tailwind mapping)
-3. Add override in each preset in `presets.css`
-4. Update this document
-5. Test with all preset themes
+3. Update this document
+4. Verify light/dark mode rendering

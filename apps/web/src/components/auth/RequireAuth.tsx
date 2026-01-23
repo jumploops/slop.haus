@@ -22,7 +22,7 @@ export function RequireAuth({ children, fallback }: RequireAuthProps) {
 
   if (isPending) {
     return (
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 space-y-3">
+      <div className="border-2 border-dashed border-border bg-card p-4 space-y-3">
         <Skeleton className="h-6 w-48" />
         <Skeleton className="h-40 w-full" />
       </div>
@@ -31,8 +31,8 @@ export function RequireAuth({ children, fallback }: RequireAuthProps) {
 
   if (!session?.user) {
     return fallback || (
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-6 text-center">
-        <p className="text-sm text-muted">Please sign in to continue</p>
+      <div className="border-2 border-dashed border-border bg-card p-6 text-center">
+        <p className="text-sm text-muted-foreground font-mono">Please sign in to continue</p>
       </div>
     );
   }

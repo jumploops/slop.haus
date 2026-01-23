@@ -132,17 +132,16 @@ export function EditableProjectPreview({
   return (
     <div className="space-y-6">
       {/* Edit mode banner */}
-      <div className="bg-warning border-2 border-[color:var(--border)] px-4 py-2 text-xs font-bold text-fg text-center">
+      <div className="bg-slop-orange/20 border-2 border-dashed border-border px-4 py-2 text-xs font-mono font-bold text-foreground text-center">
         Review your project. Click any highlighted area to edit.
       </div>
 
       {/* Project preview - mirrors ProjectDetails structure */}
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4">
+      <div className="border-2 border-border bg-card p-4">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Media section */}
             <div className="md:w-[420px] flex-shrink-0">
-              <div className="border-2 border-[color:var(--foreground)] bg-bg-secondary">
+              <div className="border-2 border-border bg-background">
                 <img
                   src={imageUrl}
                   alt={title || "Project screenshot"}
@@ -160,7 +159,7 @@ export function EditableProjectPreview({
                 maxLength={255}
                 required
                 as="h1"
-                className="text-2xl text-slop-blue"
+                className="text-2xl font-mono font-black text-foreground"
               />
 
               <InlineEditText
@@ -169,17 +168,17 @@ export function EditableProjectPreview({
                 placeholder="One-sentence description"
                 maxLength={500}
                 required
-                className="text-sm text-muted font-normal"
+                className="text-sm text-muted-foreground font-normal"
                 as="p"
               />
 
               {/* Author info (read-only) */}
-              <div className="border-2 border-[color:var(--border)] bg-bg-secondary p-2 text-xs flex flex-wrap gap-3">
-                <span className="flex items-center gap-2 font-bold text-slop-purple">
+              <div className="border-2 border-border bg-muted p-2 text-xs flex flex-wrap gap-3">
+                <span className="flex items-center gap-2 font-mono font-bold text-foreground">
                   <Avatar src={userImage} alt={userName} size="sm" />
                   {userName}
                 </span>
-                <span className="text-muted">Submitted just now</span>
+                <span className="text-muted-foreground font-mono">Submitted just now</span>
               </div>
 
               {/* Links */}
@@ -213,33 +212,29 @@ export function EditableProjectPreview({
                   </a>
                 )}
                 {!mainUrl && !repoUrl && (
-                  <span className="text-xs text-muted">Add a URL below</span>
+                  <span className="text-xs text-muted-foreground font-mono">Add a URL below</span>
                 )}
               </div>
             </div>
           </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
         <div className="space-y-6">
           {/* Description section */}
-          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-            <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-              <h3 className="text-sm font-bold text-slop-purple">~~ ABOUT THIS SLOP ~~</h3>
+          <div className="border-2 border-border bg-card p-4 space-y-3">
+              <h3 className="font-mono text-sm font-bold text-foreground">About this slop</h3>
               <InlineEditTextarea
                 value={description}
                 onSave={handleDescriptionSave}
                 placeholder="Add a description..."
                 maxLength={10000}
               />
-            </div>
           </div>
 
           {/* Tools section */}
-          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-            <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-              <h3 className="text-sm font-bold text-slop-purple">~~ BUILT WITH ~~</h3>
+          <div className="border-2 border-border bg-card p-4 space-y-3">
+              <h3 className="font-mono text-sm font-bold text-foreground">Built with</h3>
               {tools.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {tools.map((tool) => (
@@ -249,18 +244,16 @@ export function EditableProjectPreview({
                   ))}
                 </div>
               ) : (
-                <span className="text-xs text-muted">Add technologies...</span>
+                <span className="text-xs text-muted-foreground">Add technologies...</span>
               )}
               <TagEditor selected={tools} onChange={handleToolsChange} />
-            </div>
           </div>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-4">
-          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-            <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-              <h4 className="text-xs font-bold text-slop-purple text-center">~~ VIBE SCORE ~~</h4>
+          <div className="border-2 border-border bg-card p-4 space-y-3">
+              <h4 className="font-mono text-xs font-bold text-foreground text-center">Vibe Score</h4>
               <VibeMeter percent={vibePercent} showLabel />
               <VibeInput
                 mode={vibeMode}
@@ -270,39 +263,35 @@ export function EditableProjectPreview({
                 vibeDetails={vibeDetails}
                 onVibeDetailsChange={setVibeDetails}
               />
-            </div>
           </div>
 
-          <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-            <div className="bg-bg border-2 border-[color:var(--border)] p-4">
-              <h4 className="text-xs font-bold text-slop-purple text-center">~~ REVIEWS & LIKES ~~</h4>
-              <div className="space-y-2 text-xs mt-3">
+          <div className="border-2 border-border bg-card p-4">
+              <h4 className="font-mono text-xs font-bold text-foreground text-center">Reviews & Likes</h4>
+              <div className="space-y-2 text-xs mt-3 text-muted-foreground">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-fg">Slop score</span>
-                  <span className="text-muted">—</span>
+                  <span className="font-bold text-foreground">Slop score</span>
+                  <span>—</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-fg">Reviews</span>
-                  <span className="text-muted">0</span>
+                  <span className="font-bold text-foreground">Reviews</span>
+                  <span>0</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-fg">Likes</span>
-                  <span className="text-muted">0</span>
+                  <span className="font-bold text-foreground">Likes</span>
+                  <span>0</span>
                 </div>
               </div>
-              <p className="text-[10px] text-muted mt-3">
+              <p className="text-[10px] text-muted-foreground mt-3">
                 Reviews and likes appear after submission
               </p>
-            </div>
           </div>
         </div>
       </div>
 
       {/* URL editors */}
-      <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-1">
-        <div className="bg-bg border-2 border-[color:var(--border)] p-4 space-y-3">
-          <h3 className="text-sm font-bold text-slop-purple">~~ PROJECT LINKS ~~</h3>
-          <p className="text-[10px] text-muted">At least one URL is required</p>
+      <div className="border-2 border-border bg-card p-4 space-y-3">
+          <h3 className="font-mono text-sm font-bold text-foreground">Project Links</h3>
+          <p className="text-[10px] text-muted-foreground">At least one URL is required</p>
           <div className="space-y-3">
             <Input
               label="Live URL"
@@ -321,13 +310,12 @@ export function EditableProjectPreview({
               placeholder="https://github.com/user/repo"
             />
           </div>
-        </div>
       </div>
 
       {/* Error display */}
       {error && (
-        <div className="border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] p-4 text-center">
-          <p className="text-xs text-danger">{error}</p>
+        <div className="border-2 border-destructive bg-card p-4 text-center">
+          <p className="text-xs text-destructive">{error}</p>
         </div>
       )}
 

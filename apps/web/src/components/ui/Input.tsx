@@ -16,7 +16,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-2">
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-fg">
+          <label htmlFor={inputId} className="text-sm font-medium text-foreground">
             {label}
           </label>
         )}
@@ -24,20 +24,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "px-3 py-2 rounded-sm",
-            "bg-bg-secondary text-fg text-sm",
-            "border-2 border-[color:var(--border)]",
-            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
+            "px-3 py-2 rounded-none font-mono",
+            "bg-background text-foreground text-sm",
+            "border-2 border-border",
             "transition-colors duration-200",
-            "placeholder:text-muted",
-            "focus:outline-none focus:border-accent",
-            error && "border-danger",
+            "placeholder:text-muted-foreground",
+            "focus:outline-none focus:border-primary",
+            error && "border-destructive",
             className
           )}
           {...props}
         />
-        {error && <p className="text-xs text-danger">{error}</p>}
-        {helperText && !error && <p className="text-xs text-muted">{helperText}</p>}
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        {helperText && !error && <p className="text-xs text-muted-foreground">{helperText}</p>}
       </div>
     );
   }
@@ -58,7 +57,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="flex flex-col gap-2">
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-fg">
+          <label htmlFor={inputId} className="text-sm font-medium text-foreground">
             {label}
           </label>
         )}
@@ -66,20 +65,19 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "px-3 py-2 rounded-sm min-h-[100px] resize-y",
-            "bg-bg-secondary text-fg text-sm",
-            "border-2 border-[color:var(--border)]",
-            "shadow-[inset_1px_1px_0_var(--background-secondary),inset_-1px_-1px_0_var(--border)]",
+            "px-3 py-2 rounded-none min-h-[100px] resize-y font-mono",
+            "bg-background text-foreground text-sm",
+            "border-2 border-border",
             "transition-colors duration-200",
-            "placeholder:text-muted",
-            "focus:outline-none focus:border-accent",
-            error && "border-danger",
+            "placeholder:text-muted-foreground",
+            "focus:outline-none focus:border-primary",
+            error && "border-destructive",
             className
           )}
           {...props}
         />
-        {error && <p className="text-xs text-danger">{error}</p>}
-        {helperText && !error && <p className="text-xs text-muted">{helperText}</p>}
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        {helperText && !error && <p className="text-xs text-muted-foreground">{helperText}</p>}
       </div>
     );
   }

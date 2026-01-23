@@ -58,11 +58,11 @@ export function AuthButtons() {
         </Button>
 
         {isDropdownOpen && (
-          <div className="absolute top-[calc(100%+0.5rem)] right-0 min-w-[180px] border-2 border-[color:var(--border)] bg-bg-secondary shadow-[2px_2px_0_var(--foreground)] z-[1000]">
-            <div className="bg-bg border-2 border-[color:var(--border)]">
+          <div className="absolute top-[calc(100%+0.5rem)] right-0 min-w-[180px] border-2 border-dashed border-border bg-card z-[1000]">
+            <div className="flex flex-col">
               <Link
                 href="/favorites"
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg no-underline hover:bg-warning/20"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground no-underline transition-colors hover:bg-muted hover:text-primary"
                 onClick={() => setIsDropdownOpen(false)}
               >
                 <HeartIcon />
@@ -70,7 +70,7 @@ export function AuthButtons() {
               </Link>
               <Link
                 href="/settings"
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg no-underline hover:bg-warning/20"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground no-underline transition-colors hover:bg-muted hover:text-primary"
                 onClick={() => setIsDropdownOpen(false)}
               >
                 <SettingsIcon />
@@ -79,7 +79,7 @@ export function AuthButtons() {
               {showAdminLink && (
                 <Link
                   href="/admin"
-                  className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg no-underline hover:bg-warning/20"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground no-underline transition-colors hover:bg-muted hover:text-primary"
                   onClick={() => setIsDropdownOpen(false)}
                 >
                   <ShieldIcon />
@@ -88,7 +88,7 @@ export function AuthButtons() {
               )}
               <div className="h-px bg-border" />
               <button
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-bold text-fg bg-transparent border-none cursor-pointer hover:bg-warning/20 text-left"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground bg-transparent border-none cursor-pointer text-left transition-colors hover:bg-muted hover:text-primary"
                 onClick={() => {
                   setIsDropdownOpen(false);
                   signOut();

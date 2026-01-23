@@ -38,7 +38,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       {/* Overlay */}
       <div
         className={cn(
-          "fixed inset-0 bg-fg/50 z-[100]",
+          "fixed inset-0 bg-foreground/50 z-[100]",
           "transition-opacity duration-200",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
@@ -50,7 +50,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       <nav
         className={cn(
           "fixed top-0 right-0 bottom-0 w-[280px] max-w-full",
-          "bg-bg-secondary border-l-2 border-[color:var(--border)] z-[101]",
+          "bg-card border-l-2 border-border z-[101]",
           "flex flex-col",
           "transform transition-transform duration-200 ease-out",
           isOpen ? "translate-x-0" : "translate-x-full"
@@ -58,16 +58,15 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
         aria-label="Mobile navigation"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b-2 border-[color:var(--border)]">
-          <span className="text-lg font-bold text-accent">slop.haus</span>
+        <div className="flex items-center justify-between p-4 border-b-2 border-dashed border-border">
+          <span className="font-mono text-lg font-bold text-foreground">slop.haus</span>
           <button
             onClick={onClose}
             className={cn(
               "flex items-center justify-center w-8 h-8",
-              "border-2 border-[color:var(--border)]",
-              "bg-bg-secondary text-fg",
-              "shadow-[2px_2px_0_var(--foreground)]",
-              "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              "border-2 border-dashed border-border",
+              "bg-muted text-foreground",
+              "active:translate-x-[1px] active:translate-y-[1px]"
             )}
             aria-label="Close navigation"
           >
@@ -106,12 +105,12 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
         </div>
 
         {/* Auth section */}
-        <div className="p-4 border-t border-border flex flex-col gap-3">
+        <div className="p-4 border-t-2 border-dashed border-border flex flex-col gap-3">
           {isPending ? (
-            <span className="text-muted text-sm">Loading...</span>
+            <span className="text-muted-foreground text-sm">Loading...</span>
           ) : session?.user ? (
             <>
-              <span className="text-sm text-muted truncate">{session.user.name}</span>
+              <span className="text-sm text-muted-foreground truncate">{session.user.name}</span>
               <Button variant="secondary" onClick={() => signOut()} className="w-full">
                 Sign Out
               </Button>
@@ -153,13 +152,12 @@ function MobileNavLink({
     <Link
       href={href}
       className={cn(
-        "block px-4 py-2 text-sm font-bold transition-colors",
-        "border-2 border-[color:var(--border)]",
-        "bg-bg-secondary shadow-[2px_2px_0_var(--foreground)]",
+        "block px-4 py-2 font-mono text-sm uppercase tracking-wide transition-colors",
+        "border-2 border-border bg-card",
         "no-underline hover:no-underline",
         active
-          ? "bg-accent text-accent-foreground translate-x-[1px] translate-y-[1px] shadow-none"
-          : "text-fg hover:bg-bg"
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:text-primary"
       )}
     >
       {children}

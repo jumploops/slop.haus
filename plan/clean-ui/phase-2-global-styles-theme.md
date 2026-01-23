@@ -1,6 +1,6 @@
 # Phase 2: Global Styles + Theme Simplification
 
-**Status:** Pending
+**Status:** Completed (2026-01-22)
 
 ## Goals
 
@@ -50,7 +50,12 @@ ThemeProvider target:
 
 ## Verification Checklist
 
-- [ ] App loads with clean-ui tokens (`bg-background`, `text-foreground`).
-- [ ] System theme toggling works (no hydration mismatch).
-- [ ] Fonts render as Geist / Geist Mono.
-- [ ] No references to `bg-bg` / `text-fg` remain in layout styles.
+- [x] App loads with clean-ui tokens (`bg-background`, `text-foreground`).
+- [x] System theme toggling works (no hydration mismatch).
+- [x] Fonts render as Geist / Geist Mono.
+- [x] No references to `bg-bg` / `text-fg` remain in layout styles.
+
+## Implementation Notes
+
+- Add temporary legacy token aliases in `apps/web/src/app/globals.css` so existing `bg-bg`/`text-fg` classes keep working during migration.
+- Carry forward legacy slop palette variables (`slop-blue`, `slop-purple`, etc.) until Phase 5 cleanup.

@@ -1,6 +1,6 @@
 # Phase 4: Page-Level Reskins
 
-**Status:** Pending
+**Status:** In Progress
 
 ## Goals
 
@@ -29,6 +29,13 @@
 5. Favorites + My Projects.
    - Update listing layout to use clean-ui card patterns.
 
+6. Edit project flow.
+   - Reskin edit page loading/error states.
+   - Align EditableProject, revision banner, and screenshot editor with clean-ui tokens.
+
+7. Theme gallery page.
+   - Use style guide for header + cards.
+
 ## Files to Change (Expected)
 
 - `apps/web/src/app/page.tsx`
@@ -40,6 +47,12 @@
 - `apps/web/src/app/admin/*`
 - `apps/web/src/app/favorites/*`
 - `apps/web/src/app/my/*`
+- `apps/web/src/app/p/[slug]/edit/page.tsx`
+- `apps/web/src/components/project/EditableProject.tsx`
+- `apps/web/src/components/project/RevisionStatusBanner.tsx`
+- `apps/web/src/components/project/ScreenshotEditor.tsx`
+- `apps/web/src/components/project/UrlChangeModal.tsx`
+- `apps/web/src/app/theme-gallery/page.tsx`
 
 ## Reference Files
 
@@ -51,8 +64,18 @@
 
 ## Verification Checklist
 
-- [ ] Feed page matches clean-ui layout and spacing.
-- [ ] Project detail page aligns with clean-ui review UI.
-- [ ] Form pages (submit/settings) follow style guide.
-- [ ] Admin + favorites pages are consistent with new tokens.
-- [ ] No legacy `bg-bg` / `text-fg` tokens remain on pages.
+- [x] Feed page matches clean-ui layout and spacing.
+- [x] Project detail page aligns with clean-ui review UI.
+- [x] Form pages (submit/settings) follow style guide.
+- [x] Admin + favorites pages are consistent with new tokens.
+- [x] Edit project flow uses clean-ui card styles.
+- [x] No legacy `bg-bg` / `text-fg` tokens remain on pages.
+
+## Implementation Notes
+
+- Feed page now includes clean-ui hero + date header + updated controls.
+- Project detail layout, review thread, and review form are reskinned to clean-ui styles.
+- Submit flow (URL, manual, draft review) and settings pages are now aligned to clean-ui tokens and typography.
+- Admin, favorites, my projects, and auth gates are aligned to clean-ui card styles.
+- Edit project flow components now match clean-ui card structure and typography.
+- Theme gallery header and cards updated to clean-ui layout.

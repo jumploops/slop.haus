@@ -25,7 +25,7 @@ export function LoginModal() {
   return (
     <Modal isOpen={isOpen} onClose={closeLoginModal} title="Sign In">
       <div className="py-4">
-        <p className="text-muted mb-6 text-center">
+        <p className="text-muted-foreground mb-6 text-center">
           Sign in to submit projects, like, review, and save your favorites.
         </p>
 
@@ -49,7 +49,7 @@ export function LoginModal() {
           </Button>
         </div>
 
-        <p className="text-xs text-muted text-center mt-6">
+        <p className="text-xs text-muted-foreground text-center mt-6">
           GitHub is required to submit projects. You can link additional
           accounts later in settings.
         </p>
