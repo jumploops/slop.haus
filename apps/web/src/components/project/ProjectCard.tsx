@@ -65,7 +65,7 @@ export function ProjectCard({
           className="absolute inset-0 z-0"
         />
         {rank && (
-          <div className="absolute -left-2 -top-2 z-50 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
+          <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
             {rank}
           </div>
         )}
@@ -183,7 +183,7 @@ export function ProjectCard({
         className="absolute inset-0 z-0"
       />
       {rank && (
-        <div className="absolute -left-2 -top-2 z-50 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
+        <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
           {rank}
         </div>
       )}

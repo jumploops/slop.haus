@@ -127,7 +127,7 @@ export default function FeedPage() {
                 "justify-self-center"
               )}
             >
-              Submit your slop
+              Submit slop
             </Link>
           </div>
         </div>
@@ -242,7 +242,7 @@ export default function FeedPage() {
           <div
             className={cn(
               displayMode === "grid"
-                ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 : displayMode === "list-lg"
                 ? "space-y-4"
                 : "space-y-3"
