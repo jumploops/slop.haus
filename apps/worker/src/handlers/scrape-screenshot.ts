@@ -60,7 +60,7 @@ export async function handleScrapeScreenshot(payload: unknown): Promise<void> {
         if (imageResponse.ok) {
           const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
           const storage = getStorage();
-          const key = generateStorageKey("draft-screenshots", "png");
+          const key = generateStorageKey("screenshots", "png");
           screenshotUrl = await storage.upload(key, imageBuffer, "image/png");
           console.log(`Screenshot saved for draft ${draftId}: ${screenshotUrl}`);
         }

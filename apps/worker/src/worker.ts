@@ -1,6 +1,6 @@
 import { db } from "@slop/db";
 import { jobs } from "@slop/db/schema";
-import { eq, and, lte, sql, isNull, or } from "drizzle-orm";
+import { eq, and, lte, asc } from "drizzle-orm";
 
 export type JobHandler = (payload: unknown) => Promise<void>;
 
@@ -14,22 +14,36 @@ export function registerHandler(type: string, handler: JobHandler) {
 async function claimJob() {
   const now = new Date();
 
-  // Find and claim a job in one transaction
-  const [claimed] = await db
-    .update(jobs)
-    .set({
-      status: "processing",
-      startedAt: now,
-    })
-    .where(
-      and(
-        eq(jobs.status, "pending"),
-        lte(jobs.runAt, now)
+  // Find and claim exactly one job in a transaction
+  return await db.transaction(async (tx) => {
+    const [candidate] = await tx
+      .select()
+      .from(jobs)
+      .where(
+        and(
+          eq(jobs.status, "pending"),
+          lte(jobs.runAt, now)
+        )
       )
-    )
-    .returning();
+      .orderBy(asc(jobs.runAt))
+      .limit(1)
+      .for("update", { skipLocked: true });
 
-  return claimed || null;
+    if (!candidate) {
+      return null;
+    }
+
+    const [claimed] = await tx
+      .update(jobs)
+      .set({
+        status: "processing",
+        startedAt: now,
+      })
+      .where(eq(jobs.id, candidate.id))
+      .returning();
+
+    return claimed || null;
+  });
 }
 
 // Process a single job

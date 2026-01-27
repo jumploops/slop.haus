@@ -9,6 +9,7 @@ import {
   moderationEvents,
 } from "@slop/db/schema";
 import { eq, and, or, desc, sql, inArray } from "drizzle-orm";
+import { computeHotScoreExpr } from "../lib/hotScore";
 import { requireAdmin, requireMod } from "../middleware/auth";
 
 const adminRoutes = new Hono();
@@ -336,7 +337,9 @@ adminRoutes.post("/comments/:id/approve", requireMod(), async (c) => {
       if (isReview) {
         updates.reviewCount = sql`${projects.reviewCount} + 1`;
         updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} + ${comment.reviewScore}`;
-        updates.slopScore = sql`CASE WHEN (${projects.reviewCount} + 1) = 0 THEN 0 ELSE ((${projects.reviewScoreTotal} + ${comment.reviewScore})::numeric / (${projects.reviewCount} + 1)) END`;
+        const newSlopScore = sql`CASE WHEN (${projects.reviewCount} + 1) = 0 THEN 0 ELSE ((${projects.reviewScoreTotal} + ${comment.reviewScore})::numeric / (${projects.reviewCount} + 1)) END`;
+        updates.slopScore = newSlopScore;
+        updates.hotScore = computeHotScoreExpr(newSlopScore);
       }
 
       await tx.update(projects).set(updates).where(eq(projects.id, comment.projectId));
@@ -382,7 +385,9 @@ adminRoutes.post("/comments/:id/remove", requireMod(), async (c) => {
       if (isReview) {
         updates.reviewCount = sql`${projects.reviewCount} - 1`;
         updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} - ${comment.reviewScore}`;
-        updates.slopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${comment.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+        const newSlopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${comment.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+        updates.slopScore = newSlopScore;
+        updates.hotScore = computeHotScoreExpr(newSlopScore);
       }
 
       await tx.update(projects).set(updates).where(eq(projects.id, comment.projectId));

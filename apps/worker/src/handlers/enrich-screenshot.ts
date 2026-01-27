@@ -63,7 +63,7 @@ export async function handleEnrichScreenshot(payload: unknown): Promise<void> {
 
   // Upload to storage
   const storage = getStorage();
-  const key = generateStorageKey(`screenshots/${project.slug}`, "png");
+  const key = generateStorageKey("screenshots", "png");
   const url = await storage.upload(key, screenshotBuffer, "image/png");
 
   // Check if project already has a primary screenshot from firecrawl

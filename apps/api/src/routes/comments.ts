@@ -5,6 +5,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { requireAuth } from "../middleware/auth";
 import { commentVoteSchema, updateCommentSchema } from "@slop/shared";
 import { checkRateLimit, COMMENT_VOTE_RATE_LIMITS } from "../lib/rateLimit";
+import { computeHotScoreExpr } from "../lib/hotScore";
 
 const commentRoutes = new Hono();
 
@@ -88,7 +89,9 @@ commentRoutes.delete("/:id", requireAuth(), async (c) => {
       if (isReview) {
         updates.reviewCount = sql`${projects.reviewCount} - 1`;
         updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} - ${existing.reviewScore}`;
-        updates.slopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${existing.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+        const newSlopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${existing.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+        updates.slopScore = newSlopScore;
+        updates.hotScore = computeHotScoreExpr(newSlopScore);
       }
 
       await tx.update(projects).set(updates).where(eq(projects.id, existing.projectId));
@@ -120,7 +123,7 @@ commentRoutes.post("/:id/vote", requireAuth(), async (c) => {
     return c.json({ error: "Comment not found" }, 404);
   }
 
-  const userLimit = checkRateLimit(
+  const userLimit = await checkRateLimit(
     `comment-vote:user:${session.user.id}`,
     COMMENT_VOTE_RATE_LIMITS.perUser
   );
@@ -135,7 +138,7 @@ commentRoutes.post("/:id/vote", requireAuth(), async (c) => {
     );
   }
 
-  const commentUserLimit = checkRateLimit(
+  const commentUserLimit = await checkRateLimit(
     `comment-vote:comment:${id}:${session.user.id}`,
     COMMENT_VOTE_RATE_LIMITS.perCommentUser
   );

@@ -8,6 +8,7 @@
     "start": "dotenv -e ../../.env -- node dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.500.0",
     "@hono/node-server": "^1.13.7",
     "better-auth": "^1.2.3",
     "drizzle-orm": "^0.41.0",

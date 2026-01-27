@@ -4,6 +4,7 @@ import { comments, projects, user } from "@slop/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { requireAuth } from "../middleware/auth";
 import { createCommentSchema } from "@slop/shared";
+import { computeHotScoreExpr } from "../lib/hotScore";
 
 const MAX_DEPTH = 10;
 
@@ -125,7 +126,9 @@ projectCommentRoutes.post("/:slug/comments", requireAuth(), async (c) => {
     if (!parentCommentId && reviewScore !== undefined) {
       updates.reviewCount = sql`${projects.reviewCount} + 1`;
       updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} + ${reviewScore}`;
-      updates.slopScore = sql`CASE WHEN (${projects.reviewCount} + 1) = 0 THEN 0 ELSE ((${projects.reviewScoreTotal} + ${reviewScore})::numeric / (${projects.reviewCount} + 1)) END`;
+      const newSlopScore = sql`CASE WHEN (${projects.reviewCount} + 1) = 0 THEN 0 ELSE ((${projects.reviewScoreTotal} + ${reviewScore})::numeric / (${projects.reviewCount} + 1)) END`;
+      updates.slopScore = newSlopScore;
+      updates.hotScore = computeHotScoreExpr(newSlopScore);
     }
 
     await tx.update(projects).set(updates).where(eq(projects.id, project.id));

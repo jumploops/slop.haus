@@ -63,6 +63,9 @@ export const projects = pgTable(
     slopScore: numeric("slop_score", { precision: 4, scale: 2 })
       .default("0")
       .notNull(),
+    hotScore: numeric("hot_score", { precision: 10, scale: 4 })
+      .default("0")
+      .notNull(),
     commentCount: integer("comment_count").default(0).notNull(),
     status: projectStatusEnum("status").default("published").notNull(),
     enrichmentStatus: enrichmentStatusEnum("enrichment_status")
@@ -76,6 +79,7 @@ export const projects = pgTable(
     index("projects_author_user_id_idx").on(table.authorUserId),
     index("projects_status_idx").on(table.status),
     index("projects_created_at_idx").on(table.createdAt),
+    index("projects_hot_score_idx").on(table.hotScore),
   ]
 );
 

@@ -1,32 +1,18 @@
 /**
- * Simple in-memory rate limiter for MVP
- * Replace with Redis-based solution for production
+ * Postgres-backed rate limiter (simple fixed-window counters)
+ * Switch to Redis if write throughput becomes an issue.
  */
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
+import { db } from "@slop/db";
+import { rateLimits } from "@slop/db/schema";
+import { sql, lt } from "drizzle-orm";
 
-// Map of key -> rate limit entry
-const rateLimitStore = new Map<string, RateLimitEntry>();
-
-// Clean up expired entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of rateLimitStore.entries()) {
-    if (entry.resetAt < now) {
-      rateLimitStore.delete(key);
-    }
-  }
-}, 60 * 1000); // Clean every minute
-
-interface RateLimitOptions {
+export interface RateLimitOptions {
   windowMs: number; // Time window in milliseconds
   maxRequests: number; // Max requests per window
 }
 
-interface RateLimitResult {
+export interface RateLimitResult {
   allowed: boolean;
   remaining: number;
   resetAt: number;
@@ -35,42 +21,45 @@ interface RateLimitResult {
 /**
  * Check if a request is allowed under the rate limit
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   key: string,
   options: RateLimitOptions
-): RateLimitResult {
-  const now = Date.now();
-  const entry = rateLimitStore.get(key);
+): Promise<RateLimitResult> {
+  const nowMs = Date.now();
+  const windowStartMs = Math.floor(nowMs / options.windowMs) * options.windowMs;
+  const windowStart = new Date(windowStartMs);
+  const windowEndMs = windowStartMs + options.windowMs;
 
-  // No existing entry or expired
-  if (!entry || entry.resetAt < now) {
-    const newEntry: RateLimitEntry = {
+  // Best-effort cleanup of old windows (1% chance)
+  if (Math.random() < 0.01) {
+    const cutoff = new Date(nowMs - 2 * 24 * 60 * 60 * 1000);
+    await db.delete(rateLimits).where(lt(rateLimits.windowStart, cutoff));
+  }
+
+  const [row] = await db
+    .insert(rateLimits)
+    .values({
+      key,
+      windowStart,
       count: 1,
-      resetAt: now + options.windowMs,
-    };
-    rateLimitStore.set(key, newEntry);
-    return {
-      allowed: true,
-      remaining: options.maxRequests - 1,
-      resetAt: newEntry.resetAt,
-    };
-  }
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [rateLimits.key, rateLimits.windowStart],
+      set: {
+        count: sql`${rateLimits.count} + 1`,
+        updatedAt: new Date(),
+      },
+    })
+    .returning({ count: rateLimits.count });
 
-  // Check if under limit
-  if (entry.count < options.maxRequests) {
-    entry.count++;
-    return {
-      allowed: true,
-      remaining: options.maxRequests - entry.count,
-      resetAt: entry.resetAt,
-    };
-  }
+  const count = row?.count ?? 1;
+  const remaining = Math.max(0, options.maxRequests - count);
 
-  // Rate limited
   return {
-    allowed: false,
-    remaining: 0,
-    resetAt: entry.resetAt,
+    allowed: count <= options.maxRequests,
+    remaining,
+    resetAt: windowEndMs,
   };
 }
 
@@ -99,5 +88,14 @@ export const COMMENT_VOTE_RATE_LIMITS = {
   perCommentUser: {
     windowMs: 60 * 60 * 1000,
     maxRequests: 20,
+  },
+};
+
+// Preset rate limiters for draft analysis
+export const DRAFT_ANALYSIS_RATE_LIMITS = {
+  // Max 5 analyses per hour per user
+  perUser: {
+    windowMs: 60 * 60 * 1000,
+    maxRequests: 5,
   },
 };
