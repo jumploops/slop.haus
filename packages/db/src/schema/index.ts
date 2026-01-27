@@ -7,3 +7,4 @@ export * from "./jobs";
 export * from "./favorites";
 export * from "./enrichment-drafts";
 export * from "./rate-limits";
+export * from "./locks";

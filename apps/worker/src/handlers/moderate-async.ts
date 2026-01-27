@@ -10,6 +10,7 @@ import {
   MODERATION_LABELS,
   CONFIDENCE_LEVELS,
 } from "@slop/shared";
+import { fetchWithTimeout, HttpError } from "../lib/firecrawl";
 
 export interface ModerateAsyncPayload {
   projectId: string;
@@ -109,7 +110,7 @@ async function moderateText(content: string): Promise<ModerationResult> {
   }
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,17 +122,16 @@ async function moderateText(content: string): Promise<ModerationResult> {
         max_tokens: 512,
         messages: [{ role: "user", content: buildModerationPrompt(content) }],
       }),
-    });
+    }, 30000);
 
     if (!response.ok) {
-      console.error("Moderation API error:", await response.text());
-      return {
-        approved: true,
-        decision: "approved",
-        labels: [],
-        highestConfidence: "none",
-        reason: "API error - failing open",
-      };
+      const errorText = await response.text();
+      console.error("Moderation API error:", errorText);
+      const error = new HttpError(
+        response.status,
+        `Moderation API error: ${response.status} ${errorText}`
+      );
+      throw error;
     }
 
     const result = await response.json();
@@ -147,7 +147,7 @@ async function moderateText(content: string): Promise<ModerationResult> {
       decision: "approved",
       labels: [],
       highestConfidence: "none",
-      reason: "Parse error - failing open",
+      reason: "API error - failing open",
     };
   }
 }

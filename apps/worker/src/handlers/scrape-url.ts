@@ -1,7 +1,7 @@
 import { db } from "@slop/db";
 import { enrichmentDrafts, jobs } from "@slop/db/schema";
 import { eq } from "drizzle-orm";
-import { scrape } from "../lib/firecrawl";
+import { scrape, fetchWithTimeout, isRetryableError } from "../lib/firecrawl";
 import { getScrapeConfig } from "../lib/scrape-configs";
 import { getStorage, generateStorageKey } from "../lib/storage";
 import type { UrlType } from "@slop/shared";
@@ -66,13 +66,11 @@ export async function handleScrapeUrl(payload: unknown): Promise<void> {
       try {
         // Firecrawl v2 returns URL, not base64
         // Add 30s timeout to prevent hanging on slow/unresponsive URLs
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000);
-
-        const imageResponse = await fetch(result.data.screenshot, {
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
+        const imageResponse = await fetchWithTimeout(
+          result.data.screenshot,
+          {},
+          30000
+        );
 
         if (imageResponse.ok) {
           const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
@@ -123,11 +121,7 @@ export async function handleScrapeUrl(payload: unknown): Promise<void> {
     const lowerMessage = errorMessage.toLowerCase();
 
     // Determine if error is retryable
-    const isRetryable =
-      lowerMessage.includes("timeout") ||
-      lowerMessage.includes("network") ||
-      lowerMessage.includes("econnreset") ||
-      lowerMessage.includes("econnrefused") ||
+    const isRetryable = isRetryableError(error) ||
       lowerMessage.includes("rate limit") ||
       lowerMessage.includes("429") ||
       lowerMessage.includes("503") ||
@@ -142,6 +136,12 @@ export async function handleScrapeUrl(payload: unknown): Promise<void> {
       lowerMessage.includes("404") ||
       lowerMessage.includes("invalid url");
 
+    // Only re-throw for retryable errors; keep status in scraping for retries
+    if (isRetryable && !isPermanent) {
+      throw error;
+    }
+
+    // Permanent failure: mark as failed
     await db
       .update(enrichmentDrafts)
       .set({
@@ -151,12 +151,6 @@ export async function handleScrapeUrl(payload: unknown): Promise<void> {
       })
       .where(eq(enrichmentDrafts.id, draftId));
 
-    // Only re-throw for retryable errors
-    if (isRetryable && !isPermanent) {
-      throw error;
-    }
-
-    // Log permanent failures without retrying
     console.log(`Permanent scrape failure for draft ${draftId}: ${errorMessage}`);
   }
 }

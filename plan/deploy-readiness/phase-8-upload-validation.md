@@ -1,6 +1,6 @@
 # Phase 8 — Upload Validation Hardening
 
-**Status:** planned
+**Status:** completed
 **Priority:** P1
 
 ## Problem
@@ -20,8 +20,7 @@ Screenshot upload validates only client-provided MIME type, which can be spoofed
 - Potentially shared validation helper in `packages/shared`
 
 ## Implementation Notes
-- Prefer existing dependencies if available; only add new ones if necessary.
-- If adding a dependency, document it in the plan before coding.
+- Implemented minimal magic-byte detection (PNG/JPEG/WebP) without new dependencies.
 
 ## Verification Checklist
 - [ ] Non-image files are rejected even with spoofed MIME types.

@@ -31,9 +31,9 @@ Resolve deploy-readiness issues identified in `review/deploy-readiness/*` with a
 | 4 | Sitemap endpoint + Next Image hosts | P1 | completed |
 | 5 | Draft SSE scaling improvements | P1 | completed |
 | 6 | Hot sort persistence & DB ordering | P1 | completed |
-| 7 | External API timeouts & retry policy | P1 | planned |
-| 8 | Upload validation hardening | P1 | planned |
-| 9 | Single-instance scheduled cleanup | P1 | planned |
+| 7 | External API timeouts & retry policy | P1 | completed |
+| 8 | Upload validation hardening | P1 | completed |
+| 9 | Single-instance scheduled cleanup | P1 | completed |
 
 ## Dependencies / Ordering
 1) Phase 1 before scaling worker or queue throughput.

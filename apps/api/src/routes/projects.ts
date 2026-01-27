@@ -20,6 +20,7 @@ import {
 import { slugify, generateUniqueSlug } from "@slop/shared";
 import { moderateProject } from "../lib/moderation";
 import { getStorage, generateStorageKey } from "../lib/storage";
+import { detectImageType, getImageExtension } from "../lib/uploads";
 
 const projectRoutes = new Hono();
 
@@ -696,25 +697,18 @@ projectRoutes.post("/:slug/screenshot", requireAuth(), async (c) => {
     return c.json({ error: "File too large (max 5MB)" }, 400);
   }
 
-  // Validate file type
-  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const detectedType = detectImageType(buffer);
+  if (!detectedType) {
     return c.json({ error: "Invalid file type. Allowed: PNG, JPEG, WebP" }, 400);
   }
 
-  // Get file extension from mime type
-  const extensions: Record<string, string> = {
-    "image/png": "png",
-    "image/jpeg": "jpg",
-    "image/webp": "webp",
-  };
-  const ext = extensions[file.type] || "png";
+  const ext = getImageExtension(detectedType);
 
   // Upload to storage
-  const buffer = Buffer.from(await file.arrayBuffer());
   const storage = getStorage();
   const key = generateStorageKey("screenshots", ext);
-  const url = await storage.upload(key, buffer, file.type);
+  const url = await storage.upload(key, buffer, detectedType);
 
   // Update projectMedia - set old screenshots as not primary
   await db

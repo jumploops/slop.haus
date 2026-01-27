@@ -1,7 +1,7 @@
 import { db } from "@slop/db";
 import { projects, projectMedia, jobs } from "@slop/db/schema";
 import { eq } from "drizzle-orm";
-import { scrape } from "../lib/firecrawl";
+import { scrape, fetchWithTimeout } from "../lib/firecrawl";
 import { getStorage, generateStorageKey } from "../lib/storage";
 
 export interface EnrichScreenshotPayload {
@@ -54,7 +54,7 @@ export async function handleEnrichScreenshot(payload: unknown): Promise<void> {
   console.log(`Firecrawl returned screenshot URL: ${screenshotUrl}`);
 
   // Fetch the screenshot image from the URL
-  const imageResponse = await fetch(screenshotUrl);
+  const imageResponse = await fetchWithTimeout(screenshotUrl, {}, 30000);
   if (!imageResponse.ok) {
     throw new Error(`Failed to fetch screenshot image: ${imageResponse.status}`);
   }

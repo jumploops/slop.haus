@@ -1,6 +1,6 @@
 # Phase 9 — Single-Instance Scheduled Cleanup
 
-**Status:** planned
+**Status:** completed
 **Priority:** P1
 
 ## Problem
@@ -10,8 +10,7 @@
 - Ensure scheduled cleanup runs once per interval across the fleet.
 
 ## Proposed Approach
-- Move cleanup to a dedicated scheduled job (cron/queue).
-- Alternatively, implement leader election (Redis lock) for the interval.
+- Implement a Postgres-backed lock with TTL to ensure only one worker runs cleanup.
 
 ## Files to Change
 - `apps/worker/src/index.ts`
