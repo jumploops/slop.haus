@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { db } from "@slop/db";
 import { flags, projects, comments } from "@slop/db/schema";
 import { eq, and, sql } from "drizzle-orm";
+import { computeHotScoreExpr } from "../lib/hotScore";
 import { requireAuth } from "../middleware/auth";
 
 const flagRoutes = new Hono();
@@ -125,7 +126,9 @@ flagRoutes.post("/", requireAuth(), async (c) => {
           if (isReview) {
             updates.reviewCount = sql`${projects.reviewCount} - 1`;
             updates.reviewScoreTotal = sql`${projects.reviewScoreTotal} - ${targetComment.reviewScore}`;
-            updates.slopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${targetComment.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+            const newSlopScore = sql`CASE WHEN (${projects.reviewCount} - 1) <= 0 THEN 0 ELSE ((${projects.reviewScoreTotal} - ${targetComment.reviewScore})::numeric / (${projects.reviewCount} - 1)) END`;
+            updates.slopScore = newSlopScore;
+            updates.hotScore = computeHotScoreExpr(newSlopScore);
           }
 
           await tx

@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { buildExtractionPrompt } from "../lib/extraction-prompt";
 import { matchToolsToDatabase } from "../lib/tool-matching";
+import { fetchWithTimeout, HttpError, isRetryableError } from "../lib/firecrawl";
 
 const ANALYSIS_MODEL = "claude-3-5-haiku-latest";
 
@@ -83,7 +84,7 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
     );
 
     // 3. Call Claude API
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -95,12 +96,15 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
         max_tokens: 1024,
         messages: [{ role: "user", content: prompt }],
       }),
-    });
+    }, 45000);
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Claude API error:", errorText);
-      throw new Error(`Claude API error: ${response.status}`);
+      throw new HttpError(
+        response.status,
+        `Claude API error: ${response.status} ${errorText}`
+      );
     }
 
     const result = await response.json();
@@ -194,15 +198,19 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
+    const retryable = isRetryableError(error);
 
-    await db
-      .update(enrichmentDrafts)
-      .set({
-        status: "failed",
-        error: `Analysis failed: ${errorMessage}`,
-        updatedAt: new Date(),
-      })
-      .where(eq(enrichmentDrafts.id, draftId));
+    if (!retryable) {
+      await db
+        .update(enrichmentDrafts)
+        .set({
+          status: "failed",
+          error: `Analysis failed: ${errorMessage}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(enrichmentDrafts.id, draftId));
+      return;
+    }
 
     throw error;
   }

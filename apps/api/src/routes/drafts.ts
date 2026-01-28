@@ -11,6 +11,7 @@ import {
 } from "@slop/db/schema";
 import { eq, and, isNull, inArray, desc, like } from "drizzle-orm";
 import { requireAuth, requireGitHub } from "../middleware/auth";
+import { checkRateLimit, DRAFT_ANALYSIS_RATE_LIMITS } from "../lib/rateLimit";
 import {
   detectUrlType,
   validateUrl,
@@ -24,36 +25,7 @@ import { moderateProject } from "../lib/moderation";
 
 const draftRoutes = new Hono();
 
-// Rate limiting: max 5 analyses per hour per user
-const analysisLimits = new Map<string, number[]>();
-
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now();
-  const hourAgo = now - 60 * 60 * 1000;
-
-  // Clean up old entries periodically (1% chance per request)
-  if (Math.random() < 0.01) {
-    for (const [id, timestamps] of analysisLimits.entries()) {
-      const recent = timestamps.filter((t) => t > hourAgo);
-      if (recent.length === 0) {
-        analysisLimits.delete(id);
-      } else {
-        analysisLimits.set(id, recent);
-      }
-    }
-  }
-
-  const timestamps = analysisLimits.get(userId) || [];
-  const recent = timestamps.filter((t) => t > hourAgo);
-
-  if (recent.length >= 5) {
-    return false;
-  }
-
-  recent.push(now);
-  analysisLimits.set(userId, recent);
-  return true;
-}
+// Rate limiting: max 5 analyses per hour per user (Postgres-backed)
 
 // GET /api/v1/drafts - List user's active drafts (for resuming)
 draftRoutes.get("/", requireAuth(), async (c) => {
@@ -104,9 +76,17 @@ draftRoutes.post("/analyze", requireGitHub(), async (c) => {
   }
 
   // Rate limit check
-  if (!checkRateLimit(session.user.id)) {
+  const rateLimit = await checkRateLimit(
+    `draft-analysis:user:${session.user.id}`,
+    DRAFT_ANALYSIS_RATE_LIMITS.perUser
+  );
+  if (!rateLimit.allowed) {
     return c.json(
-      { error: "Rate limit exceeded. Max 5 analyses per hour." },
+      {
+        error: "Rate limit exceeded. Max 5 analyses per hour.",
+        code: "RATE_LIMITED",
+        retryAfter: Math.ceil((rateLimit.resetAt - Date.now()) / 1000),
+      },
       429
     );
   }
@@ -496,8 +476,11 @@ draftRoutes.get("/:draftId/events", requireAuth(), async (c) => {
 
   return streamSSE(c, async (stream) => {
     let lastStatus = draft.status;
+    let lastUpdatedAt = draft.updatedAt;
     let pollCount = 0;
-    const maxPolls = 120; // 2 minutes max (1 poll per second)
+    const maxPolls = 150; // 5 minutes max with adaptive polling
+    let pollIntervalMs = 2000;
+    const maxPollIntervalMs = 5000;
 
     // Send initial status
     await stream.writeSSE({
@@ -510,7 +493,7 @@ draftRoutes.get("/:draftId/events", requireAuth(), async (c) => {
 
     // Poll for updates
     while (pollCount < maxPolls) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
       pollCount++;
 
       // Check if client disconnected
@@ -535,9 +518,14 @@ draftRoutes.get("/:draftId/events", requireAuth(), async (c) => {
         break;
       }
 
-      // Status changed
-      if (currentDraft.status !== lastStatus) {
+      // Status or updatedAt changed
+      if (
+        currentDraft.status !== lastStatus ||
+        (currentDraft.updatedAt && currentDraft.updatedAt.getTime() !== lastUpdatedAt?.getTime())
+      ) {
         lastStatus = currentDraft.status;
+        lastUpdatedAt = currentDraft.updatedAt;
+        pollIntervalMs = 2000;
 
         if (lastStatus === "ready") {
           await stream.writeSSE({
@@ -576,6 +564,8 @@ draftRoutes.get("/:draftId/events", requireAuth(), async (c) => {
             }),
           });
         }
+      } else if (pollIntervalMs < maxPollIntervalMs) {
+        pollIntervalMs = Math.min(maxPollIntervalMs, pollIntervalMs + 1000);
       }
 
       // Heartbeat every 15 seconds
@@ -622,9 +612,17 @@ draftRoutes.post("/:draftId/retry", requireAuth(), async (c) => {
   }
 
   // Rate limit check for retry
-  if (!checkRateLimit(session.user.id)) {
+  const retryLimit = await checkRateLimit(
+    `draft-analysis:user:${session.user.id}`,
+    DRAFT_ANALYSIS_RATE_LIMITS.perUser
+  );
+  if (!retryLimit.allowed) {
     return c.json(
-      { error: "Rate limit exceeded. Max 5 analyses per hour." },
+      {
+        error: "Rate limit exceeded. Max 5 analyses per hour.",
+        code: "RATE_LIMITED",
+        retryAfter: Math.ceil((retryLimit.resetAt - Date.now()) / 1000),
+      },
       429
     );
   }

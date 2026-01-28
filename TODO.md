@@ -102,6 +102,8 @@ Future enhancements, fixes, and improvements.
   - LLM token usage per analysis
   - Field edit rates (how often users modify extracted values)
 
+- [ ] **Admin observability page** - Add a general observability page to the admin view with worker metrics (queue depth, job age, failures) and API health summaries.
+
 - [ ] **Error alerting** - Send alerts on repeated failures, API errors, or unusual patterns.
 
 - [ ] **LLM accuracy tracking** - Log original extracted values vs final submitted values to measure prompt quality.

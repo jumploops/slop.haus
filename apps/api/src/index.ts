@@ -16,6 +16,7 @@ import { userRoutes } from "./routes/users";
 import { adminRoutes } from "./routes/admin";
 import { flagRoutes } from "./routes/flags";
 import { draftRoutes } from "./routes/drafts";
+import { sitemapRoutes } from "./routes/sitemap";
 import type { AuthSession } from "./middleware/auth";
 
 // Extend Hono context with session
@@ -45,14 +46,17 @@ app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Static file serving for uploads (MVP - local storage)
-app.use(
-  "/uploads/*",
-  serveStatic({
-    root: process.env.STORAGE_LOCAL_PATH || "./uploads",
-    rewriteRequestPath: (path) => path.replace(/^\/uploads/, ""),
-  })
-);
+// Static file serving for uploads (local storage only)
+const storageType = process.env.STORAGE_TYPE || "local";
+if (storageType === "local") {
+  app.use(
+    "/uploads/*",
+    serveStatic({
+      root: process.env.STORAGE_LOCAL_PATH || "./uploads",
+      rewriteRequestPath: (path) => path.replace(/^\/uploads/, ""),
+    })
+  );
+}
 
 // Better Auth handler - handles all /api/auth/* routes
 // This handles: sign in, sign out, callbacks, account linking, etc.
@@ -72,6 +76,7 @@ app.route("/api/v1/admin", adminRoutes); // Admin routes
 app.route("/api/v1/flags", flagRoutes); // Flagging routes
 app.route("/api/v1/tools", toolRoutes);
 app.route("/api/v1/drafts", draftRoutes); // Draft submission routes
+app.route("/api/v1/sitemap", sitemapRoutes);
 
 // API info
 app.get("/api/v1", (c) => {

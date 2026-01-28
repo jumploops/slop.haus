@@ -8,6 +8,7 @@
     "start": "dotenv -e ../../.env -- node dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.500.0",
     "@slop/db": "workspace:*",
     "@slop/shared": "workspace:*",
     "drizzle-orm": "^0.41.0",

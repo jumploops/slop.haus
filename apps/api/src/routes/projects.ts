@@ -20,6 +20,7 @@ import {
 import { slugify, generateUniqueSlug } from "@slop/shared";
 import { moderateProject } from "../lib/moderation";
 import { getStorage, generateStorageKey } from "../lib/storage";
+import { detectImageType, getImageExtension } from "../lib/uploads";
 
 const projectRoutes = new Hono();
 
@@ -84,13 +85,6 @@ async function fetchCompleteProject(projectId: string) {
   };
 }
 
-// Helper: compute hot score
-function computeHotScore(score: number, createdAt: Date): number {
-  const ageHours = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60);
-  const gravity = 1.8;
-  return score / Math.pow(ageHours + 2, gravity);
-}
-
 // Helper: get time window filter
 function getTimeWindowFilter(window: string) {
   const now = new Date();
@@ -129,12 +123,12 @@ projectRoutes.get("/", async (c) => {
   // Get projects with author
   let orderBy;
   if (sort === "new") {
-    orderBy = desc(projects.createdAt);
+    orderBy = [desc(projects.createdAt)];
   } else if (sort === "top") {
-    orderBy = desc(projects.likeCount);
+    orderBy = [desc(projects.likeCount)];
   } else {
-    // hot - we'll sort in memory after fetching
-    orderBy = desc(projects.createdAt);
+    // hot - order by persisted hotScore
+    orderBy = [desc(projects.hotScore), desc(projects.createdAt)];
   }
 
   const projectList = await db
@@ -162,24 +156,11 @@ projectRoutes.get("/", async (c) => {
     .from(projects)
     .leftJoin(user, eq(projects.authorUserId, user.id))
     .where(and(...conditions))
-    .orderBy(orderBy)
-    // For hot sort, fetch more items to sort in memory
-    // TODO: For production, precompute hot scores periodically and store in DB
-    // This in-memory approach has a practical limit of ~50 pages (1000 items)
-    .limit(sort === "hot" ? Math.max(1000, offset + limit) : limit)
-    .offset(sort === "hot" ? 0 : offset);
+    .orderBy(...orderBy)
+    .limit(limit)
+    .offset(offset);
 
-  let result = projectList;
-
-  // For hot sort, compute scores and re-sort
-  if (sort === "hot") {
-    const scored = projectList.map((p) => ({
-      ...p,
-      hotScore: computeHotScore(p.slopScore, p.createdAt),
-    }));
-    scored.sort((a, b) => b.hotScore - a.hotScore);
-    result = scored.slice(offset, offset + limit);
-  }
+  const result = projectList;
 
   // Get primary media for each project
   const projectIds = result.map((p) => p.id);
@@ -716,25 +697,18 @@ projectRoutes.post("/:slug/screenshot", requireAuth(), async (c) => {
     return c.json({ error: "File too large (max 5MB)" }, 400);
   }
 
-  // Validate file type
-  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const detectedType = detectImageType(buffer);
+  if (!detectedType) {
     return c.json({ error: "Invalid file type. Allowed: PNG, JPEG, WebP" }, 400);
   }
 
-  // Get file extension from mime type
-  const extensions: Record<string, string> = {
-    "image/png": "png",
-    "image/jpeg": "jpg",
-    "image/webp": "webp",
-  };
-  const ext = extensions[file.type] || "png";
+  const ext = getImageExtension(detectedType);
 
   // Upload to storage
-  const buffer = Buffer.from(await file.arrayBuffer());
   const storage = getStorage();
-  const key = generateStorageKey("project-screenshots", ext);
-  const url = await storage.upload(key, buffer, file.type);
+  const key = generateStorageKey("screenshots", ext);
+  const url = await storage.upload(key, buffer, detectedType);
 
   // Update projectMedia - set old screenshots as not primary
   await db

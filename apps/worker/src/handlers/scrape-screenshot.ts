@@ -1,7 +1,7 @@
 import { db } from "@slop/db";
 import { enrichmentDrafts } from "@slop/db/schema";
 import { eq } from "drizzle-orm";
-import { scrape } from "../lib/firecrawl";
+import { scrape, fetchWithTimeout } from "../lib/firecrawl";
 import { getStorage, generateStorageKey } from "../lib/storage";
 
 export interface ScrapeScreenshotPayload {
@@ -56,11 +56,11 @@ export async function handleScrapeScreenshot(payload: unknown): Promise<void> {
     if (result.success && result.data?.screenshot) {
       try {
         // Firecrawl v2 returns screenshot as a URL
-        const imageResponse = await fetch(result.data.screenshot);
+        const imageResponse = await fetchWithTimeout(result.data.screenshot, {}, 30000);
         if (imageResponse.ok) {
           const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
           const storage = getStorage();
-          const key = generateStorageKey("draft-screenshots", "png");
+          const key = generateStorageKey("screenshots", "png");
           screenshotUrl = await storage.upload(key, imageBuffer, "image/png");
           console.log(`Screenshot saved for draft ${draftId}: ${screenshotUrl}`);
         }

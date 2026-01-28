@@ -41,7 +41,7 @@ likeRoutes.post("/:slug/like", async (c) => {
   const raterKeyHash = getOrCreatePublicRater(c);
   const raterType = session?.user.devVerified || getDevRater(c) ? "dev" : "public";
 
-  const raterLimit = checkRateLimit(
+  const raterLimit = await checkRateLimit(
     `like:rater:${raterKeyHash}`,
     LIKE_RATE_LIMITS.perRater
   );
@@ -56,7 +56,7 @@ likeRoutes.post("/:slug/like", async (c) => {
     );
   }
 
-  const projectRaterLimit = checkRateLimit(
+  const projectRaterLimit = await checkRateLimit(
     `like:project:${project.id}:${raterKeyHash}`,
     LIKE_RATE_LIMITS.perProjectRater
   );
