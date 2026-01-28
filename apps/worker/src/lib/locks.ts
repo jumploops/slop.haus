@@ -9,10 +9,11 @@ export async function acquireLock(
 ): Promise<boolean> {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + ttlMs);
+  const nowIso = now.toISOString();
 
   // Best-effort cleanup of expired locks (1% chance)
   if (Math.random() < 0.01) {
-    await db.delete(locks).where(sql`${locks.expiresAt} < ${now}`);
+    await db.delete(locks).where(sql`${locks.expiresAt} < ${nowIso}`);
   }
 
   const [row] = await db
@@ -30,9 +31,13 @@ export async function acquireLock(
         expiresAt,
         updatedAt: now,
       },
-      where: sql`${locks.expiresAt} < ${now}`,
+      where: sql`${locks.expiresAt} < ${nowIso}`,
     })
-    .returning({ key: locks.key, holder: locks.holder, expiresAt: locks.expiresAt });
+    .returning({
+      key: locks.key,
+      holder: locks.holder,
+      expiresAt: locks.expiresAt,
+    });
 
   return !!row && row.holder === holder && row.expiresAt.getTime() === expiresAt.getTime();
 }
