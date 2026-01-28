@@ -101,6 +101,7 @@ Future enhancements, fixes, and improvements.
   - Scrape/analyze duration histograms
   - LLM token usage per analysis
   - Field edit rates (how often users modify extracted values)
+  - Screenshot fallback usage (README image vs GitHub OG vs Firecrawl)
 
 - [ ] **Admin observability page** - Add a general observability page to the admin view with worker metrics (queue depth, job age, failures) and API health summaries.
 

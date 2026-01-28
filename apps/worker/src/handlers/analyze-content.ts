@@ -5,8 +5,14 @@ import { z } from "zod";
 import { buildExtractionPrompt } from "../lib/extraction-prompt";
 import { matchToolsToDatabase } from "../lib/tool-matching";
 import { fetchWithTimeout, HttpError, isRetryableError } from "../lib/firecrawl";
+import { extractReadmeImageCandidates, buildGithubOgUrl } from "../lib/readme-images";
+import { getStorage, generateStorageKey } from "../lib/storage";
 
-const ANALYSIS_MODEL = "claude-3-5-haiku-latest";
+const ANALYSIS_MODEL = "claude-haiku-4-5";
+const MAX_README_IMAGE_BYTES = 11 * 1024 * 1024;
+const MIN_README_IMAGE_BYTES = 25 * 1024;
+const MAX_README_IMAGE_ATTEMPTS = 4;
+const IMAGE_FETCH_TIMEOUT_MS = 20000;
 
 // Schema for LLM extraction response with defaults for robustness
 const extractionSchema = z.object({
@@ -35,6 +41,65 @@ interface ExtractionResult {
     mainUrl: string | null;
     repoUrl: string | null;
   };
+}
+
+function getImageExtension(contentType: string | null, url: string): string {
+  const normalized = contentType?.split(";")[0]?.trim().toLowerCase();
+  const contentTypeMap: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/webp": "webp",
+    "image/gif": "gif",
+  };
+
+  if (normalized && contentTypeMap[normalized]) {
+    return contentTypeMap[normalized];
+  }
+
+  const pathExtension = url.split("?")[0]?.split("#")[0]?.split(".").pop()?.toLowerCase();
+  if (pathExtension && ["png", "jpg", "jpeg", "webp", "gif"].includes(pathExtension)) {
+    return pathExtension === "jpeg" ? "jpg" : pathExtension;
+  }
+
+  return "png";
+}
+
+async function fetchImageBuffer(url: string): Promise<{ buffer: Buffer; contentType: string | null } | null> {
+  try {
+    const response = await fetchWithTimeout(url, {}, IMAGE_FETCH_TIMEOUT_MS);
+    if (!response.ok) {
+      return null;
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.toLowerCase().startsWith("image/svg")) {
+      return null;
+    }
+    if (contentType && !contentType.toLowerCase().startsWith("image/")) {
+      return null;
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.length < MIN_README_IMAGE_BYTES || buffer.length > MAX_README_IMAGE_BYTES) {
+      return null;
+    }
+
+    return { buffer, contentType };
+  } catch {
+    return null;
+  }
+}
+
+async function uploadImageBuffer(
+  buffer: Buffer,
+  contentType: string | null,
+  url: string
+): Promise<string> {
+  const storage = getStorage();
+  const extension = getImageExtension(contentType, url);
+  const key = generateStorageKey("screenshots", extension);
+  const uploadContentType = contentType?.split(";")[0]?.trim() || `image/${extension}`;
+  return storage.upload(key, buffer, uploadContentType);
 }
 
 export async function handleAnalyzeContent(payload: unknown): Promise<void> {
@@ -149,6 +214,62 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
       suggestedMainUrl = suggestedMainUrl || draft.inputUrl;
     }
 
+    let derivedScreenshotUrl = draft.screenshotUrl;
+    let derivedScreenshotSource = draft.screenshotSource;
+
+    const isRepoOnly =
+      (draft.detectedUrlType === "github" || draft.detectedUrlType === "gitlab") &&
+      !suggestedMainUrl;
+
+    if (!derivedScreenshotUrl && isRepoOnly) {
+      const repoUrlForImages = suggestedRepoUrl || draft.inputUrl;
+      const markdown = scrapedContent.markdown || "";
+      const candidates = extractReadmeImageCandidates(markdown, repoUrlForImages).slice(
+        0,
+        MAX_README_IMAGE_ATTEMPTS
+      );
+
+      for (const candidate of candidates) {
+        const imageResult = await fetchImageBuffer(candidate.url);
+        if (!imageResult) {
+          continue;
+        }
+
+        try {
+          derivedScreenshotUrl = await uploadImageBuffer(
+            imageResult.buffer,
+            imageResult.contentType,
+            candidate.url
+          );
+          derivedScreenshotSource = "readme_image";
+          console.log(`README screenshot captured for draft ${draftId}`);
+          break;
+        } catch (uploadError) {
+          console.warn(`Failed to upload README image for draft ${draftId}:`, uploadError);
+        }
+      }
+
+      if (!derivedScreenshotUrl && draft.detectedUrlType === "github") {
+        const ogUrl = buildGithubOgUrl(repoUrlForImages);
+        if (ogUrl) {
+          const ogResult = await fetchImageBuffer(ogUrl);
+          if (ogResult) {
+            try {
+              derivedScreenshotUrl = await uploadImageBuffer(
+                ogResult.buffer,
+                ogResult.contentType,
+                ogUrl
+              );
+              derivedScreenshotSource = "github_og";
+              console.log(`GitHub OG screenshot captured for draft ${draftId}`);
+            } catch (uploadError) {
+              console.warn(`Failed to upload GitHub OG image for draft ${draftId}:`, uploadError);
+            }
+          }
+        }
+      }
+    }
+
     // 7. Check if we need to capture a screenshot from the mainUrl
     // For GitHub/GitLab repos, we didn't capture a screenshot during scraping
     // If LLM found a mainUrl (live site), we should capture a screenshot from it
@@ -174,6 +295,8 @@ export async function handleAnalyzeContent(payload: unknown): Promise<void> {
         ),
         suggestedMainUrl,
         suggestedRepoUrl,
+        screenshotUrl: derivedScreenshotUrl,
+        screenshotSource: derivedScreenshotSource,
         updatedAt: new Date(),
       })
       .where(eq(enrichmentDrafts.id, draftId));

@@ -76,6 +76,7 @@ export async function handleScrapeScreenshot(payload: unknown): Promise<void> {
       .update(enrichmentDrafts)
       .set({
         screenshotUrl: screenshotUrl || draft.screenshotUrl, // Keep existing if new one failed
+        screenshotSource: screenshotUrl ? "firecrawl" : draft.screenshotSource,
         status: "ready",
         updatedAt: new Date(),
       })
