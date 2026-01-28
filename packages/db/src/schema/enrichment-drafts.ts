@@ -31,6 +31,12 @@ export const urlTypeEnum = pgEnum("url_type", [
   "live_site",
 ]);
 
+export const draftScreenshotSourceEnum = pgEnum("draft_screenshot_source", [
+  "firecrawl",
+  "readme_image",
+  "github_og",
+]);
+
 export const enrichmentDrafts = pgTable(
   "enrichment_drafts",
   {
@@ -47,6 +53,7 @@ export const enrichmentDrafts = pgTable(
     scrapedContent: jsonb("scraped_content"),
     scrapedMetadata: jsonb("scraped_metadata"),
     screenshotUrl: text("screenshot_url"),
+    screenshotSource: draftScreenshotSourceEnum("screenshot_source"),
 
     // LLM Extracted Fields (suggested values)
     suggestedTitle: varchar("suggested_title", { length: 255 }),

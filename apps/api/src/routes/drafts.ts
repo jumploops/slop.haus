@@ -356,7 +356,7 @@ draftRoutes.post("/:draftId/submit", requireGitHub(), async (c) => {
       projectId: project.id,
       type: "screenshot",
       url: draft.screenshotUrl,
-      source: "firecrawl",
+      source: draft.screenshotSource || "firecrawl",
       isPrimary: true,
     });
   }

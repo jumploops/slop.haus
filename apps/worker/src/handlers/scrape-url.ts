@@ -105,6 +105,7 @@ export async function handleScrapeUrl(payload: unknown): Promise<void> {
         scrapedContent,
         scrapedMetadata,
         screenshotUrl,
+        screenshotSource: screenshotUrl ? "firecrawl" : draft.screenshotSource,
         updatedAt: new Date(),
       })
       .where(eq(enrichmentDrafts.id, draftId));

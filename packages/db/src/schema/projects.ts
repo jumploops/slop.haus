@@ -33,6 +33,8 @@ export const mediaTypeEnum = pgEnum("media_type", ["screenshot", "video"]);
 export const mediaSourceEnum = pgEnum("media_source", [
   "firecrawl",
   "user_upload",
+  "readme_image",
+  "github_og",
 ]);
 
 export const enrichmentStatusEnum = pgEnum("enrichment_status", [
