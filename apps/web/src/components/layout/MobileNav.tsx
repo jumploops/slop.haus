@@ -81,7 +81,11 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b-2 border-dashed border-border">
-          <span className="font-mono text-lg font-bold text-foreground">slop.haus</span>
+          <span className="flex items-baseline gap-0">
+            <span className="font-display text-xl font-normal tracking-tight text-slop-green">slop</span>
+            <span className="font-mono text-lg font-black text-foreground">.</span>
+            <span className="brick-text font-haus text-xl font-normal tracking-tight">haus</span>
+          </span>
           <button
             onClick={onClose}
             className={cn(

@@ -16,11 +16,12 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b-2 border-dashed border-border bg-card">
       <div className="mx-auto flex h-full max-w-5xl items-center justify-between px-4 py-4">
         {/* Logo */}
-        <Link href="/" className="group flex items-baseline gap-1 no-underline hover:no-underline">
-          <span className="font-mono text-2xl font-black tracking-tighter text-foreground transition-transform group-hover:-rotate-2">
+        <Link href="/" className="group flex items-baseline gap-0 no-underline hover:no-underline">
+          <span className="font-display text-3xl font-normal tracking-tight text-slop-green transition-transform group-hover:-rotate-2">
             slop
           </span>
-          <span className="font-mono text-2xl font-light text-primary">.haus</span>
+          <span className="font-mono text-2xl font-black text-foreground">.</span>
+          <span className="brick-text font-haus text-3xl font-normal tracking-tight">haus</span>
         </Link>
 
         {/* Right side */}
