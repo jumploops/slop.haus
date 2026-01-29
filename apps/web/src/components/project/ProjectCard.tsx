@@ -9,12 +9,32 @@ import { useEffect, useState } from "react";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import type { ProjectListItem } from "@/lib/api/projects";
 
+const SLOP_CARD_OFFSETS = [
+  "rotate-[0.6deg] translate-x-[1px] translate-y-[1px]",
+  "rotate-[-0.5deg] translate-x-[-1px] translate-y-[1px]",
+  "rotate-[0.3deg] translate-x-[2px] translate-y-[-1px]",
+  "rotate-[-0.8deg] translate-x-[-1px] translate-y-[2px]",
+];
+
+const SLOP_TAPE_VARIANTS = [
+  "after:pointer-events-none after:absolute after:-top-2 after:left-6 after:h-4 after:w-12 after:-rotate-2 after:bg-secondary/70 after:border after:border-border after:content-[''] after:opacity-80",
+  "after:pointer-events-none after:absolute after:-top-2 after:right-6 after:h-3 after:w-10 after:rotate-2 after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80",
+  "after:pointer-events-none after:absolute after:-bottom-2 after:left-8 after:h-3 after:w-14 after:rotate-[-1.5deg] after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80",
+];
+
+const SLOP_CARD_CHROME =
+  "before:pointer-events-none before:absolute before:inset-0 before:translate-x-1 before:translate-y-1 before:border-2 before:border-border/40 before:content-[''] before:-z-10";
+
+const SLOP_FRAME =
+  "after:pointer-events-none after:absolute after:inset-1 after:translate-x-[1px] after:translate-y-[-1px] after:rotate-[0.6deg] after:border-2 after:border-border/40 after:content-['']";
+
 interface ProjectCardProps {
   project: ProjectListItem;
   showFavoriteButton?: boolean;
   onFavoriteChange?: () => void;
   rank?: number;
   variant?: "list-sm" | "list-lg" | "grid";
+  sloppy?: boolean;
 }
 
 export function ProjectCard({
@@ -23,6 +43,7 @@ export function ProjectCard({
   onFavoriteChange,
   rank,
   variant = "list-sm",
+  sloppy = false,
 }: ProjectCardProps) {
   const isGrid = variant === "grid";
   const isLarge = variant === "list-lg";
@@ -49,13 +70,22 @@ export function ProjectCard({
   const thumbnailSize = isLarge ? "sm:h-32 sm:w-48" : "sm:h-16 sm:w-24";
   const likeButtonSize = isGrid ? "h-12 w-12" : "h-16 w-14";
   const scoreSizeClass = isGrid ? "h-10 w-10 text-base" : "h-12 w-12 text-lg";
+  const slopSeed = project.id || project.slug || project.title;
+  const slopIndex = sloppy ? getSlopIndex(slopSeed) : 0;
+  const slopClass = sloppy ? SLOP_CARD_OFFSETS[slopIndex % SLOP_CARD_OFFSETS.length] : "";
+  const slopTapeClass = sloppy ? SLOP_TAPE_VARIANTS[slopIndex % SLOP_TAPE_VARIANTS.length] : "";
+  const slopChromeClass = sloppy ? SLOP_CARD_CHROME : "";
+  const slopFrameClass = sloppy ? SLOP_FRAME : "";
 
   if (isGrid) {
     return (
       <article
         className={cn(
-          "group relative flex flex-col border-2 border-border bg-card transition-all duration-200",
+          "group relative z-0 flex flex-col border-2 border-border bg-card transition-all duration-200",
           rotation,
+          slopClass,
+          slopChromeClass,
+          slopTapeClass,
           "hover:border-primary hover:shadow-lg"
         )}
       >
@@ -70,7 +100,12 @@ export function ProjectCard({
           </div>
         )}
 
-        <div className="relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border">
+        <div
+          className={cn(
+            "relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border",
+            slopFrameClass
+          )}
+        >
           <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
           <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
         </div>
@@ -172,8 +207,11 @@ export function ProjectCard({
   return (
     <article
       className={cn(
-        "group relative flex gap-4 border-2 border-border bg-card p-4 transition-all duration-200",
+        "group relative z-0 flex gap-4 border-2 border-border bg-card p-4 transition-all duration-200",
         rotation,
+        slopClass,
+        slopChromeClass,
+        slopTapeClass,
         "hover:border-primary hover:shadow-lg"
       )}
     >
@@ -210,7 +248,8 @@ export function ProjectCard({
         href={`/p/${project.slug}`}
         className={cn(
           "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
-          thumbnailSize
+          thumbnailSize,
+          slopFrameClass
         )}
       >
         <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -316,4 +355,13 @@ function getSlopTone(score: number, reviewCount: number) {
   if (score >= 60) return "bg-slop-lime text-foreground";
   if (score >= 40) return "bg-slop-orange text-foreground";
   return "bg-destructive text-destructive-foreground";
+}
+
+function getSlopIndex(seed: string) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
 }

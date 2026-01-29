@@ -2,16 +2,18 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Droplet, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { signOut, useSession } from "@/lib/auth-client";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { useLoginModal } from "@/hooks/useLoginModal";
+import { useSlopMode } from "@/lib/slop-mode";
 
 export function AuthButtons() {
   const { data: session, isPending } = useSession();
   const { theme, setTheme } = useTheme();
+  const { enabled: slopEnabled, toggle: toggleSlop } = useSlopMode();
   const [mounted, setMounted] = useState(false);
   const { openLoginModal } = useLoginModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -43,6 +45,7 @@ export function AuthButtons() {
   };
 
   const themeLabel = mounted ? getThemeLabel(theme) : "System";
+  const slopLabel = slopEnabled ? "On" : "Off";
 
   if (isPending) {
     return (
@@ -113,6 +116,17 @@ export function AuthButtons() {
                   Theme
                 </span>
                 <span className="text-[10px]">{themeLabel}</span>
+              </button>
+              <button
+                type="button"
+                onClick={toggleSlop}
+                className="flex items-center justify-between gap-2 w-full px-3 py-2 text-xs font-mono font-bold uppercase tracking-wide text-muted-foreground bg-transparent border-none cursor-pointer transition-colors hover:bg-muted hover:text-primary"
+              >
+                <span className="flex items-center gap-2">
+                  <Droplet className="h-4 w-4" />
+                  Slop Mode
+                </span>
+                <span className="text-[10px]">{slopLabel}</span>
               </button>
               {showAdminLink && (
                 <Link

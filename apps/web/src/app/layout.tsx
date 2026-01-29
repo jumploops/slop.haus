@@ -43,12 +43,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable} ${rubikWetPaint.variable} ${alfaSlabOne.variable} font-sans antialiased`}>
         <Providers>
-          <div className="bg-construction-yellow overflow-hidden text-foreground">
+          <div className="bg-construction-yellow overflow-hidden construction-banner-text">
             <div className="animate-[marquee_20s_linear_infinite] flex whitespace-nowrap">
               {Array.from({ length: 10 }).map((_, i) => (
                 <span
                   key={i}
-                  className="marquee-stripes ml-4 mr-4 flex items-center py-1 pr-36 font-mono text-sm font-bold tracking-wide"
+                  className="marquee-stripes ml-4 mr-4 flex items-center pl-24 font-mono text-sm font-bold tracking-wide"
                 >
                   {i % 2 === 0 ? "UNDER CONSTRUCTION" : "PARDON OUR SLOP"}
                 </span>

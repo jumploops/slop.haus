@@ -10,6 +10,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
+import { useSlopMode } from "@/lib/slop-mode";
 import { LayoutGrid, List, ListOrdered } from "lucide-react";
 
 type SortOption = "hot" | "new" | "top";
@@ -31,11 +32,31 @@ const windowOptions: { value: WindowOption; label: string }[] = [
 
 export default function FeedPage() {
   const { data: session } = useSession();
+  const { enabled: slopEnabled } = useSlopMode();
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [page, setPage] = useState(1);
   const [showIntro, setShowIntro] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
+  const slopIntroClass = slopEnabled
+    ? "shadow-[2px_2px_0_var(--border)] before:absolute before:-top-3 before:left-8 before:h-4 before:w-12 before:-rotate-2 before:bg-secondary/70 before:border before:border-border before:content-[''] before:opacity-80 after:absolute after:-top-3 after:right-6 after:h-3 after:w-10 after:rotate-2 after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80"
+    : "";
+  const slopDismissClass = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] -rotate-6"
+    : "";
+  const slopControlRowClass = slopEnabled ? "rotate-[-0.3deg] translate-y-[1px]" : "";
+  const slopSelectClass = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[0.4deg]"
+    : "";
+  const slopToggleSm = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[-0.4deg] translate-y-[1px]"
+    : "";
+  const slopToggleLg = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[0.6deg] -translate-y-[1px]"
+    : "";
+  const slopToggleGrid = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[-0.2deg]"
+    : "";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -100,9 +121,22 @@ export default function FeedPage() {
     <div className="space-y-8">
       {showIntro && (
         <div className="flex flex-col items-center text-center pt-6">
-          <div className="relative mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3">
+          <div
+            className={cn(
+              "relative mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3",
+              slopIntroClass
+            )}
+          >
             <h1 className="font-mono text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-              Confess your slop
+              <span className="relative inline-block">
+                {slopEnabled && (
+                  <span
+                    className="absolute -left-2 -right-3 top-3 -z-10 h-3 -rotate-1 bg-primary/20 blur-[0.5px]"
+                    aria-hidden="true"
+                  />
+                )}
+                <span className="relative">Confess your slop</span>
+              </span>
             </h1>
             <button
               type="button"
@@ -111,7 +145,10 @@ export default function FeedPage() {
                 setShowIntro(false);
               }}
               aria-label="Dismiss intro"
-              className="absolute -top-7 -right-6 inline-flex h-8 w-8 items-center justify-center border-2 border-border bg-muted font-mono text-sm leading-none text-muted-foreground transition-colors hover:border-primary hover:bg-card hover:text-foreground rotate-4"
+              className={cn(
+                "absolute -top-7 -right-6 inline-flex h-8 w-8 items-center justify-center border-2 border-border bg-muted font-mono text-sm leading-none text-muted-foreground transition-colors hover:border-primary hover:bg-card hover:text-foreground rotate-4",
+                slopDismissClass
+              )}
             >
               ×
             </button>
@@ -133,13 +170,19 @@ export default function FeedPage() {
         </div>
       )}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        className={cn(
+          "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+          slopControlRowClass
+        )}
+      >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Tabs
             tabs={sortTabs}
             activeTab={sort}
             onTabChange={handleSortChange}
             className="mb-0 w-full sm:w-auto"
+            sloppy={slopEnabled}
           />
 
           {sort === "top" && (
@@ -151,6 +194,7 @@ export default function FeedPage() {
                 "min-h-10 sm:min-h-0 px-3 py-2 sm:py-1 text-xs font-bold font-mono uppercase tracking-wide",
                 "bg-background text-foreground",
                 "border-2 border-dashed border-border",
+                slopSelectClass,
                 "focus:outline-none focus:border-primary"
               )}
             >
@@ -171,6 +215,7 @@ export default function FeedPage() {
             title="List (small)"
             className={cn(
               "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              slopToggleSm,
               displayMode === "list-sm"
                 ? "bg-primary/10 text-primary border-primary"
                 : "bg-card text-muted-foreground border-border hover:text-primary"
@@ -185,6 +230,7 @@ export default function FeedPage() {
             title="List (large)"
             className={cn(
               "hidden sm:inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              slopToggleLg,
               displayMode === "list-lg"
                 ? "bg-primary/10 text-primary border-primary"
                 : "bg-card text-muted-foreground border-border hover:text-primary"
@@ -199,6 +245,7 @@ export default function FeedPage() {
             title="Grid"
             className={cn(
               "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              slopToggleGrid,
               displayMode === "grid"
                 ? "bg-primary/10 text-primary border-primary"
                 : "bg-card text-muted-foreground border-border hover:text-primary"
@@ -254,6 +301,7 @@ export default function FeedPage() {
                 project={project}
                 rank={index + 1}
                 variant={displayMode}
+                sloppy={slopEnabled}
               />
             ))}
           </div>
