@@ -188,7 +188,45 @@
   .construction-banner-text {
     color: #000000;
   }
+
+
+  .slop-sticky {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slop-sticky::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 8px;
+    height: 8px;
+    background: var(--border);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .slop-sticky-outline {
+    box-shadow: 1px 1px 0 var(--border);
+  }
+
+  .slop-tilt-1 {
+    transform: rotate(-1.5deg) translateY(1px);
+  }
+
+  .slop-tilt-2 {
+    transform: rotate(1.2deg) translateY(-1px);
+  }
+
+  .slop-tilt-3 {
+    transform: rotate(-0.8deg) translateX(1px);
+  }
 }
+
 
 @keyframes marquee {
   0% {

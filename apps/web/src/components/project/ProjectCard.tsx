@@ -22,6 +22,8 @@ const SLOP_TAPE_VARIANTS = [
   "after:pointer-events-none after:absolute after:-bottom-2 after:left-8 after:h-3 after:w-14 after:rotate-[-1.5deg] after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80",
 ];
 
+const SLOP_BADGE_TILTS = ["slop-tilt-1", "slop-tilt-2", "slop-tilt-3"];
+
 const SLOP_CARD_CHROME =
   "before:pointer-events-none before:absolute before:inset-0 before:translate-x-1 before:translate-y-1 before:border-2 before:border-border/40 before:content-[''] before:-z-10";
 
@@ -76,6 +78,13 @@ export function ProjectCard({
   const slopTapeClass = sloppy ? SLOP_TAPE_VARIANTS[slopIndex % SLOP_TAPE_VARIANTS.length] : "";
   const slopChromeClass = sloppy ? SLOP_CARD_CHROME : "";
   const slopFrameClass = sloppy ? SLOP_FRAME : "";
+  const slopBadgeClass = sloppy
+    ? cn(
+        "slop-sticky slop-sticky-outline",
+        SLOP_BADGE_TILTS[slopIndex % SLOP_BADGE_TILTS.length]
+      )
+    : "";
+  const slopScoreClass = sloppy ? "slop-sticky slop-sticky-outline" : "";
 
   if (isGrid) {
     return (
@@ -149,7 +158,8 @@ export function ProjectCard({
                   className={cn(
                     "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
                     scoreSizeClass,
-                    scoreTone
+                    scoreTone,
+                    slopScoreClass
                   )}
                 >
                   {slopScore}
@@ -169,7 +179,12 @@ export function ProjectCard({
             <span className="font-mono">by {project.author.name}</span>
             <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
             {isNew && (
-              <span className="bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary">
+              <span
+                className={cn(
+                  "bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary",
+                  slopBadgeClass
+                )}
+              >
                 new
               </span>
             )}
@@ -277,7 +292,8 @@ export function ProjectCard({
                 className={cn(
                   "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
                   scoreSizeClass,
-                  scoreTone
+                  scoreTone,
+                  slopScoreClass
                 )}
               >
                 {slopScore}
@@ -297,7 +313,12 @@ export function ProjectCard({
           <span className="font-mono">by {project.author.name}</span>
           <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
           {isNew && (
-            <span className="bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary">
+            <span
+              className={cn(
+                "bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary",
+                slopBadgeClass
+              )}
+            >
               new
             </span>
           )}
