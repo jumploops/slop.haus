@@ -1,6 +1,6 @@
 # Phase 7 — Goo/Slime Bottom Edge
 
-**Status:** Draft  
+**Status:** Reference (visual baseline)  
 **Goal:** Add a “drippy paint / slime” bottom edge treatment using procedural SVG masks, without clipping content.
 
 ## Concept Summary

@@ -29,6 +29,8 @@ Introduce intentionally “sloppy” visual treatments to the main feed page to 
 | 5 | Add edge treatments | Card/section edges, intro card | `phase-5-edge-treatments.md` |
 | 6 | Slopify buttons + inputs | Buttons, tabs, selects, inputs | `phase-6-button-input-slop.md` |
 | 7 | Goo/slime bottom edge | Drip masks + pseudo elements | `phase-7-goo-slime-bottom-edge.md` |
+| 8 | Drip blob geometry | Project cards (bottom edge) | `phase-8-drip-blob-geometry.md` |
+| 9 | Drip surface texture (optional) | Project cards (texture overlay) | `phase-9-drip-surface-texture.md` |
 
 ## Dependencies
 - None (CSS + component styling only)

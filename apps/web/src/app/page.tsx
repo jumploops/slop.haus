@@ -10,6 +10,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
+import { useSlopDrip } from "@/lib/slop-drip";
 import { useSlopMode } from "@/lib/slop-mode";
 import { LayoutGrid, List, ListOrdered } from "lucide-react";
 
@@ -38,6 +39,7 @@ export default function FeedPage() {
   const [page, setPage] = useState(1);
   const [showIntro, setShowIntro] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
+  const introDripRef = useSlopDrip(slopEnabled, { depth: 32, dripCount: 9 });
   const slopIntroClass = slopEnabled
     ? "shadow-[2px_2px_0_var(--border)] before:absolute before:-top-3 before:left-8 before:h-4 before:w-12 before:-rotate-2 before:bg-secondary/70 before:border before:border-border before:content-[''] before:opacity-80 after:absolute after:-top-3 after:right-6 after:h-3 after:w-10 after:rotate-2 after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80"
     : "";
@@ -122,9 +124,11 @@ export default function FeedPage() {
       {showIntro && (
         <div className="flex flex-col items-center text-center pt-6">
           <div
+            ref={introDripRef}
             className={cn(
               "relative mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3",
-              slopIntroClass
+              slopIntroClass,
+              slopEnabled && "slop-drip"
             )}
           >
             <h1 className="font-mono text-3xl font-black tracking-tight text-foreground sm:text-4xl">

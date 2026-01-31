@@ -7,6 +7,7 @@ import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
 import { useEffect, useState } from "react";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
+import { useSlopDrip } from "@/lib/slop-drip";
 import type { ProjectListItem } from "@/lib/api/projects";
 
 const SLOP_CARD_OFFSETS = [
@@ -85,16 +86,27 @@ export function ProjectCard({
       )
     : "";
   const slopScoreClass = sloppy ? "slop-sticky slop-sticky-outline" : "";
+  const dripRef = useSlopDrip(sloppy, {
+    depth: 20,
+    dripCount: 6 + (slopIndex % 5),
+    baseline: 0.12,
+    maxExtra: 0.9,
+    roughness: 0.08,
+    seed: slopIndex,
+    segmented: true,
+  });
 
   if (isGrid) {
     return (
       <article
+        ref={dripRef}
         className={cn(
           "group relative z-0 flex flex-col border-2 border-border bg-card transition-all duration-200",
           rotation,
           slopClass,
           slopChromeClass,
           slopTapeClass,
+          sloppy && "slop-drip",
           "hover:border-primary hover:shadow-lg"
         )}
       >
@@ -221,12 +233,14 @@ export function ProjectCard({
 
   return (
     <article
+      ref={dripRef}
       className={cn(
         "group relative z-0 flex gap-4 border-2 border-border bg-card p-4 transition-all duration-200",
         rotation,
         slopClass,
         slopChromeClass,
         slopTapeClass,
+        sloppy && "slop-drip",
         "hover:border-primary hover:shadow-lg"
       )}
     >

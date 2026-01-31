@@ -189,6 +189,38 @@
     color: #000000;
   }
 
+  .slop-drip {
+    position: relative;
+    overflow: visible;
+  }
+
+  .slop-drip::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: var(--slop-depth, 28px);
+    background: var(--slop-drip-fill, var(--slop-green));
+    pointer-events: none;
+
+    -webkit-mask-image: var(--slop-mask);
+    mask-image: var(--slop-mask);
+    -webkit-mask-size: 140% 100%;
+    mask-size: 140% 100%;
+    -webkit-mask-position: var(--slop-mask-x, 0%) 0%;
+    mask-position: var(--slop-mask-x, 0%) 0%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.08));
+  }
+
+  @supports not (mask-image: url("")) {
+    .slop-drip::after {
+      display: none;
+    }
+  }
 
   .slop-sticky {
     position: relative;
