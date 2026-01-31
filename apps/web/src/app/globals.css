@@ -162,6 +162,21 @@
   }
 }
 
+@keyframes slop-goo-fall {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(var(--slop-fall)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--slop-fall)) scale(0.25);
+    opacity: 0;
+  }
+}
+
 @layer utilities {
   .brick-text {
     color: transparent;
@@ -192,6 +207,14 @@
   .slop-drip {
     position: relative;
     overflow: visible;
+  }
+
+  .slop-goo-drop {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation-name: slop-goo-fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
   }
 
   .slop-drip::after {

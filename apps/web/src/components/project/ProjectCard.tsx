@@ -5,16 +5,16 @@ import { MessageCircle, ExternalLink, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
-import { useSlopDrip } from "@/lib/slop-drip";
+import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
 
 const SLOP_CARD_OFFSETS = [
-  "rotate-[0.6deg] translate-x-[1px] translate-y-[1px]",
-  "rotate-[-0.5deg] translate-x-[-1px] translate-y-[1px]",
-  "rotate-[0.3deg] translate-x-[2px] translate-y-[-1px]",
-  "rotate-[-0.8deg] translate-x-[-1px] translate-y-[2px]",
+  { className: "rotate-[0.6deg] translate-x-[1px] translate-y-[1px]", rotationDeg: 0.6 },
+  { className: "rotate-[-0.5deg] translate-x-[-1px] translate-y-[1px]", rotationDeg: -0.5 },
+  { className: "rotate-[0.3deg] translate-x-[2px] translate-y-[-1px]", rotationDeg: 0.3 },
+  { className: "rotate-[-0.8deg] translate-x-[-1px] translate-y-[2px]", rotationDeg: -0.8 },
 ];
 
 const SLOP_TAPE_VARIANTS = [
@@ -30,6 +30,8 @@ const SLOP_CARD_CHROME =
 
 const SLOP_FRAME =
   "after:pointer-events-none after:absolute after:inset-1 after:translate-x-[1px] after:translate-y-[-1px] after:rotate-[0.6deg] after:border-2 after:border-border/40 after:content-['']";
+
+const SLOP_GOO_ATTACH = { start: 0.08, end: 0.96 } as const;
 
 interface ProjectCardProps {
   project: ProjectListItem;
@@ -63,6 +65,7 @@ export function ProjectCard({
     { onSuccess: onFavoriteChange }
   );
 
+  const cardRef = useRef<HTMLElement | null>(null);
 
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
   const isNew = Date.now() - new Date(project.createdAt).getTime() < 2 * 24 * 60 * 60 * 1000;
@@ -75,7 +78,9 @@ export function ProjectCard({
   const scoreSizeClass = isGrid ? "h-10 w-10 text-base" : "h-12 w-12 text-lg";
   const slopSeed = project.id || project.slug || project.title;
   const slopIndex = sloppy ? getSlopIndex(slopSeed) : 0;
-  const slopClass = sloppy ? SLOP_CARD_OFFSETS[slopIndex % SLOP_CARD_OFFSETS.length] : "";
+  const slopOffset = sloppy ? SLOP_CARD_OFFSETS[slopIndex % SLOP_CARD_OFFSETS.length] : null;
+  const slopClass = slopOffset?.className ?? "";
+  const slopRotationDeg = slopOffset?.rotationDeg ?? 0;
   const slopTapeClass = sloppy ? SLOP_TAPE_VARIANTS[slopIndex % SLOP_TAPE_VARIANTS.length] : "";
   const slopChromeClass = sloppy ? SLOP_CARD_CHROME : "";
   const slopFrameClass = sloppy ? SLOP_FRAME : "";
@@ -86,27 +91,169 @@ export function ProjectCard({
       )
     : "";
   const slopScoreClass = sloppy ? "slop-sticky slop-sticky-outline" : "";
-  const dripRef = useSlopDrip(sloppy, {
-    depth: 20,
-    dripCount: 6 + (slopIndex % 5),
-    baseline: 0.12,
-    maxExtra: 0.9,
-    roughness: 0.08,
-    seed: slopIndex,
-    segmented: true,
-  });
+  const goo = sloppy ? (
+    <SlopGoo
+      targetRef={cardRef}
+      seed={slopIndex}
+      rotationDeg={slopRotationDeg}
+      attach={SLOP_GOO_ATTACH}
+      thickness={isGrid ? 10 : 12}
+      maxDrop={isGrid ? 70 : 90}
+      beadSpacing={isGrid ? 14 : 16}
+      dripCount={5 + (slopIndex % 5)}
+      poolBias={0.75}
+      viscositySeconds={70}
+      zIndex={0}
+    />
+  ) : null;
 
   if (isGrid) {
     return (
+      <>
+        <article
+          ref={cardRef}
+          className={cn(
+            "group relative z-10 flex flex-col border-2 border-border bg-card transition-all duration-200",
+            rotation,
+            slopClass,
+            slopChromeClass,
+            slopTapeClass,
+            "hover:border-primary hover:shadow-lg"
+          )}
+        >
+          <Link
+            href={`/p/${project.slug}`}
+            aria-label={`View ${project.title}`}
+            className="absolute inset-0 z-0"
+          />
+          {rank && (
+            <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
+              {rank}
+            </div>
+          )}
+
+          <div
+            className={cn(
+              "relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border",
+              slopFrameClass
+            )}
+          >
+            <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+          </div>
+
+          <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-3 p-4">
+            <div className="flex items-start gap-3">
+              <button
+                type="button"
+                onClick={() => submitLike(likeState?.liked ? 0 : 1)}
+                disabled={isLiking}
+                className={cn(
+                  "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto",
+                  likeButtonSize,
+                  likeState?.liked
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+                  isLiking && "opacity-50 cursor-not-allowed"
+                )}
+                aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
+              >
+                <ChevronUp className="h-5 w-5" />
+                <span className="font-mono text-sm font-bold">{localLikeCount}</span>
+              </button>
+
+              <div className="min-w-0 flex-1 pointer-events-none">
+                <Link
+                  href={`/p/${project.slug}`}
+                  className="no-underline hover:no-underline"
+                >
+                  <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
+                    <span className="truncate">{project.title}</span>
+                    <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                  </h3>
+                </Link>
+                <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{project.tagline}</p>
+              </div>
+
+              <div className="flex-shrink-0 pointer-events-none">
+                <div className="flex flex-col items-center gap-1">
+                  <div
+                    className={cn(
+                      "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
+                      scoreSizeClass,
+                      scoreTone,
+                      slopScoreClass
+                    )}
+                  >
+                    {slopScore}
+                  </div>
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Slop
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground pointer-events-none">
+              <div className="flex items-center gap-1">
+                <MessageCircle className="h-3.5 w-3.5" />
+                <span className="font-mono">{project.reviewCount} reviews</span>
+              </div>
+              <span className="font-mono">by {project.author.name}</span>
+              <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
+              {isNew && (
+                <span
+                  className={cn(
+                    "bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary",
+                    slopBadgeClass
+                  )}
+                >
+                  new
+                </span>
+              )}
+              {visitUrl && (
+                <a
+                  href={visitUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pointer-events-auto font-mono text-[10px] uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
+                >
+                  visit
+                </a>
+              )}
+            </div>
+
+            {showFavoriteButton && (
+              <div className="flex items-center gap-2 pointer-events-auto">
+                <Button
+                  variant={isFavorited ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={toggleFavorite}
+                  disabled={favoriteLoading}
+                  aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                >
+                  <HeartIcon filled={isFavorited} />
+                  <span className="sr-only">Favorite</span>
+                </Button>
+              </div>
+            )}
+          </div>
+        </article>
+        {goo}
+      </>
+    );
+  }
+
+  return (
+    <>
       <article
-        ref={dripRef}
+        ref={cardRef}
         className={cn(
-          "group relative z-0 flex flex-col border-2 border-border bg-card transition-all duration-200",
+          "group relative z-10 flex gap-4 border-2 border-border bg-card p-4 transition-all duration-200",
           rotation,
           slopClass,
           slopChromeClass,
           slopTapeClass,
-          sloppy && "slop-drip",
           "hover:border-primary hover:shadow-lg"
         )}
       >
@@ -121,50 +268,52 @@ export function ProjectCard({
           </div>
         )}
 
-        <div
+        <button
+          type="button"
+          onClick={() => submitLike(likeState?.liked ? 0 : 1)}
+          disabled={isLiking}
           className={cn(
-            "relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border",
+            "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors",
+            likeButtonSize,
+            likeState?.liked
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+            isLiking && "opacity-50 cursor-not-allowed"
+          )}
+          aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
+        >
+          <ChevronUp className="h-5 w-5" />
+          <span className="font-mono text-sm font-bold">{localLikeCount}</span>
+        </button>
+
+        <Link
+          href={`/p/${project.slug}`}
+          className={cn(
+            "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
+            thumbnailSize,
             slopFrameClass
           )}
         >
           <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
           <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
-        </div>
+        </Link>
 
-        <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-3 p-4">
-          <div className="flex items-start gap-3">
-            <button
-              type="button"
-              onClick={() => submitLike(likeState?.liked ? 0 : 1)}
-              disabled={isLiking}
-              className={cn(
-                "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto",
-                likeButtonSize,
-                likeState?.liked
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
-                isLiking && "opacity-50 cursor-not-allowed"
-              )}
-              aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
-            >
-              <ChevronUp className="h-5 w-5" />
-              <span className="font-mono text-sm font-bold">{localLikeCount}</span>
-            </button>
-
-            <div className="min-w-0 flex-1 pointer-events-none">
+        <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
               <Link
                 href={`/p/${project.slug}`}
-                className="no-underline hover:no-underline"
+                className="pointer-events-auto no-underline hover:no-underline"
               >
                 <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
                   <span className="truncate">{project.title}</span>
                   <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                 </h3>
               </Link>
-              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{project.tagline}</p>
+              <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{project.tagline}</p>
             </div>
 
-            <div className="flex-shrink-0 pointer-events-none">
+            <div className="flex-shrink-0">
               <div className="flex flex-col items-center gap-1">
                 <div
                   className={cn(
@@ -183,7 +332,7 @@ export function ProjectCard({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground pointer-events-none">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <MessageCircle className="h-3.5 w-3.5" />
               <span className="font-mono">{project.reviewCount} reviews</span>
@@ -228,142 +377,8 @@ export function ProjectCard({
           )}
         </div>
       </article>
-    );
-  }
-
-  return (
-    <article
-      ref={dripRef}
-      className={cn(
-        "group relative z-0 flex gap-4 border-2 border-border bg-card p-4 transition-all duration-200",
-        rotation,
-        slopClass,
-        slopChromeClass,
-        slopTapeClass,
-        sloppy && "slop-drip",
-        "hover:border-primary hover:shadow-lg"
-      )}
-    >
-      <Link
-        href={`/p/${project.slug}`}
-        aria-label={`View ${project.title}`}
-        className="absolute inset-0 z-0"
-      />
-      {rank && (
-        <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
-          {rank}
-        </div>
-      )}
-
-      <button
-        type="button"
-        onClick={() => submitLike(likeState?.liked ? 0 : 1)}
-        disabled={isLiking}
-        className={cn(
-          "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors",
-          likeButtonSize,
-          likeState?.liked
-            ? "border-primary bg-primary/10 text-primary"
-            : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
-          isLiking && "opacity-50 cursor-not-allowed"
-        )}
-        aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
-      >
-        <ChevronUp className="h-5 w-5" />
-        <span className="font-mono text-sm font-bold">{localLikeCount}</span>
-      </button>
-
-      <Link
-        href={`/p/${project.slug}`}
-        className={cn(
-          "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
-          thumbnailSize,
-          slopFrameClass
-        )}
-      >
-        <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-        <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
-      </Link>
-
-      <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <Link
-              href={`/p/${project.slug}`}
-              className="pointer-events-auto no-underline hover:no-underline"
-            >
-              <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
-                <span className="truncate">{project.title}</span>
-                <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-              </h3>
-            </Link>
-            <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{project.tagline}</p>
-          </div>
-
-          <div className="flex-shrink-0">
-            <div className="flex flex-col items-center gap-1">
-              <div
-                className={cn(
-                  "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
-                  scoreSizeClass,
-                  scoreTone,
-                  slopScoreClass
-                )}
-              >
-                {slopScore}
-              </div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                Slop
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <MessageCircle className="h-3.5 w-3.5" />
-            <span className="font-mono">{project.reviewCount} reviews</span>
-          </div>
-          <span className="font-mono">by {project.author.name}</span>
-          <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
-          {isNew && (
-            <span
-              className={cn(
-                "bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary",
-                slopBadgeClass
-              )}
-            >
-              new
-            </span>
-          )}
-          {visitUrl && (
-            <a
-              href={visitUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pointer-events-auto font-mono text-[10px] uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
-            >
-              visit
-            </a>
-          )}
-        </div>
-
-        {showFavoriteButton && (
-          <div className="flex items-center gap-2 pointer-events-auto">
-            <Button
-              variant={isFavorited ? "secondary" : "ghost"}
-              size="sm"
-              onClick={toggleFavorite}
-              disabled={favoriteLoading}
-              aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-            >
-              <HeartIcon filled={isFavorited} />
-              <span className="sr-only">Favorite</span>
-            </Button>
-          </div>
-        )}
-      </div>
-    </article>
+      {goo}
+    </>
   );
 }
 
