@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import { Tabs } from "@/components/ui/Tabs";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { ProjectCardSkeleton } from "@/components/ui/Skeleton";
@@ -36,7 +36,6 @@ export default function FeedPage() {
   const { enabled: slopEnabled } = useSlopMode();
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
-  const [page, setPage] = useState(1);
   const [showIntro, setShowIntro] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
   const introDripRef = useSlopDrip(slopEnabled, { depth: 32, dripCount: 9 });
@@ -83,23 +82,32 @@ export default function FeedPage() {
     window.localStorage.setItem("slop:feedDisplayMode", displayMode);
   }, [displayMode]);
 
-  const { data, error, isLoading, mutate } = useSWR<FeedResponse>(
-    ["feed", sort, timeWindow, page],
-    () => fetchFeed({ sort, window: timeWindow, page, limit: 20 }),
+  const { data, error, isLoading, size, setSize, mutate } = useSWRInfinite<FeedResponse>(
+    (pageIndex, previousPageData) => {
+      if (previousPageData && pageIndex >= previousPageData.pagination.totalPages) {
+        return null;
+      }
+      return ["feed", sort, timeWindow, pageIndex + 1] as const;
+    },
+    ([, nextSort, nextWindow, page]) =>
+      fetchFeed({ sort: nextSort, window: nextWindow, page, limit: 20 }),
     {
       revalidateOnFocus: false,
-      keepPreviousData: true,
     }
   );
 
+  const pages = data ?? [];
+  const projects = pages.flatMap((page) => page.projects);
+  const pagination = pages[0]?.pagination;
+  const totalPages = pagination?.totalPages ?? 0;
+  const totalCount = pagination?.total ?? 0;
+
   const handleSortChange = (newSort: string) => {
     setSort(newSort as SortOption);
-    setPage(1);
   };
 
   const handleWindowChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTimeWindow(e.target.value as WindowOption);
-    setPage(1);
   };
 
   const handleDisplayModeChange = (mode: DisplayMode) => {
@@ -113,9 +121,13 @@ export default function FeedPage() {
     setDisplayMode(mode);
   };
 
+  useEffect(() => {
+    setSize(1);
+  }, [sort, timeWindow, setSize]);
+
   const loadMore = () => {
-    if (data && page < data.pagination.totalPages) {
-      setPage((p) => p + 1);
+    if (pagination && size < totalPages) {
+      setSize((prev) => prev + 1);
     }
   };
 
@@ -270,7 +282,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {isLoading && !data && (
+      {isLoading && pages.length === 0 && (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
             <ProjectCardSkeleton key={i} />
@@ -278,7 +290,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {data && data.projects.length === 0 && (
+      {pagination && projects.length === 0 && (
         <div className="border-2 border-dashed border-border p-6 text-center">
           <h3 className="text-lg font-bold text-foreground mb-2">No projects yet</h3>
           <p className="text-sm text-muted-foreground">Be the first to submit a project!</p>
@@ -288,7 +300,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {data && data.projects.length > 0 && (
+      {pagination && projects.length > 0 && (
         <>
           <div
             className={cn(
@@ -299,7 +311,7 @@ export default function FeedPage() {
                 : "space-y-3"
             )}
           >
-            {data.projects.map((project, index) => (
+            {projects.map((project, index) => (
               <ProjectCard
                 key={project.id}
                 project={project}
@@ -310,7 +322,7 @@ export default function FeedPage() {
             ))}
           </div>
 
-          {page < data.pagination.totalPages && (
+          {pagination && size < totalPages && (
             <div className="flex justify-center mt-4">
               <Button variant="secondary" onClick={loadMore}>
                 Load More
@@ -319,7 +331,7 @@ export default function FeedPage() {
           )}
 
           <div className="text-center text-muted-foreground text-xs mt-4">
-            Showing {data.projects.length} of {data.pagination.total} projects
+            Showing {projects.length} of {totalCount} projects
           </div>
         </>
       )}
