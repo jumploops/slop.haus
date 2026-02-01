@@ -43,6 +43,11 @@ export type SlopGooProps = {
   dripCount?: number;
   poolBias?: number; // 0..1
   viscositySeconds?: number;
+  edgeInset?: number;
+  edgeOffset?: number;
+  edgeFeather?: number;
+  borderOffset?: number;
+  useBorderOffset?: boolean;
   zIndex?: number;
   enabled?: boolean;
 };

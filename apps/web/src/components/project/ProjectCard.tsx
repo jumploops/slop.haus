@@ -31,7 +31,7 @@ const SLOP_CARD_CHROME =
 const SLOP_FRAME =
   "after:pointer-events-none after:absolute after:inset-1 after:translate-x-[1px] after:translate-y-[-1px] after:rotate-[0.6deg] after:border-2 after:border-border/40 after:content-['']";
 
-const SLOP_GOO_ATTACH = { start: 0.08, end: 0.96 } as const;
+const SLOP_GOO_ATTACH = { start: 0, end: 1 } as const;
 
 interface ProjectCardProps {
   project: ProjectListItem;
@@ -98,12 +98,13 @@ export function ProjectCard({
       rotationDeg={slopRotationDeg}
       attach={SLOP_GOO_ATTACH}
       thickness={isGrid ? 10 : 12}
-      maxDrop={isGrid ? 70 : 90}
+      maxDrop={isGrid ? 55 : 75}
       beadSpacing={isGrid ? 14 : 16}
       dripCount={5 + (slopIndex % 5)}
       poolBias={0.75}
       viscositySeconds={70}
-      zIndex={0}
+      edgeInset={isGrid ? 3 : 4}
+      zIndex={12}
     />
   ) : null;
 
@@ -118,6 +119,7 @@ export function ProjectCard({
             slopClass,
             slopChromeClass,
             slopTapeClass,
+            sloppy && "border-b-0",
             "hover:border-primary hover:shadow-lg"
           )}
         >
@@ -254,6 +256,7 @@ export function ProjectCard({
           slopClass,
           slopChromeClass,
           slopTapeClass,
+          sloppy && "border-b-0",
           "hover:border-primary hover:shadow-lg"
         )}
       >

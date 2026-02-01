@@ -53,6 +53,11 @@ export type SlopGooProps = {
   dripCount?: number;
   poolBias?: number;
   viscositySeconds?: number;
+  edgeInset?: number;
+  edgeOffset?: number;
+  edgeFeather?: number;
+  borderOffset?: number;
+  useBorderOffset?: boolean;
   zIndex?: number;
   enabled?: boolean;
 };
@@ -71,6 +76,11 @@ export function SlopGoo({
   dripCount = 7,
   poolBias = 0.65,
   viscositySeconds = 55,
+  edgeInset = 0,
+  edgeOffset = 0,
+  edgeFeather = 4,
+  borderOffset = 0,
+  useBorderOffset = true,
   zIndex = 5000,
   enabled = true,
 }: SlopGooProps) {
@@ -154,14 +164,23 @@ export function SlopGoo({
         const a0 = lerpPoint(edge.a, edge.b, t0);
         const a1 = lerpPoint(edge.a, edge.b, t1);
 
-        const grip = thickness * 0.35;
+        const styles = useBorderOffset ? getComputedStyle(el) : null;
+        const borderWidth = styles
+          ? Math.max(
+              Number.parseFloat(styles.borderTopWidth) || 0,
+              Number.parseFloat(styles.borderRightWidth) || 0,
+              Number.parseFloat(styles.borderBottomWidth) || 0,
+              Number.parseFloat(styles.borderLeftWidth) || 0
+            )
+          : 0;
+        const offset = edgeOffset + borderOffset + (useBorderOffset ? borderWidth : 0);
         const b0 = {
-          x: a0.x + edge.nIn.x * grip,
-          y: a0.y + edge.nIn.y * grip,
+          x: a0.x - edge.nIn.x * offset,
+          y: a0.y - edge.nIn.y * offset,
         };
         const b1 = {
-          x: a1.x + edge.nIn.x * grip,
-          y: a1.y + edge.nIn.y * grip,
+          x: a1.x - edge.nIn.x * offset,
+          y: a1.y - edge.nIn.y * offset,
         };
 
         const margin = Math.max(blur * 3, thickness * 2, 24);
@@ -175,9 +194,16 @@ export function SlopGoo({
         const width = Math.max(1, maxX - minX);
         const height = Math.max(1, maxY - minY);
 
-        const localB0 = { x: b0.x - left, y: b0.y - top };
-        const localB1 = { x: b1.x - left, y: b1.y - top };
-        const segLen = Math.hypot(localB1.x - localB0.x, localB1.y - localB0.y) || 1;
+        let localB0 = { x: b0.x - left, y: b0.y - top };
+        let localB1 = { x: b1.x - left, y: b1.y - top };
+        let segLen = Math.hypot(localB1.x - localB0.x, localB1.y - localB0.y) || 1;
+        if (edgeInset > 0 && segLen > edgeInset * 2) {
+          const ex = (localB1.x - localB0.x) / segLen;
+          const ey = (localB1.y - localB0.y) / segLen;
+          localB0 = { x: localB0.x + ex * edgeInset, y: localB0.y + ey * edgeInset };
+          localB1 = { x: localB1.x - ex * edgeInset, y: localB1.y - ey * edgeInset };
+          segLen = Math.hypot(localB1.x - localB0.x, localB1.y - localB0.y) || 1;
+        }
         const lowEndIsB1 = b1.y > b0.y;
 
         setGeom({
@@ -212,7 +238,7 @@ export function SlopGoo({
       window.removeEventListener("scroll", measure, true);
       window.removeEventListener("resize", measure);
     };
-  }, [attach, blur, enabled, maxDrop, targetRef, thickness]);
+  }, [attach, blur, borderOffset, edgeInset, edgeOffset, enabled, maxDrop, targetRef, thickness, useBorderOffset]);
 
   const shapes = useMemo(() => {
     if (!geom || seed === null) return null;
@@ -232,10 +258,14 @@ export function SlopGoo({
     const beadCount = Math.max(2, Math.floor(geom.segLen / spacing));
     for (let i = 0; i <= beadCount; i += 1) {
       const u = i / beadCount;
-      const t = clamp01(u + (rand() - 0.5) * (1 / beadCount) * 0.6);
+      const isEnd = i === 0 || i === beadCount;
+      const t = isEnd ? u : clamp01(u + (rand() - 0.5) * (1 / beadCount) * 0.6);
       const g = biasToLowEnd ? t : 1 - t;
-      const r = thicknessSafe * (0.35 + rand() * 0.25 + g * 0.25);
-      beads.push({ t, r, j: (rand() - 0.5) * thicknessSafe * 0.25 });
+      const r = isEnd
+        ? thicknessSafe * (0.6 + g * 0.2)
+        : thicknessSafe * (0.35 + rand() * 0.25 + g * 0.25);
+      const j = isEnd ? 0 : (rand() - 0.5) * thicknessSafe * 0.25;
+      beads.push({ t, r, j });
     }
 
     const poolBlobs: Array<{ t: number; r: number; y: number }> = [];
@@ -281,15 +311,13 @@ export function SlopGoo({
   }
 
   const baselineStroke = Math.max(1, thickness);
-  const clipId = `slop-goo-clip-${id}`;
-  const clipOffset = Math.max(height, maxDrop) + blur * 6 + thickness * 2;
-  const clipPoints = [
-    `${b0.x},${b0.y}`,
-    `${b1.x},${b1.y}`,
-    `${b1.x + nx * clipOffset},${b1.y + ny * clipOffset}`,
-    `${b0.x + nx * clipOffset},${b0.y + ny * clipOffset}`,
-  ].join(" ");
-
+  const maskId = `slop-goo-mask-${id}`;
+  const gradientId = `slop-goo-mask-gradient-${id}`;
+  const feather = Math.max(1, edgeFeather);
+  const gx1 = b0.x - nx * feather;
+  const gy1 = b0.y - ny * feather;
+  const gx2 = b0.x + nx * feather;
+  const gy2 = b0.y + ny * feather;
   const svg = (
     <div
       style={{
@@ -324,12 +352,23 @@ export function SlopGoo({
             </feTurbulence>
             <feDisplacementMap in="goo" in2="noise" scale={prefersReducedMotion ? 0 : 6} xChannelSelector="R" yChannelSelector="G" />
           </filter>
-          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
-            <polygon points={clipPoints} />
-          </clipPath>
+          <linearGradient
+            id={gradientId}
+            gradientUnits="userSpaceOnUse"
+            x1={gx1}
+            y1={gy1}
+            x2={gx2}
+            y2={gy2}
+          >
+            <stop offset="0" stopColor="black" stopOpacity="0" />
+            <stop offset="1" stopColor="white" stopOpacity="1" />
+          </linearGradient>
+          <mask id={maskId} maskUnits="userSpaceOnUse">
+            <rect x="0" y="0" width={width} height={height} fill={`url(#${gradientId})`} />
+          </mask>
         </defs>
 
-        <g filter={`url(#${filterId})`} clipPath={`url(#${clipId})`}>
+        <g filter={`url(#${filterId})`} mask={`url(#${maskId})`}>
           <line
             x1={b0.x}
             y1={b0.y}
