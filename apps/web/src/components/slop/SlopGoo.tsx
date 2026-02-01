@@ -54,6 +54,7 @@ export type SlopGooProps = {
   poolBias?: number;
   viscositySeconds?: number;
   edgeInset?: number;
+  edgeInsetLowEnd?: number;
   edgeOffset?: number;
   edgeFeather?: number;
   borderOffset?: number;
@@ -77,6 +78,7 @@ export function SlopGoo({
   poolBias = 0.65,
   viscositySeconds = 55,
   edgeInset = 0,
+  edgeInsetLowEnd = 0,
   edgeOffset = 0,
   edgeFeather = 4,
   borderOffset = 0,
@@ -194,17 +196,19 @@ export function SlopGoo({
         const width = Math.max(1, maxX - minX);
         const height = Math.max(1, maxY - minY);
 
+        const lowEndIsB1 = b1.y > b0.y;
         let localB0 = { x: b0.x - left, y: b0.y - top };
         let localB1 = { x: b1.x - left, y: b1.y - top };
         let segLen = Math.hypot(localB1.x - localB0.x, localB1.y - localB0.y) || 1;
-        if (edgeInset > 0 && segLen > edgeInset * 2) {
+        const insetStart = edgeInset + (lowEndIsB1 ? 0 : edgeInsetLowEnd);
+        const insetEnd = edgeInset + (lowEndIsB1 ? edgeInsetLowEnd : 0);
+        if (segLen > insetStart + insetEnd) {
           const ex = (localB1.x - localB0.x) / segLen;
           const ey = (localB1.y - localB0.y) / segLen;
-          localB0 = { x: localB0.x + ex * edgeInset, y: localB0.y + ey * edgeInset };
-          localB1 = { x: localB1.x - ex * edgeInset, y: localB1.y - ey * edgeInset };
+          localB0 = { x: localB0.x + ex * insetStart, y: localB0.y + ey * insetStart };
+          localB1 = { x: localB1.x - ex * insetEnd, y: localB1.y - ey * insetEnd };
           segLen = Math.hypot(localB1.x - localB0.x, localB1.y - localB0.y) || 1;
         }
-        const lowEndIsB1 = b1.y > b0.y;
 
         setGeom({
           left,
@@ -238,7 +242,7 @@ export function SlopGoo({
       window.removeEventListener("scroll", measure, true);
       window.removeEventListener("resize", measure);
     };
-  }, [attach, blur, borderOffset, edgeInset, edgeOffset, enabled, maxDrop, targetRef, thickness, useBorderOffset]);
+  }, [attach, blur, borderOffset, edgeInset, edgeInsetLowEnd, edgeOffset, enabled, maxDrop, targetRef, thickness, useBorderOffset]);
 
   const shapes = useMemo(() => {
     if (!geom || seed === null) return null;

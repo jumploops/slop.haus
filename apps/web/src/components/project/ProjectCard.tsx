@@ -104,6 +104,7 @@ export function ProjectCard({
       poolBias={0.75}
       viscositySeconds={70}
       edgeInset={isGrid ? 3 : 4}
+      edgeInsetLowEnd={11}
       zIndex={12}
     />
   ) : null;

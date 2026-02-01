@@ -44,6 +44,7 @@ export type SlopGooProps = {
   poolBias?: number; // 0..1
   viscositySeconds?: number;
   edgeInset?: number;
+  edgeInsetLowEnd?: number;
   edgeOffset?: number;
   edgeFeather?: number;
   borderOffset?: number;
