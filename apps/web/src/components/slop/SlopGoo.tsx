@@ -317,7 +317,7 @@ export function SlopGoo({
   const baselineStroke = Math.max(1, thickness);
   const maskId = `slop-goo-mask-${id}`;
   const gradientId = `slop-goo-mask-gradient-${id}`;
-  const feather = Math.max(1, edgeFeather);
+  const feather = Math.max(0, edgeFeather);
   const gx1 = b0.x - nx * feather;
   const gy1 = b0.y - ny * feather;
   const gx2 = b0.x + nx * feather;
@@ -364,7 +364,7 @@ export function SlopGoo({
             x2={gx2}
             y2={gy2}
           >
-            <stop offset="0" stopColor="black" stopOpacity="0" />
+            <stop offset="0" stopColor="black" stopOpacity={feather === 0 ? 1 : 0} />
             <stop offset="1" stopColor="white" stopOpacity="1" />
           </linearGradient>
           <mask id={maskId} maskUnits="userSpaceOnUse">

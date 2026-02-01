@@ -53,6 +53,7 @@ export function ProjectCard({
   const isGrid = variant === "grid";
   const isLarge = variant === "list-lg";
   const [localLikeCount, setLocalLikeCount] = useState(project.likeCount);
+  const [isHovered, setIsHovered] = useState(false);
   const { likeState, submitLike, isLiking } = useLike(project.slug, {
     onLikeSuccess: (result) => setLocalLikeCount(result.likeCount),
   });
@@ -82,7 +83,7 @@ export function ProjectCard({
   const slopClass = slopOffset?.className ?? "";
   const slopRotationDeg = slopOffset?.rotationDeg ?? 0;
   const slopTapeClass = sloppy ? SLOP_TAPE_VARIANTS[slopIndex % SLOP_TAPE_VARIANTS.length] : "";
-  const slopChromeClass = sloppy ? SLOP_CARD_CHROME : "";
+  const slopChromeClass = "";
   const slopFrameClass = sloppy ? SLOP_FRAME : "";
   const slopBadgeClass = sloppy
     ? cn(
@@ -91,7 +92,8 @@ export function ProjectCard({
       )
     : "";
   const slopScoreClass = sloppy ? "slop-sticky slop-sticky-outline" : "";
-  const goo = sloppy ? (
+  const showGoo = sloppy && isHovered;
+  const goo = showGoo ? (
     <SlopGoo
       targetRef={cardRef}
       seed={slopIndex}
@@ -102,9 +104,11 @@ export function ProjectCard({
       beadSpacing={isGrid ? 14 : 16}
       dripCount={5 + (slopIndex % 5)}
       poolBias={0.75}
-      viscositySeconds={70}
+      viscositySeconds={35}
       edgeInset={isGrid ? 3 : 4}
-      edgeInsetLowEnd={11}
+      edgeInsetLowEnd={isGrid ? 11 : 6}
+      edgeFeather={1}
+      borderOffset={-3}
       zIndex={12}
     />
   ) : null;
@@ -120,9 +124,16 @@ export function ProjectCard({
             slopClass,
             slopChromeClass,
             slopTapeClass,
-            sloppy && "border-b-0",
             "hover:border-primary hover:shadow-lg"
           )}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onFocusCapture={() => setIsHovered(true)}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+              setIsHovered(false);
+            }
+          }}
         >
           <Link
             href={`/p/${project.slug}`}
@@ -257,9 +268,16 @@ export function ProjectCard({
           slopClass,
           slopChromeClass,
           slopTapeClass,
-          sloppy && "border-b-0",
           "hover:border-primary hover:shadow-lg"
         )}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocusCapture={() => setIsHovered(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+            setIsHovered(false);
+          }
+        }}
       >
         <Link
           href={`/p/${project.slug}`}
