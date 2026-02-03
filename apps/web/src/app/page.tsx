@@ -308,7 +308,13 @@ export default function FeedPage() {
                 ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 : displayMode === "list-lg"
                 ? "space-y-4"
-                : "space-y-3"
+                : "space-y-3",
+              slopEnabled &&
+                (displayMode === "grid"
+                  ? "gap-6"
+                  : displayMode === "list-lg"
+                  ? "space-y-6"
+                  : "space-y-5")
             )}
           >
             {projects.map((project, index) => (

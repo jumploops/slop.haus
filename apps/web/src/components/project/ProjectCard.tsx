@@ -17,19 +17,7 @@ const SLOP_CARD_OFFSETS = [
   { className: "rotate-[-0.8deg] translate-x-[-1px] translate-y-[2px]", rotationDeg: -0.8 },
 ];
 
-const SLOP_TAPE_VARIANTS = [
-  "after:pointer-events-none after:absolute after:-top-2 after:left-6 after:h-4 after:w-12 after:-rotate-2 after:bg-secondary/70 after:border after:border-border after:content-[''] after:opacity-80",
-  "after:pointer-events-none after:absolute after:-top-2 after:right-6 after:h-3 after:w-10 after:rotate-2 after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80",
-  "after:pointer-events-none after:absolute after:-bottom-2 after:left-8 after:h-3 after:w-14 after:rotate-[-1.5deg] after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80",
-];
-
 const SLOP_BADGE_TILTS = ["slop-tilt-1", "slop-tilt-2", "slop-tilt-3"];
-
-const SLOP_CARD_CHROME =
-  "before:pointer-events-none before:absolute before:inset-0 before:translate-x-1 before:translate-y-1 before:border-2 before:border-border/40 before:content-[''] before:-z-10";
-
-const SLOP_FRAME =
-  "after:pointer-events-none after:absolute after:inset-1 after:translate-x-[1px] after:translate-y-[-1px] after:rotate-[0.6deg] after:border-2 after:border-border/40 after:content-['']";
 
 const SLOP_GOO_ATTACH = { start: 0, end: 1 } as const;
 
@@ -82,16 +70,13 @@ export function ProjectCard({
   const slopOffset = sloppy ? SLOP_CARD_OFFSETS[slopIndex % SLOP_CARD_OFFSETS.length] : null;
   const slopClass = slopOffset?.className ?? "";
   const slopRotationDeg = slopOffset?.rotationDeg ?? 0;
-  const slopTapeClass = sloppy ? SLOP_TAPE_VARIANTS[slopIndex % SLOP_TAPE_VARIANTS.length] : "";
   const slopChromeClass = "";
-  const slopFrameClass = sloppy ? SLOP_FRAME : "";
   const slopBadgeClass = sloppy
     ? cn(
         "slop-sticky slop-sticky-outline",
         SLOP_BADGE_TILTS[slopIndex % SLOP_BADGE_TILTS.length]
       )
     : "";
-  const slopScoreClass = sloppy ? "slop-sticky slop-sticky-outline" : "";
   const showGoo = sloppy && isHovered;
   const goo = showGoo ? (
     <SlopGoo
@@ -123,7 +108,6 @@ export function ProjectCard({
             rotation,
             slopClass,
             slopChromeClass,
-            slopTapeClass,
             "hover:border-primary hover:shadow-lg"
           )}
           onMouseEnter={() => setIsHovered(true)}
@@ -147,10 +131,7 @@ export function ProjectCard({
           )}
 
           <div
-            className={cn(
-              "relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border",
-              slopFrameClass
-            )}
+            className="relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border"
           >
             <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
             <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
@@ -196,7 +177,7 @@ export function ProjectCard({
                       "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
                       scoreSizeClass,
                       scoreTone,
-                      slopScoreClass
+                      ""
                     )}
                   >
                     {slopScore}
@@ -267,7 +248,6 @@ export function ProjectCard({
           rotation,
           slopClass,
           slopChromeClass,
-          slopTapeClass,
           "hover:border-primary hover:shadow-lg"
         )}
         onMouseEnter={() => setIsHovered(true)}
@@ -312,8 +292,7 @@ export function ProjectCard({
           href={`/p/${project.slug}`}
           className={cn(
             "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
-            thumbnailSize,
-            slopFrameClass
+            thumbnailSize
           )}
         >
           <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -342,7 +321,7 @@ export function ProjectCard({
                     "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
                     scoreSizeClass,
                     scoreTone,
-                    slopScoreClass
+                    ""
                   )}
                 >
                   {slopScore}
