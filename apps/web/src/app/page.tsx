@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
 import { useSlopMode } from "@/lib/slop-mode";
 import { SlopGoo } from "@/components/slop/SlopGoo";
-import { LayoutGrid, List, ListOrdered } from "lucide-react";
+import { LayoutGrid, List, ListOrdered, Loader2 } from "lucide-react";
 
 type SortOption = "hot" | "new" | "top";
 type WindowOption = "24h" | "7d" | "30d" | "all";
@@ -80,7 +80,7 @@ export default function FeedPage() {
     window.localStorage.setItem("slop:feedDisplayMode", displayMode);
   }, [displayMode]);
 
-  const { data, error, isLoading, size, setSize, mutate } = useSWRInfinite<FeedResponse>(
+  const { data, error, isLoading, isValidating, size, setSize, mutate } = useSWRInfinite<FeedResponse>(
     (pageIndex, previousPageData) => {
       if (previousPageData && pageIndex >= previousPageData.pagination.totalPages) {
         return null;
@@ -99,6 +99,7 @@ export default function FeedPage() {
   const pagination = pages[0]?.pagination;
   const totalPages = pagination?.totalPages ?? 0;
   const totalCount = pagination?.total ?? 0;
+  const isLoadingMore = isValidating && size > 0;
 
   const handleSortChange = (newSort: string) => {
     setSort(newSort as SortOption);
@@ -343,8 +344,9 @@ export default function FeedPage() {
 
           {pagination && size < totalPages && (
             <div className="flex justify-center mt-4">
-              <Button variant="secondary" onClick={loadMore}>
-                Load More
+              <Button variant="secondary" onClick={loadMore} disabled={isLoadingMore}>
+                {isLoadingMore && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoadingMore ? "Loading" : "Load More"}
               </Button>
             </div>
           )}
