@@ -6,21 +6,30 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { AuthButtons } from "@/components/auth/AuthButtons";
 import { MobileNav } from "./MobileNav";
+import { useSlopMode } from "@/lib/slop-mode";
 
 export function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+  const { enabled: slopEnabled } = useSlopMode();
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-dashed border-border bg-card">
       <div className="mx-auto flex h-full max-w-5xl items-center justify-between px-4 py-4">
         {/* Logo */}
-        <Link href="/" className="group flex items-baseline gap-1 no-underline hover:no-underline">
-          <span className="font-mono text-2xl font-black tracking-tighter text-foreground transition-transform group-hover:-rotate-2">
+        <Link href="/" className="group flex items-baseline gap-0 no-underline hover:no-underline">
+          <span
+            className={cn(
+              "font-display font-normal tracking-tight text-slop-green transition-transform group-hover:-rotate-2",
+              "leading-[2.5rem]",
+              slopEnabled ? "text-4xl" : "text-3xl"
+            )}
+          >
             slop
           </span>
-          <span className="font-mono text-2xl font-light text-primary">.haus</span>
+          <span className="font-mono text-2xl font-black text-foreground">.</span>
+          <span className="brick-text font-haus text-3xl font-normal tracking-tight">haus</span>
         </Link>
 
         {/* Right side */}

@@ -24,6 +24,8 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **Duplicate URL detection** - Same URL can be submitted multiple times by the same user. Check for existing draft/project with same URL.
 
+- [ ] **Fixture user for seeding/tests** - Add an optional seed user for quick local logins and test flows.
+
 - [ ] **Server-based visitor counter** - Replace localStorage-based counter with server values that increment using Cloudflare unique user data.
 
 - [ ] **Field save indicator** - No visual feedback when auto-saving fields on blur. Add "Saving..."/"Saved" indicator.

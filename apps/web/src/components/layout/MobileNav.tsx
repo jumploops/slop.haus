@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { signIn, signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { useSlopMode } from "@/lib/slop-mode";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
   const { theme, setTheme } = useTheme();
+  const { enabled: slopEnabled, toggle: toggleSlop } = useSlopMode();
   const [mounted, setMounted] = useState(false);
 
   // Close on route change
@@ -54,6 +56,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const isMod = session?.user?.role === "mod";
   const showAdminLink = isAdmin || isMod;
   const themeLabel = mounted ? getThemeLabel(theme) : "System";
+  const slopLabel = slopEnabled ? "On" : "Off";
 
   return (
     <>
@@ -81,7 +84,11 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b-2 border-dashed border-border">
-          <span className="font-mono text-lg font-bold text-foreground">slop.haus</span>
+          <span className="flex items-baseline gap-0">
+            <span className="font-display text-xl font-normal tracking-tight text-slop-green">slop</span>
+            <span className="font-mono text-lg font-black text-foreground">.</span>
+            <span className="brick-text font-haus text-xl font-normal tracking-tight">haus</span>
+          </span>
           <button
             onClick={onClose}
             className={cn(
@@ -138,6 +145,14 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
               >
                 <span>Theme</span>
                 <span className="text-[10px] uppercase tracking-wide">{themeLabel}</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={toggleSlop}
+                className="w-full justify-between"
+              >
+                <span>Slop Mode</span>
+                <span className="text-[10px] uppercase tracking-wide">{slopLabel}</span>
               </Button>
               <Button variant="secondary" onClick={() => signOut()} className="w-full">
                 Sign Out

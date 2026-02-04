@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { ScoreWidget } from "./ScoreWidget";
 import { useFavorite } from "@/hooks/useFavorite";
 import { useSession } from "@/lib/auth-client";
+import { useSlopMode } from "@/lib/slop-mode";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import type { ProjectDetail } from "@/lib/api/projects";
 
@@ -14,9 +15,12 @@ interface ProjectDetailsProps {
   project: ProjectDetail;
 }
 
+const SLOP_TAG_TILTS = ["slop-tilt-1", "slop-tilt-2", "slop-tilt-3"];
+
 export function ProjectDetails({ project }: ProjectDetailsProps) {
   const { data: session } = useSession();
   const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavorite(project.slug);
+  const { enabled: slopEnabled } = useSlopMode();
 
   const isAuthor = session?.user?.id === project.author.id;
   const primaryMedia = project.media.find((m) => m.isPrimary) || project.media[0];
@@ -47,10 +51,14 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
           <div className="flex-1">
             {project.tools.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-2">
-                {project.tools.map((tool) => (
+                {project.tools.map((tool, index) => (
                   <span
                     key={tool.id}
-                    className="bg-secondary px-2 py-0.5 font-mono text-xs uppercase text-secondary-foreground"
+                    className={cn(
+                      "bg-secondary px-2 py-0.5 font-mono text-xs uppercase text-secondary-foreground",
+                      slopEnabled && "slop-sticky slop-sticky-outline",
+                      slopEnabled && SLOP_TAG_TILTS[index % SLOP_TAG_TILTS.length]
+                    )}
                   >
                     {tool.name}
                   </span>

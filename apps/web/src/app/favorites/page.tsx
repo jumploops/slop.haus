@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/Button";
 import { fetchFavorites } from "@/lib/api/favorites";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useSlopMode } from "@/lib/slop-mode";
 
 export default function FavoritesPage() {
   return (
@@ -18,6 +19,7 @@ export default function FavoritesPage() {
 }
 
 function FavoritesContent() {
+  const { enabled: slopEnabled } = useSlopMode();
   const { data: favorites, error, isLoading, mutate } = useSWR(
     "/users/me/favorites",
     fetchFavorites
@@ -73,6 +75,7 @@ function FavoritesContent() {
               rank={index + 1}
               showFavoriteButton
               onFavoriteChange={() => mutate()}
+              sloppy={slopEnabled}
             />
           ))}
         </div>

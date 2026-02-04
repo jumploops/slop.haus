@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import { Tabs } from "@/components/ui/Tabs";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { ProjectCardSkeleton } from "@/components/ui/Skeleton";
@@ -10,7 +10,9 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
-import { LayoutGrid, List, ListOrdered } from "lucide-react";
+import { useSlopMode } from "@/lib/slop-mode";
+import { SlopGoo } from "@/components/slop/SlopGoo";
+import { LayoutGrid, List, ListOrdered, Loader2 } from "lucide-react";
 
 type SortOption = "hot" | "new" | "top";
 type WindowOption = "24h" | "7d" | "30d" | "all";
@@ -31,11 +33,29 @@ const windowOptions: { value: WindowOption; label: string }[] = [
 
 export default function FeedPage() {
   const { data: session } = useSession();
+  const { enabled: slopEnabled } = useSlopMode();
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
-  const [page, setPage] = useState(1);
   const [showIntro, setShowIntro] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
+  const introRef = useRef<HTMLDivElement | null>(null);
+  const slopIntroClass = slopEnabled ? "" : "shadow-[2px_2px_0_var(--border)]";
+  const slopDismissClass = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] -rotate-6"
+    : "";
+  const slopControlRowClass = slopEnabled ? "rotate-[-0.3deg] translate-y-[1px]" : "";
+  const slopSelectClass = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[0.4deg]"
+    : "";
+  const slopToggleSm = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[-0.4deg] translate-y-[1px]"
+    : "";
+  const slopToggleLg = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[0.6deg] -translate-y-[1px]"
+    : "";
+  const slopToggleGrid = slopEnabled
+    ? "shadow-[1px_1px_0_var(--border)] rotate-[-0.2deg]"
+    : "";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -60,23 +80,33 @@ export default function FeedPage() {
     window.localStorage.setItem("slop:feedDisplayMode", displayMode);
   }, [displayMode]);
 
-  const { data, error, isLoading, mutate } = useSWR<FeedResponse>(
-    ["feed", sort, timeWindow, page],
-    () => fetchFeed({ sort, window: timeWindow, page, limit: 20 }),
+  const { data, error, isLoading, isValidating, size, setSize, mutate } = useSWRInfinite<FeedResponse>(
+    (pageIndex, previousPageData) => {
+      if (previousPageData && pageIndex >= previousPageData.pagination.totalPages) {
+        return null;
+      }
+      return ["feed", sort, timeWindow, pageIndex + 1] as const;
+    },
+    ([, nextSort, nextWindow, page]) =>
+      fetchFeed({ sort: nextSort, window: nextWindow, page, limit: 20 }),
     {
       revalidateOnFocus: false,
-      keepPreviousData: true,
     }
   );
 
+  const pages = data ?? [];
+  const projects = pages.flatMap((page) => page.projects);
+  const pagination = pages[0]?.pagination;
+  const totalPages = pagination?.totalPages ?? 0;
+  const totalCount = pagination?.total ?? 0;
+  const isLoadingMore = isValidating && size > 0;
+
   const handleSortChange = (newSort: string) => {
     setSort(newSort as SortOption);
-    setPage(1);
   };
 
   const handleWindowChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTimeWindow(e.target.value as WindowOption);
-    setPage(1);
   };
 
   const handleDisplayModeChange = (mode: DisplayMode) => {
@@ -90,9 +120,13 @@ export default function FeedPage() {
     setDisplayMode(mode);
   };
 
+  useEffect(() => {
+    setSize(1);
+  }, [sort, timeWindow, setSize]);
+
   const loadMore = () => {
-    if (data && page < data.pagination.totalPages) {
-      setPage((p) => p + 1);
+    if (pagination && size < totalPages) {
+      setSize((prev) => prev + 1);
     }
   };
 
@@ -100,9 +134,19 @@ export default function FeedPage() {
     <div className="space-y-8">
       {showIntro && (
         <div className="flex flex-col items-center text-center pt-6">
-          <div className="relative mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3">
+          <div
+            ref={introRef}
+            className={cn(
+              "relative -rotate-2 border-4 border-primary bg-primary/10 px-6 py-3 border-dashed",
+              slopEnabled ? "mb-8" : "mb-4",
+              slopIntroClass
+            )}
+            style={slopEnabled ? { borderBottomStyle: "solid" } : undefined}
+          >
             <h1 className="font-mono text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-              Confess your slop
+              <span className="relative inline-block">
+                <span className="relative">Confess your slop</span>
+              </span>
             </h1>
             <button
               type="button"
@@ -111,11 +155,34 @@ export default function FeedPage() {
                 setShowIntro(false);
               }}
               aria-label="Dismiss intro"
-              className="absolute -top-7 -right-6 inline-flex h-8 w-8 items-center justify-center border-2 border-border bg-muted font-mono text-sm leading-none text-muted-foreground transition-colors hover:border-primary hover:bg-card hover:text-foreground rotate-4"
+              className={cn(
+                "absolute -top-7 -right-6 inline-flex h-8 w-8 items-center justify-center border-2 border-border bg-muted font-mono text-sm leading-none text-muted-foreground transition-colors hover:border-primary hover:bg-card hover:text-foreground rotate-4",
+                slopDismissClass
+              )}
             >
               ×
             </button>
           </div>
+          {slopEnabled && (
+            <SlopGoo
+              targetRef={introRef}
+              seed={42}
+              rotationDeg={-2}
+              attach={{ start: 0, end: 1 }}
+              thickness={12}
+              maxDrop={64}
+              beadSpacing={18}
+              dripCount={7}
+              poolBias={0.8}
+              viscositySeconds={35}
+              edgeInset={0}
+              edgeInsetLowEnd={8}
+              edgeOffset={2}
+              edgeFeather={1}
+              borderOffset={-8}
+              zIndex={-1}
+            />
+          )}
           <p className="max-w-md text-muted-foreground">
             This is the one place slop is encouraged — share your funny/useful/useless machinations even if they barely function.
           </p>
@@ -133,13 +200,19 @@ export default function FeedPage() {
         </div>
       )}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        className={cn(
+          "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+          slopControlRowClass
+        )}
+      >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Tabs
             tabs={sortTabs}
             activeTab={sort}
             onTabChange={handleSortChange}
             className="mb-0 w-full sm:w-auto"
+            sloppy={slopEnabled}
           />
 
           {sort === "top" && (
@@ -151,6 +224,7 @@ export default function FeedPage() {
                 "min-h-10 sm:min-h-0 px-3 py-2 sm:py-1 text-xs font-bold font-mono uppercase tracking-wide",
                 "bg-background text-foreground",
                 "border-2 border-dashed border-border",
+                slopSelectClass,
                 "focus:outline-none focus:border-primary"
               )}
             >
@@ -171,6 +245,7 @@ export default function FeedPage() {
             title="List (small)"
             className={cn(
               "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              slopToggleSm,
               displayMode === "list-sm"
                 ? "bg-primary/10 text-primary border-primary"
                 : "bg-card text-muted-foreground border-border hover:text-primary"
@@ -185,6 +260,7 @@ export default function FeedPage() {
             title="List (large)"
             className={cn(
               "hidden sm:inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              slopToggleLg,
               displayMode === "list-lg"
                 ? "bg-primary/10 text-primary border-primary"
                 : "bg-card text-muted-foreground border-border hover:text-primary"
@@ -199,6 +275,7 @@ export default function FeedPage() {
             title="Grid"
             className={cn(
               "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              slopToggleGrid,
               displayMode === "grid"
                 ? "bg-primary/10 text-primary border-primary"
                 : "bg-card text-muted-foreground border-border hover:text-primary"
@@ -219,7 +296,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {isLoading && !data && (
+      {isLoading && pages.length === 0 && (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
             <ProjectCardSkeleton key={i} />
@@ -227,7 +304,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {data && data.projects.length === 0 && (
+      {pagination && projects.length === 0 && (
         <div className="border-2 border-dashed border-border p-6 text-center">
           <h3 className="text-lg font-bold text-foreground mb-2">No projects yet</h3>
           <p className="text-sm text-muted-foreground">Be the first to submit a project!</p>
@@ -237,7 +314,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {data && data.projects.length > 0 && (
+      {pagination && projects.length > 0 && (
         <>
           <div
             className={cn(
@@ -245,29 +322,37 @@ export default function FeedPage() {
                 ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 : displayMode === "list-lg"
                 ? "space-y-4"
-                : "space-y-3"
+                : "space-y-3",
+              slopEnabled &&
+                (displayMode === "grid"
+                  ? "gap-6"
+                  : displayMode === "list-lg"
+                  ? "space-y-6"
+                  : "space-y-5")
             )}
           >
-            {data.projects.map((project, index) => (
+            {projects.map((project, index) => (
               <ProjectCard
                 key={project.id}
                 project={project}
                 rank={index + 1}
                 variant={displayMode}
+                sloppy={slopEnabled}
               />
             ))}
           </div>
 
-          {page < data.pagination.totalPages && (
+          {pagination && size < totalPages && (
             <div className="flex justify-center mt-4">
-              <Button variant="secondary" onClick={loadMore}>
-                Load More
+              <Button variant="secondary" onClick={loadMore} disabled={isLoadingMore}>
+                {isLoadingMore && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoadingMore ? "Loading" : "Load More"}
               </Button>
             </div>
           )}
 
           <div className="text-center text-muted-foreground text-xs mt-4">
-            Showing {data.projects.length} of {data.pagination.total} projects
+            Showing {projects.length} of {totalCount} projects
           </div>
         </>
       )}

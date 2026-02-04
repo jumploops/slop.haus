@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Alfa_Slab_One, Geist, Geist_Mono, Rubik_Wet_Paint } from "next/font/google";
 import { Providers } from "./providers";
 import { Header } from "@/components/layout/Header";
 import { VisitorCounter } from "@/components/layout/VisitorCounter";
@@ -7,6 +7,16 @@ import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+const rubikWetPaint = Rubik_Wet_Paint({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-rubik-wet-paint",
+});
+const alfaSlabOne = Alfa_Slab_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-alfa-slab-one",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
@@ -31,13 +41,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} ${rubikWetPaint.variable} ${alfaSlabOne.variable} font-sans antialiased`}>
         <Providers>
-          <div className="bg-slop-orange overflow-hidden py-1.5 text-foreground">
+          <div className="bg-construction-yellow overflow-hidden construction-banner-text">
             <div className="animate-[marquee_20s_linear_infinite] flex whitespace-nowrap">
               {Array.from({ length: 10 }).map((_, i) => (
-                <span key={i} className="mx-4 font-mono text-sm font-bold tracking-wide">
-                  UNDER CONSTRUCTION * PARDON OUR SLOP *
+                <span
+                  key={i}
+                  className="marquee-stripes ml-4 mr-4 flex items-center pl-24 font-mono text-sm font-bold tracking-wide"
+                >
+                  {i % 2 === 0 ? "UNDER CONSTRUCTION" : "PARDON OUR SLOP"}
                 </span>
               ))}
             </div>
