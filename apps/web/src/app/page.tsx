@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import useSWRInfinite from "swr/infinite";
 import { Tabs } from "@/components/ui/Tabs";
@@ -10,8 +10,8 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
-import { useSlopDrip } from "@/lib/slop-drip";
 import { useSlopMode } from "@/lib/slop-mode";
+import { SlopGoo } from "@/components/slop/SlopGoo";
 import { LayoutGrid, List, ListOrdered } from "lucide-react";
 
 type SortOption = "hot" | "new" | "top";
@@ -38,10 +38,8 @@ export default function FeedPage() {
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [showIntro, setShowIntro] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
-  const introDripRef = useSlopDrip(slopEnabled, { depth: 32, dripCount: 9 });
-  const slopIntroClass = slopEnabled
-    ? "shadow-[2px_2px_0_var(--border)] before:absolute before:-top-3 before:left-8 before:h-4 before:w-12 before:-rotate-2 before:bg-secondary/70 before:border before:border-border before:content-[''] before:opacity-80 after:absolute after:-top-3 after:right-6 after:h-3 after:w-10 after:rotate-2 after:bg-secondary/60 after:border after:border-border after:content-[''] after:opacity-80"
-    : "";
+  const introRef = useRef<HTMLDivElement | null>(null);
+  const slopIntroClass = slopEnabled ? "" : "shadow-[2px_2px_0_var(--border)]";
   const slopDismissClass = slopEnabled
     ? "shadow-[1px_1px_0_var(--border)] -rotate-6"
     : "";
@@ -136,21 +134,16 @@ export default function FeedPage() {
       {showIntro && (
         <div className="flex flex-col items-center text-center pt-6">
           <div
-            ref={introDripRef}
+            ref={introRef}
             className={cn(
-              "relative mb-4 -rotate-2 border-4 border-dashed border-primary bg-primary/10 px-6 py-3",
-              slopIntroClass,
-              slopEnabled && "slop-drip"
+              "relative -rotate-2 border-4 border-primary bg-primary/10 px-6 py-3 border-dashed",
+              slopEnabled ? "mb-8" : "mb-4",
+              slopIntroClass
             )}
+            style={slopEnabled ? { borderBottomStyle: "solid" } : undefined}
           >
             <h1 className="font-mono text-3xl font-black tracking-tight text-foreground sm:text-4xl">
               <span className="relative inline-block">
-                {slopEnabled && (
-                  <span
-                    className="absolute -left-2 -right-3 top-3 -z-10 h-3 -rotate-1 bg-primary/20 blur-[0.5px]"
-                    aria-hidden="true"
-                  />
-                )}
                 <span className="relative">Confess your slop</span>
               </span>
             </h1>
@@ -169,6 +162,26 @@ export default function FeedPage() {
               ×
             </button>
           </div>
+          {slopEnabled && (
+            <SlopGoo
+              targetRef={introRef}
+              seed={42}
+              rotationDeg={-2}
+              attach={{ start: 0, end: 1 }}
+              thickness={12}
+              maxDrop={64}
+              beadSpacing={18}
+              dripCount={7}
+              poolBias={0.8}
+              viscositySeconds={35}
+              edgeInset={0}
+              edgeInsetLowEnd={8}
+              edgeOffset={2}
+              edgeFeather={1}
+              borderOffset={-8}
+              zIndex={-1}
+            />
+          )}
           <p className="max-w-md text-muted-foreground">
             This is the one place slop is encouraged — share your funny/useful/useless machinations even if they barely function.
           </p>
