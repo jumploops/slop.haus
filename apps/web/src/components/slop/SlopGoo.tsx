@@ -318,6 +318,8 @@ export function SlopGoo({
   const maskId = `slop-goo-mask-${id}`;
   const gradientId = `slop-goo-mask-gradient-${id}`;
   const feather = Math.max(0, edgeFeather);
+  const displacementScale = prefersReducedMotion ? 0 : 6;
+  const filterPad = Math.ceil(blur * 3 + displacementScale + 8);
   const gx1 = b0.x - nx * feather;
   const gy1 = b0.y - ny * feather;
   const gx2 = b0.x + nx * feather;
@@ -336,7 +338,14 @@ export function SlopGoo({
     >
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: "visible" }}>
         <defs>
-          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
+          <filter
+            id={filterId}
+            filterUnits="userSpaceOnUse"
+            x={-filterPad}
+            y={-filterPad}
+            width={width + filterPad * 2}
+            height={height + filterPad * 2}
+          >
             <feGaussianBlur in="SourceGraphic" stdDeviation={blur} result="blur" />
             <feColorMatrix
               in="blur"
@@ -354,7 +363,13 @@ export function SlopGoo({
                 <animate attributeName="baseFrequency" dur="90s" values="0.010;0.014;0.010" repeatCount="indefinite" />
               )}
             </feTurbulence>
-            <feDisplacementMap in="goo" in2="noise" scale={prefersReducedMotion ? 0 : 6} xChannelSelector="R" yChannelSelector="G" />
+            <feDisplacementMap
+              in="goo"
+              in2="noise"
+              scale={displacementScale}
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
           </filter>
           <linearGradient
             id={gradientId}
