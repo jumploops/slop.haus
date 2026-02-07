@@ -5,7 +5,7 @@ services:
     region: oregon
     branch: main
     rootDir: .
-    buildCommand: pnpm install --frozen-lockfile && pnpm -F @slop/web build
+    buildCommand: pnpm install --frozen-lockfile --prod=false && pnpm -F @slop/web build
     startCommand: pnpm -F @slop/web start
     healthCheckPath: /
     envVars:
@@ -24,7 +24,7 @@ services:
     region: oregon
     branch: main
     rootDir: .
-    buildCommand: pnpm install --frozen-lockfile
+    buildCommand: pnpm install --frozen-lockfile --prod=false
     startCommand: pnpm -F @slop/api run start:prod
     healthCheckPath: /health
     envVars:
@@ -74,7 +74,7 @@ services:
     region: oregon
     branch: main
     rootDir: .
-    buildCommand: pnpm install --frozen-lockfile
+    buildCommand: pnpm install --frozen-lockfile --prod=false
     startCommand: pnpm -F @slop/worker run start:prod
     envVars:
       - key: NODE_VERSION
