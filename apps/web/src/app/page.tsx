@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import useSWRInfinite from "swr/infinite";
+import type { SWRInfiniteKeyLoader } from "swr/infinite";
 import { Tabs } from "@/components/ui/Tabs";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { ProjectCardSkeleton } from "@/components/ui/Skeleton";
@@ -17,6 +18,7 @@ import { LayoutGrid, List, ListOrdered, Loader2 } from "lucide-react";
 type SortOption = "hot" | "new" | "top";
 type WindowOption = "24h" | "7d" | "30d" | "all";
 type DisplayMode = "list-sm" | "list-lg" | "grid";
+type FeedKey = readonly ["feed", SortOption, WindowOption, number];
 
 const sortTabs = [
   { id: "hot", label: "Hot" },
@@ -80,14 +82,16 @@ export default function FeedPage() {
     window.localStorage.setItem("slop:feedDisplayMode", displayMode);
   }, [displayMode]);
 
+  const getFeedKey: SWRInfiniteKeyLoader<FeedResponse, FeedKey> = (pageIndex, previousPageData) => {
+    if (previousPageData && pageIndex >= previousPageData.pagination.totalPages) {
+      return null;
+    }
+    return ["feed", sort, timeWindow, pageIndex + 1];
+  };
+
   const { data, error, isLoading, isValidating, size, setSize, mutate } = useSWRInfinite<FeedResponse>(
-    (pageIndex, previousPageData) => {
-      if (previousPageData && pageIndex >= previousPageData.pagination.totalPages) {
-        return null;
-      }
-      return ["feed", sort, timeWindow, pageIndex + 1] as const;
-    },
-    ([, nextSort, nextWindow, page]) =>
+    getFeedKey,
+    ([, nextSort, nextWindow, page]: FeedKey) =>
       fetchFeed({ sort: nextSort, window: nextWindow, page, limit: 20 }),
     {
       revalidateOnFocus: false,
