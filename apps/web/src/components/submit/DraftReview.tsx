@@ -172,7 +172,6 @@ export function DraftReview({
             placeholder="Optional longer description"
             helperText={countHelper(description.length, 10000, 9000)}
           />
-        </div>
       </section>
 
       <section className="border-2 border-border bg-card p-4 space-y-4">
@@ -200,7 +199,6 @@ export function DraftReview({
             onBlur={() => handleFieldBlur("repoUrl", repoUrl || null)}
             placeholder="https://github.com/user/repo"
           />
-        </div>
       </section>
 
       <section className="border-2 border-border bg-card p-4 space-y-3">

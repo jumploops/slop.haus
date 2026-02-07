@@ -28,19 +28,15 @@ function usePrefersReducedMotion() {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setPrefersReducedMotion(media.matches);
     update();
-    if ("addEventListener" in media) {
-      media.addEventListener("change", update);
-      return () => media.removeEventListener("change", update);
-    }
-    media.addListener(update);
-    return () => media.removeListener(update);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   return prefersReducedMotion;
 }
 
 export type SlopGooProps = {
-  targetRef: RefObject<HTMLElement>;
+  targetRef: RefObject<HTMLElement | null>;
   seed?: number;
   rotationDeg?: number;
   attach?: Attach;
