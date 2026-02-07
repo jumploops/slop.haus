@@ -82,7 +82,10 @@ export default function FeedPage() {
     window.localStorage.setItem("slop:feedDisplayMode", displayMode);
   }, [displayMode]);
 
-  const getFeedKey: SWRInfiniteKeyLoader<FeedResponse, FeedKey> = (pageIndex, previousPageData) => {
+  const getFeedKey: SWRInfiniteKeyLoader<FeedResponse, FeedKey | null> = (
+    pageIndex,
+    previousPageData
+  ) => {
     if (previousPageData && pageIndex >= previousPageData.pagination.totalPages) {
       return null;
     }
