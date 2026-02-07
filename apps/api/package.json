@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
     "build": "tsc",
-    "start": "dotenv -e ../../.env -- node dist/index.js"
+    "start": "dotenv -e ../../.env -- tsx src/index.ts",
+    "start:prod": "tsx src/index.ts",
+    "start:dist": "dotenv -e ../../.env -- node dist/index.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.500.0",

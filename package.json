@@ -8,6 +8,7 @@
     "lint": "pnpm -r run lint",
     "db:generate": "pnpm --filter @slop/db run generate",
     "db:migrate": "pnpm --filter @slop/db run migrate",
+    "db:migrate:prod": "pnpm --filter @slop/db run migrate:prod",
     "db:push": "pnpm --filter @slop/db run push",
     "db:studio": "pnpm --filter @slop/db run studio"
   },

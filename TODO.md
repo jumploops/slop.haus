@@ -66,6 +66,12 @@ Future enhancements, fixes, and improvements.
 
 ## Code Quality
 
+- [ ] **Worker runtime: move from tsx to compiled JS** - Refactor production worker startup to use `node dist/index.js` instead of `tsx src/index.ts`. Required follow-up:
+  - Fix ESM import resolution in worker build output (missing `.js` extensions)
+  - Build and export `@slop/db` and `@slop/shared` as runtime JS artifacts
+  - Update Render start command to use compiled worker output
+  - Verify prod startup with environment-only config (no dotenv)
+
 - [ ] **Move tool aliases to database** - Hardcoded `TOOL_ALIASES` in `tool-matching.ts` should be a database table for easier management.
 
 - [ ] **Version LLM prompts** - Store prompt versions for A/B testing and rollback. Track which version generated each extraction.

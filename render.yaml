@@ -1,0 +1,108 @@
+services:
+  - type: web
+    name: slop-web
+    runtime: node
+    region: oregon
+    branch: main
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile && pnpm -F @slop/web build
+    startCommand: pnpm -F @slop/web start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://slop.haus
+      - key: NEXT_PUBLIC_API_URL
+        value: https://api.slop.haus
+
+  - type: web
+    name: slop-api
+    runtime: node
+    region: oregon
+    branch: main
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile
+    startCommand: pnpm -F @slop/api run start:prod
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        value: https://slop.haus
+      - key: API_URL
+        value: https://api.slop.haus
+      # Existing Render Postgres: set this value in the dashboard (or swap to fromDatabase).
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: STORAGE_TYPE
+        value: s3
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        value: us-west-2
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_PUBLIC_URL
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_SESSION_TOKEN
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+  - type: worker
+    name: slop-worker
+    runtime: node
+    region: oregon
+    branch: main
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile
+    startCommand: pnpm -F @slop/worker run start:prod
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Existing Render Postgres: set this value in the dashboard (or swap to fromDatabase).
+      - key: DATABASE_URL
+        sync: false
+      - key: STORAGE_TYPE
+        value: s3
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        value: us-west-2
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_PUBLIC_URL
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_SESSION_TOKEN
+        sync: false
+      - key: FIRECRAWL_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: WORKER_POLL_INTERVAL_MS
+        value: "5000"
