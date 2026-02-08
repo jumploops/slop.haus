@@ -31,9 +31,5 @@ pnpm-debug.log*
 # Testing
 coverage/
 
-# Drizzle
-packages/db/drizzle/
-
 # Local file store
 uploads/
-

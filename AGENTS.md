@@ -292,6 +292,31 @@ pnpm db:push
 
 `pnpm db:migrate` is reserved for production/CI when applying tracked migrations.
 
+### Migration Safety Rules
+
+1. **Source of truth for production is tracked migrations, not `db:push`**
+   - `db:push` is allowed for local iteration only.
+   - Before merge/deploy, ensure required schema changes exist in tracked migrations.
+
+2. **Never add/edit migration SQL without matching Drizzle metadata updates**
+   - Keep `packages/db/drizzle/*.sql` and `packages/db/drizzle/meta/*` in sync.
+   - If `drizzle-kit generate` fails, fix metadata chain issues before adding more migrations.
+   - Migration files in `packages/db/drizzle/` must be committed to git.
+
+3. **Run production migrations against the exact deployed DB URL**
+   - Use environment-provided `DATABASE_URL` in CI/Render shell.
+   - Do not rely on local `.env.prod` as deployment source of truth.
+
+4. **Pre-deploy verification**
+   - Confirm target DB host/db name from `DATABASE_URL`.
+   - Confirm `drizzle.__drizzle_migrations` (or `public.__drizzle_migrations`) includes latest tag after migration.
+
+5. **Production command**
+
+```bash
+pnpm db:migrate:prod
+```
+
 ## Environment
 
 - Node.js 20+

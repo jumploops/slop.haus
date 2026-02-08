@@ -63,7 +63,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       {/* Overlay */}
       <div
         className={cn(
-          "fixed inset-0 bg-foreground/50 z-[100]",
+          "fixed inset-0 bg-overlay z-[100]",
           "transition-opacity duration-200",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}

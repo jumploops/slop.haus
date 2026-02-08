@@ -46,7 +46,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
       className={cn(
         "border-2 border-border bg-card text-foreground p-0",
         "max-w-[500px] w-[90%] m-auto",
-        "backdrop:bg-foreground/75",
+        "backdrop:bg-overlay",
         className
       )}
       onClick={handleBackdropClick}

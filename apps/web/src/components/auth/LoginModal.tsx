@@ -33,7 +33,7 @@ export function LoginModal() {
           <Button
             variant="secondary"
             onClick={handleGitHubLogin}
-            className="w-full justify-center gap-3 py-3.5"
+            className="w-full justify-center gap-3 py-3.5 cursor-pointer"
           >
             <GithubIcon />
             Continue with GitHub
@@ -42,7 +42,7 @@ export function LoginModal() {
           <Button
             variant="secondary"
             onClick={handleGoogleLogin}
-            className="w-full justify-center gap-3 py-3.5"
+            className="w-full justify-center gap-3 py-3.5 cursor-pointer"
           >
             <GoogleIcon />
             Continue with Google

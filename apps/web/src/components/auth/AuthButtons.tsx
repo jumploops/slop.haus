@@ -158,7 +158,7 @@ export function AuthButtons() {
 
   return (
     <div className="relative">
-      <Button variant="primary" onClick={openLoginModal}>
+      <Button variant="primary" onClick={openLoginModal} className="cursor-pointer">
         Sign In
       </Button>
     </div>

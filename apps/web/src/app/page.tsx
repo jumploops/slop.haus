@@ -163,7 +163,7 @@ export default function FeedPage() {
               }}
               aria-label="Dismiss intro"
               className={cn(
-                "absolute -top-7 -right-6 inline-flex h-8 w-8 items-center justify-center border-2 border-border bg-muted font-mono text-sm leading-none text-muted-foreground transition-colors hover:border-primary hover:bg-card hover:text-foreground rotate-4",
+                "absolute -top-7 -right-6 inline-flex h-8 w-8 items-center justify-center border-2 border-border bg-muted font-mono text-sm leading-none text-muted-foreground transition-colors hover:border-primary hover:bg-card hover:text-foreground cursor-pointer -rotate-4",
                 slopDismissClass
               )}
             >
