@@ -36,7 +36,7 @@ export function Header() {
         <div className="flex items-center gap-3">
           <nav className="hidden sm:flex items-center gap-6 pr-4">
             <NavLink href="/" active={pathname === "/"}>
-              New
+              Feed
             </NavLink>
             <NavLink href="/submit" active={pathname === "/submit"}>
               Submit

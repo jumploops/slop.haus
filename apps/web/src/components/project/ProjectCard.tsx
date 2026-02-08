@@ -9,6 +9,8 @@ import { useEffect, useRef, useState } from "react";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
+import { getSlopBandForAggregateScore, getSlopBandTerm } from "@slop/shared";
+import { getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
 
 const SLOP_CARD_OFFSETS = [
   { className: "rotate-[0.6deg] translate-x-[1px] translate-y-[1px]", rotationDeg: 0.6 },
@@ -58,9 +60,11 @@ export function ProjectCard({
 
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
   const isNew = Date.now() - new Date(project.createdAt).getTime() < 2 * 24 * 60 * 60 * 1000;
+  const slopBand = getSlopBandForAggregateScore(project.slopScore, project.reviewCount);
   const slopScore = project.reviewCount === 0 ? "—" : project.slopScore.toFixed(1);
+  const slopTerm = getSlopBandTerm(slopBand);
   const visitUrl = project.mainUrl || project.repoUrl;
-  const scoreTone = getSlopTone(project.slopScore, project.reviewCount);
+  const scoreTone = getSlopBandBadgeClass(slopBand);
   const rotation = rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
   const thumbnailSize = isLarge ? "sm:h-32 sm:w-48" : "sm:h-16 sm:w-24";
   const likeButtonSize = isGrid ? "h-12 w-12" : "h-16 w-14";
@@ -182,8 +186,8 @@ export function ProjectCard({
                   >
                     {slopScore}
                   </div>
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Slop
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground text-center leading-none">
+                    {slopTerm}
                   </span>
                 </div>
               </div>
@@ -326,8 +330,8 @@ export function ProjectCard({
                 >
                   {slopScore}
                 </div>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Slop
+                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground text-center leading-none">
+                  {slopTerm}
                 </span>
               </div>
             </div>
@@ -396,16 +400,6 @@ function HeartIcon({ filled }: { filled: boolean }) {
       <path d="M8 13.5l-1.2-1.1C3.4 9.4 1.5 7.6 1.5 5.4 1.5 3.6 2.9 2 4.6 2c1 0 2 .5 2.6 1.2h.6C8.4 2.5 9.4 2 10.4 2c1.7 0 3.1 1.6 3.1 3.4 0 2.2-1.9 4-5.3 7L8 13.5z" />
     </svg>
   );
-}
-
-function getSlopTone(score: number, reviewCount: number) {
-  if (reviewCount === 0) {
-    return "bg-muted text-muted-foreground";
-  }
-  if (score >= 80) return "bg-primary text-primary-foreground";
-  if (score >= 60) return "bg-slop-lime text-foreground";
-  if (score >= 40) return "bg-slop-orange text-foreground";
-  return "bg-destructive text-destructive-foreground";
 }
 
 function getSlopIndex(seed: string) {

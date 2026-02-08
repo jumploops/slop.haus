@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DEFAULT_VIBE_DETAILS } from "@slop/shared";
+import { DEFAULT_VIBE_DETAILS, getSlopBandTerm } from "@slop/shared";
 import { useSession } from "@/lib/auth-client";
 import { InlineEditText } from "./InlineEditText";
 import { InlineEditTextarea } from "./InlineEditTextarea";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn, getPlaceholderImage } from "@/lib/utils";
+import { getSlopBandTextClass } from "@/lib/slop-score-presentation";
 
 interface DraftData {
   draftId: string;
@@ -128,6 +129,7 @@ export function EditableProjectPreview({
   // Validation
   const hasRequiredFields =
     title.trim() && tagline.trim() && (mainUrl || repoUrl);
+  const unratedTerm = getSlopBandTerm("unrated");
 
   return (
     <div className="space-y-6">
@@ -270,7 +272,17 @@ export function EditableProjectPreview({
               <div className="space-y-2 text-xs mt-3 text-muted-foreground">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-foreground">Slop score</span>
-                  <span>—</span>
+                  <div className="flex items-center gap-1">
+                    <span>—</span>
+                    <span
+                      className={cn(
+                        "font-mono text-[10px] uppercase tracking-wide",
+                        getSlopBandTextClass("unrated")
+                      )}
+                    >
+                      {unratedTerm}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-foreground">Reviews</span>

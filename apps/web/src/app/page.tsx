@@ -198,7 +198,7 @@ export default function FeedPage() {
               href="/submit"
               className={cn(
                 buttonVariants({ variant: "primary", size: "md" }),
-                "justify-self-center"
+                "justify-self-center text-white hover:text-white dark:text-zinc-900 dark:hover:text-zinc-900"
               )}
             >
               Submit slop

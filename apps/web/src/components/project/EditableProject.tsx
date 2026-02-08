@@ -2,7 +2,12 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { DEFAULT_VIBE_DETAILS, isEqualVibeDetails } from "@slop/shared";
+import {
+  DEFAULT_VIBE_DETAILS,
+  getSlopBandForAggregateScore,
+  getSlopBandTerm,
+  isEqualVibeDetails,
+} from "@slop/shared";
 import { InlineEditText } from "@/components/submit/InlineEditText";
 import { InlineEditTextarea } from "@/components/submit/InlineEditTextarea";
 import { TagEditor } from "@/components/submit/TagEditor";
@@ -17,6 +22,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { refreshProject, type ProjectDetail, type ProjectRevision } from "@/lib/api/projects";
+import { getSlopBandTextClass } from "@/lib/slop-score-presentation";
 
 interface EditableProjectProps {
   project: ProjectDetail;
@@ -56,6 +62,8 @@ export function EditableProject({
   // Screenshot state
   const primaryMedia = project.media.find((m) => m.isPrimary) || project.media[0];
   const [screenshotUrl, setScreenshotUrl] = useState(primaryMedia?.url || null);
+  const slopBand = getSlopBandForAggregateScore(project.slopScore, project.reviewCount);
+  const slopTerm = getSlopBandTerm(slopBand);
 
   // URL change modal state - now triggered on submit, not blur
   const [urlChangeModal, setUrlChangeModal] = useState<{
@@ -419,9 +427,19 @@ export function EditableProject({
                     <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
                       Slop score
                     </span>
-                    <span className="font-mono text-xs text-foreground">
-                      {project.reviewCount > 0 ? project.slopScore.toFixed(1) : "—"}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="font-mono text-xs text-foreground">
+                        {project.reviewCount > 0 ? project.slopScore.toFixed(1) : "—"}
+                      </span>
+                      <span
+                        className={cn(
+                          "font-mono text-[10px] uppercase tracking-wide",
+                          getSlopBandTextClass(slopBand)
+                        )}
+                      >
+                        {slopTerm}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">

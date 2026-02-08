@@ -10,6 +10,8 @@ import { deleteComment, voteOnComment } from "@/lib/api/comments";
 import { useToast } from "@/components/ui/Toast";
 import type { CommentWithChildren } from "@/lib/api/comments";
 import { ThumbsUp } from "lucide-react";
+import { getSlopBandForReviewScore } from "@slop/shared";
+import { getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
 
 interface CommentItemProps {
   comment: CommentWithChildren;
@@ -102,7 +104,7 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
             <div
               className={cn(
                 "flex h-8 w-8 rotate-3 items-center justify-center rounded-sm font-mono text-xs font-black shadow-md",
-                getScoreTone(comment.reviewScore)
+                getSlopBandBadgeClass(getSlopBandForReviewScore(comment.reviewScore))
               )}
             >
               {comment.reviewScore}
@@ -189,11 +191,4 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
       </div>
     </div>
   );
-}
-
-function getScoreTone(score: number) {
-  if (score >= 8) return "bg-primary text-primary-foreground";
-  if (score >= 6) return "bg-slop-lime text-foreground";
-  if (score >= 4) return "bg-slop-orange text-foreground";
-  return "bg-destructive text-destructive-foreground";
 }

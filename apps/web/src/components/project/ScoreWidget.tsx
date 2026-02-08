@@ -6,6 +6,8 @@ import { VibeMeter } from "./VibeMeter";
 import { useLike } from "@/hooks/useLike";
 import { useSlopMode } from "@/lib/slop-mode";
 import { cn } from "@/lib/utils";
+import { getSlopBandForAggregateScore, getSlopBandTerm } from "@slop/shared";
+import { getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
 
 interface ScoreWidgetProps {
   projectSlug: string;
@@ -36,6 +38,11 @@ export function ScoreWidget({
     if (reviewCount === 0) return "—";
     return slopScore.toFixed(1);
   }, [reviewCount, slopScore]);
+  const slopBand = useMemo(
+    () => getSlopBandForAggregateScore(slopScore, reviewCount),
+    [reviewCount, slopScore]
+  );
+  const slopTerm = getSlopBandTerm(slopBand);
 
   return (
     <div className="border-2 border-border bg-card p-4 space-y-6">
@@ -53,12 +60,15 @@ export function ScoreWidget({
           <div
             className={cn(
               "flex h-12 w-12 rotate-3 items-center justify-center rounded-sm font-mono text-lg font-black shadow-md",
-              getSlopTone(slopScore, reviewCount),
+              getSlopBandBadgeClass(slopBand),
               slopEnabled && "slop-sticky slop-sticky-outline"
             )}
           >
             {displayScore}
           </div>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            {slopTerm}
+          </span>
         </div>
       </div>
 
@@ -85,14 +95,4 @@ export function ScoreWidget({
       </div>
     </div>
   );
-}
-
-function getSlopTone(score: number, reviewCount: number) {
-  if (reviewCount === 0) {
-    return "bg-muted text-muted-foreground";
-  }
-  if (score >= 80) return "bg-primary text-primary-foreground";
-  if (score >= 60) return "bg-slop-lime text-foreground";
-  if (score >= 40) return "bg-slop-orange text-foreground";
-  return "bg-destructive text-destructive-foreground";
 }

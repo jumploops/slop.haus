@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/Input";
 import { createComment } from "@/lib/api/comments";
 import { useToast } from "@/components/ui/Toast";
 import { useSession } from "@/lib/auth-client";
+import { getSlopBandForReviewScore, getSlopBandLabel } from "@slop/shared";
+import { getSlopBandTextClass } from "@/lib/slop-score-presentation";
 
 interface CommentFormProps {
   projectSlug: string;
@@ -28,6 +30,7 @@ export function CommentForm({
   const [reviewScore, setReviewScore] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isTopLevel = !parentCommentId;
+  const selectedBand = reviewScore === null ? null : getSlopBandForReviewScore(reviewScore);
 
   // Render placeholder during session loading to avoid hydration mismatch
   if (isPending) {
@@ -95,12 +98,12 @@ export function CommentForm({
               }}
             >
               <span
-                className={`font-mono text-lg font-black leading-none ${reviewScore === null ? "text-muted-foreground" : getScoreColor(reviewScore)}`}
+                className={`font-mono text-lg font-black leading-none ${selectedBand === null ? "text-muted-foreground" : getSlopBandTextClass(selectedBand)}`}
               >
                 {reviewScore ?? "—"}
               </span>
               <span className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">
-                {reviewScore === null ? "SELECT SCORE" : getScoreLabel(reviewScore)}
+                {selectedBand === null ? "SELECT SCORE" : getSlopBandLabel(selectedBand)}
               </span>
             </div>
             <input
@@ -140,19 +143,4 @@ export function CommentForm({
       </div>
     </form>
   );
-}
-
-function getScoreLabel(score: number) {
-  if (score >= 10) return "IMMACULATE SLOP";
-  if (score >= 8) return "SOLID SLOP";
-  if (score >= 6) return "DECENT SLOP";
-  if (score >= 4) return "STALE SLOP";
-  return "SLOPPY SLOP";
-}
-
-function getScoreColor(score: number) {
-  if (score >= 8) return "text-primary";
-  if (score >= 6) return "text-slop-lime";
-  if (score >= 4) return "text-slop-orange";
-  return "text-destructive";
 }
