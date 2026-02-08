@@ -42,7 +42,10 @@ cp .env.example .env
 # Push database schema
 pnpm db:push
 
-# Seed initial data (tools, etc.)
+# Reset and seed local database (destructive)
+pnpm db:reset
+
+# Seed without reset (non-destructive)
 pnpm --filter @slop/db seed
 ```
 
@@ -84,7 +87,11 @@ pnpm db:generate   # Generate migrations
 pnpm db:migrate    # Run migrations
 pnpm db:push       # Push schema (dev)
 pnpm db:studio     # Open Drizzle Studio
+pnpm db:reset      # Reset + seed local DB (destructive)
 ```
+
+`db:reset` is guarded to local DB hosts by default.  
+Set `ALLOW_DB_RESET=1` to bypass the host check.
 
 ## Ports
 

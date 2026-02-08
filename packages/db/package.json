@@ -14,10 +14,13 @@
     "migrate:prod": "dotenv -e ../../.env.prod drizzle-kit migrate",
     "push": "dotenv -e ../../.env -- drizzle-kit push",
     "studio": "dotenv -e ../../.env -- drizzle-kit studio",
-    "seed": "dotenv -e ../../.env -- tsx src/seed.ts"
+    "seed": "dotenv -e ../../.env -- tsx src/seed.ts",
+    "reset": "dotenv -e ../../.env -- tsx src/reset.ts",
+    "seed:reset": "dotenv -e ../../.env -- tsx src/seed-reset.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.41.0",
+    "drizzle-seed": "^0.3.1",
     "postgres": "^3.4.5"
   },
   "devDependencies": {

@@ -1,7 +1,11 @@
 import { db } from "./index";
 import { projects } from "./schema";
 import { notInArray, sql } from "drizzle-orm";
-import { buildComments, seedComments } from "./seed/comments";
+import {
+  buildComments,
+  buildProjectReviewScoreTargets,
+  seedComments,
+} from "./seed/comments";
 import { buildEnrichmentDrafts, seedEnrichmentDrafts } from "./seed/enrichment";
 import {
   buildCommentVotes,
@@ -18,11 +22,12 @@ import { buildProjects, fetchProjectMap, seedProjects, updateProjectCounts } fro
 import { buildProjectRevisions, seedProjectRevisions } from "./seed/revisions";
 import { seedTools } from "./seed/tools";
 import { seedUsers } from "./seed/users";
+import { pathToFileURL } from "node:url";
 
 const PROJECT_COUNT = 200;
 const SEED_TOKEN = "slop-heavy-v1";
 
-async function seed() {
+export async function seedDatabase(): Promise<void> {
   const start = Date.now();
   console.log(`Seeding database (heavy, ${PROJECT_COUNT} projects)...`);
 
@@ -66,6 +71,10 @@ async function seed() {
     seed: `${SEED_TOKEN}:comments`,
     projectIds,
     userIds,
+    projectTargetScores: buildProjectReviewScoreTargets({
+      projectIds,
+      seed: `${SEED_TOKEN}:project-score-targets`,
+    }),
   });
   await seedComments(db, comments);
 
@@ -171,9 +180,21 @@ async function seed() {
   console.log(`Done in ${elapsed}s.`);
 }
 
-seed()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+function isDirectExecution(metaUrl: string): boolean {
+  const entryFile = process.argv[1];
+  if (!entryFile) return false;
+  return pathToFileURL(entryFile).href === metaUrl;
+}
+
+async function main(): Promise<void> {
+  await seedDatabase();
+}
+
+if (isDirectExecution(import.meta.url)) {
+  main()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}

@@ -154,7 +154,6 @@ export function buildProjects(options: {
     const enrichmentRoll = rng();
     const enrichmentStatus = enrichmentRoll < 0.7 ? "completed" : enrichmentRoll < 0.9 ? "pending" : "failed";
 
-    const slopScore = formatNumber(randFloat(rng, 0.5, 9.5), 2);
     const hotScore = formatNumber(randFloat(rng, 0, 200), 4);
 
     const vibeDetailsJson =
@@ -183,7 +182,7 @@ export function buildProjects(options: {
       likeCount: 0,
       reviewCount: 0,
       reviewScoreTotal: 0,
-      slopScore,
+      slopScore: "0",
       hotScore,
       commentCount: 0,
       status,
@@ -218,12 +217,16 @@ export async function updateProjectCounts(
   counts: Map<string, { likeCount: number; reviewCount: number; reviewScoreTotal: number; commentCount: number }>
 ): Promise<void> {
   for (const [projectId, values] of counts.entries()) {
+    const slopScore =
+      values.reviewCount > 0 ? formatNumber(values.reviewScoreTotal / values.reviewCount, 2) : "0";
+
     await db
       .update(projects)
       .set({
         likeCount: values.likeCount,
         reviewCount: values.reviewCount,
         reviewScoreTotal: values.reviewScoreTotal,
+        slopScore,
         commentCount: values.commentCount,
       })
       .where(eq(projects.id, projectId));

@@ -10,7 +10,8 @@
     "db:migrate": "pnpm --filter @slop/db run migrate",
     "db:migrate:prod": "pnpm --filter @slop/db run migrate:prod",
     "db:push": "pnpm --filter @slop/db run push",
-    "db:studio": "pnpm --filter @slop/db run studio"
+    "db:studio": "pnpm --filter @slop/db run studio",
+    "db:reset": "pnpm --filter @slop/db run seed:reset"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
