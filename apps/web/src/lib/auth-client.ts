@@ -6,6 +6,12 @@ export const authClient = createAuthClient({
   plugins: [
     inferAdditionalFields({
       user: {
+        username: {
+          type: "string",
+        },
+        usernameSource: {
+          type: "string",
+        },
         role: {
           type: "string",
         },
@@ -23,4 +29,5 @@ export const {
   useSession,
   linkSocial,
   unlinkAccount,
+  updateUser,
 } = authClient;

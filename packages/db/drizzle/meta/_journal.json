@@ -36,6 +36,13 @@
       "when": 1770535674887,
       "tag": "0004_curious_magik",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1770628614457,
+      "tag": "0005_sharp_alex_power",
+      "breakpoints": true
     }
   ]
 }

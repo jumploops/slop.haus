@@ -8,11 +8,21 @@ import {
 
 // Custom fields for our app
 export const userRoleEnum = pgEnum("user_role", ["user", "mod", "admin"]);
+export const usernameSourceEnum = pgEnum("username_source", [
+  "github",
+  "google_random",
+  "manual",
+  "seed",
+]);
 
 // Better Auth compatible user table
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  username: text("username").notNull().unique(),
+  usernameSource: usernameSourceEnum("usernameSource")
+    .default("manual")
+    .notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),

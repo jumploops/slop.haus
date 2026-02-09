@@ -74,9 +74,10 @@ adminRoutes.get("/verified-devs", requireAdmin(), async (c) => {
   const devs = await db
     .select({
       id: user.id,
-      name: user.name,
+      username: user.username,
       email: user.email,
       image: user.image,
+      devVerified: user.devVerified,
       createdAt: user.createdAt,
     })
     .from(user)
@@ -104,8 +105,9 @@ adminRoutes.get("/mod-queue", requireMod(), async (c) => {
             createdAt: projects.createdAt,
             author: {
               id: user.id,
-              name: user.name,
+              username: user.username,
               email: user.email,
+              image: user.image,
             },
           })
           .from(projects)
@@ -127,8 +129,9 @@ adminRoutes.get("/mod-queue", requireMod(), async (c) => {
             createdAt: comments.createdAt,
             author: {
               id: user.id,
-              name: user.name,
+              username: user.username,
               email: user.email,
+              image: user.image,
             },
           })
           .from(comments)
@@ -424,8 +427,9 @@ adminRoutes.get("/revisions", requireMod(), async (c) => {
       },
       author: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         email: user.email,
+        image: user.image,
       },
     })
     .from(projectRevisions)

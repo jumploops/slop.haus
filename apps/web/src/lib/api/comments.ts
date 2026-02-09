@@ -3,7 +3,7 @@ import type { CommentVoteInput, CreateCommentInput, UpdateCommentInput } from "@
 
 export interface CommentAuthor {
   id: string;
-  name: string;
+  username: string;
   image: string | null;
   devVerified: boolean;
 }

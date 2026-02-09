@@ -73,7 +73,7 @@ export function AuthButtons() {
         >
           <Avatar
             src={session.user.image ?? null}
-            alt={session.user.name ?? "User"}
+            alt={session.user.username ?? "User"}
             size="sm"
           />
           <ChevronIcon open={isDropdownOpen} />

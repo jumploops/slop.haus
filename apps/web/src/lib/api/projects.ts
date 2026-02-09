@@ -11,7 +11,7 @@ export interface ProjectMedia {
 
 export interface ProjectAuthor {
   id: string;
-  name: string;
+  username: string;
   image: string | null;
   devVerified: boolean;
 }

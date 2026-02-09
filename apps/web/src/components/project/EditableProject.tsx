@@ -339,10 +339,10 @@ export function EditableProject({
                 <span className="flex items-center gap-2 font-mono text-foreground">
                   <Avatar
                     src={project.author.image}
-                    alt={project.author.name}
+                    alt={project.author.username}
                     size="sm"
                   />
-                  {project.author.name}
+                  {project.author.username}
                 </span>
                 {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
                 <span className="text-muted-foreground">

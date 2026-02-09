@@ -50,7 +50,7 @@ async function fetchCompleteProject(projectId: string) {
       authorUserId: projects.authorUserId,
       author: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         image: user.image,
         devVerified: user.devVerified,
       },
@@ -148,7 +148,7 @@ projectRoutes.get("/", async (c) => {
       createdAt: projects.createdAt,
       author: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         image: user.image,
         devVerified: user.devVerified,
       },
@@ -223,7 +223,7 @@ projectRoutes.get("/:slug", async (c) => {
       authorUserId: projects.authorUserId,
       author: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         image: user.image,
         devVerified: user.devVerified,
       },

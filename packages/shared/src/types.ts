@@ -8,7 +8,8 @@ export type CommentStatus = "visible" | "hidden" | "removed";
 export interface User {
   id: string;
   email: string;
-  name: string;
+  username: string;
+  usernameSource: "github" | "google_random" | "manual" | "seed";
   image: string | null;
   role: UserRole;
   devVerified: boolean;
@@ -54,9 +55,9 @@ export interface Comment {
 }
 
 export interface ProjectWithAuthor extends Project {
-  author: Pick<User, "id" | "name" | "image" | "devVerified">;
+  author: Pick<User, "id" | "username" | "image" | "devVerified">;
 }
 
 export interface CommentWithAuthor extends Comment {
-  author: Pick<User, "id" | "name" | "image" | "devVerified">;
+  author: Pick<User, "id" | "username" | "image" | "devVerified">;
 }

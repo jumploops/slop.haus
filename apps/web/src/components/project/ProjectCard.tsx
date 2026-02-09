@@ -198,7 +198,7 @@ export function ProjectCard({
                 <MessageCircle className="h-3.5 w-3.5" />
                 <span className="font-mono">{project.reviewCount} reviews</span>
               </div>
-              <span className="font-mono">by {project.author.name}</span>
+              <span className="font-mono">by {project.author.username}</span>
               <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
               {isNew && (
                 <span
@@ -342,7 +342,7 @@ export function ProjectCard({
               <MessageCircle className="h-3.5 w-3.5" />
               <span className="font-mono">{project.reviewCount} reviews</span>
             </div>
-            <span className="font-mono">by {project.author.name}</span>
+            <span className="font-mono">by {project.author.username}</span>
             <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
             {isNew && (
               <span

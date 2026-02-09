@@ -76,8 +76,8 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-2 font-mono">
-                <Avatar src={project.author.image} alt={project.author.name} size="sm" />
-                {project.author.name}
+                <Avatar src={project.author.image} alt={project.author.username} size="sm" />
+                {project.author.username}
               </span>
               {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
               <span className="font-mono">Submitted {formatRelativeTime(project.createdAt)}</span>

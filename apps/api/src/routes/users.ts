@@ -44,7 +44,7 @@ userRoutes.get("/me/favorites", requireAuth(), async (c) => {
       createdAt: projects.createdAt,
       author: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         image: user.image,
         devVerified: user.devVerified,
       },
@@ -116,7 +116,7 @@ userRoutes.get("/me/projects", requireAuth(), async (c) => {
       lastEditedAt: projects.lastEditedAt,
       author: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         image: user.image,
         devVerified: user.devVerified,
       },

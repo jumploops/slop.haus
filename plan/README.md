@@ -15,6 +15,7 @@ All phases implemented and working. Remaining work is CSS polish and production 
 | Feature | Status | Description |
 |---------|--------|-------------|
 | [URL-First Onboarding](./url-first-onboarding/) | Not Started | Simplified submit flow: enter URL → auto-extract → review → submit |
+| [Username System](./username-system/) | Proposed | Replace provider display names with usernames (GitHub prefill, Google generated), plus editable username UX |
 
 ## Phase Summary
 

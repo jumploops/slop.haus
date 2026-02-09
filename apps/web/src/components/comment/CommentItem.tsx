@@ -114,9 +114,9 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
 
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center gap-2 flex-wrap">
-            <Avatar src={comment.author.image} alt={comment.author.name} size="sm" />
+            <Avatar src={comment.author.image} alt={comment.author.username} size="sm" />
             <span className="font-mono text-sm font-bold text-foreground break-words">
-              {comment.author.name}
+              {comment.author.username}
             </span>
             {comment.author.devVerified && <Badge variant="dev">Dev</Badge>}
             <span className="text-xs text-muted-foreground">{formatRelativeTime(comment.createdAt)}</span>
@@ -170,7 +170,7 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
                 parentCommentId={comment.id}
                 onSuccess={handleReplySuccess}
                 onCancel={() => setIsReplying(false)}
-                placeholder={`Reply to ${comment.author.name}...`}
+                placeholder={`Reply to ${comment.author.username}...`}
               />
             </div>
           )}

@@ -100,6 +100,10 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **Display mode A/B test** - Randomize default feed display mode and measure engagement.
 
+- [ ] **Username change cooldown/rate limit** - Add policy guardrails for frequent username changes (for example: max N changes per 24h or a 7-day cooldown), with clear in-product messaging.
+
+- [ ] **Username history for moderation** - Track username change history for abuse investigations and moderator tooling.
+
 ---
 
 ## Monitoring & Observability
@@ -154,6 +158,8 @@ Future enhancements, fixes, and improvements.
 - [ ] **GitHub OAuth integration** - For GitHub URLs, fetch additional data via GitHub API (stars, language, etc.).
 
 - [ ] **Scheduled re-scraping** - Periodically re-scrape project URLs to update screenshots and detect dead links.
+
+- [ ] **Suggest GitHub-handle adoption after linking** - If a Google-first user links GitHub, offer one-click switch to their GitHub handle when available.
 
 - [ ] **User-submitted tools** - Allow users to suggest new tools/technologies not in the database. Requires:
   - Tool submission form (name, slug, optional icon URL)

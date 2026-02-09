@@ -137,7 +137,9 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
             <span className="text-muted-foreground text-sm">Loading...</span>
           ) : session?.user ? (
             <>
-              <span className="text-sm text-muted-foreground truncate">{session.user.name}</span>
+              <span className="text-sm text-muted-foreground truncate">
+                {session.user.username || "User"}
+              </span>
               <Button
                 variant="secondary"
                 onClick={cycleTheme}

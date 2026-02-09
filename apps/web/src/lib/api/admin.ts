@@ -12,14 +12,34 @@ export interface ModQueueItem {
   createdAt: string;
   author: {
     id: string;
-    name: string;
+    username: string;
     image: string | null;
+  };
+}
+
+interface ModQueueApiEntry {
+  type: "project" | "comment";
+  item: {
+    id: string;
+    status: string;
+    title?: string;
+    body?: string;
+    slug?: string;
+    createdAt: string;
+    author: {
+      id: string;
+      username: string;
+      image: string | null;
+    };
+  };
+  flags: {
+    count: number;
   };
 }
 
 export interface VerifiedDev {
   id: string;
-  name: string;
+  username: string;
   email: string;
   image: string | null;
   devVerified: boolean;
@@ -27,8 +47,19 @@ export interface VerifiedDev {
 
 export async function fetchModQueue(type?: "project" | "comment"): Promise<ModQueueItem[]> {
   const params = type ? `?type=${type}` : "";
-  const response = await apiGet<{ items: ModQueueItem[] }>(`/admin/mod-queue${params}`);
-  return response.items;
+  const response = await apiGet<{ queue: ModQueueApiEntry[] }>(`/admin/mod-queue${params}`);
+
+  return response.queue.map((entry) => ({
+    id: entry.item.id,
+    type: entry.type,
+    status: entry.item.status,
+    title: entry.item.title,
+    body: entry.item.body,
+    slug: entry.item.slug,
+    flagCount: entry.flags.count,
+    createdAt: entry.item.createdAt,
+    author: entry.item.author,
+  }));
 }
 
 export async function approveProject(id: string): Promise<void> {
@@ -60,8 +91,8 @@ export async function unverifyDev(userId: string): Promise<void> {
 }
 
 export async function fetchVerifiedDevs(): Promise<VerifiedDev[]> {
-  const response = await apiGet<{ users: VerifiedDev[] }>("/admin/verified-devs");
-  return response.users;
+  const response = await apiGet<{ developers: VerifiedDev[] }>("/admin/verified-devs");
+  return response.developers;
 }
 
 export async function fetchPendingRevisions(): Promise<ProjectRevision[]> {

@@ -123,7 +123,7 @@ export function EditableProjectPreview({
   const imageUrl = draft.screenshot || getPlaceholderImage(title || "Project");
 
   // User info for author section
-  const userName = session?.user?.name || "You";
+  const userName = session?.user?.username || "You";
   const userImage = session?.user?.image || null;
 
   // Validation

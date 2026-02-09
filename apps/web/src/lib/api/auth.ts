@@ -2,7 +2,8 @@ import { apiGet, apiDelete, apiPost } from "../api";
 
 export interface CurrentUser {
   id: string;
-  name: string;
+  username: string;
+  usernameSource: "github" | "google_random" | "manual" | "seed";
   email: string;
   image: string | null;
   role: "user" | "mod" | "admin";

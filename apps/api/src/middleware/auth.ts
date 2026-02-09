@@ -6,11 +6,12 @@ import { eq } from "drizzle-orm";
 
 export type AuthUser = {
   id: string;
-  name: string;
+  username: string;
   email: string;
   image: string | null;
   role: "user" | "mod" | "admin";
   devVerified: boolean;
+  usernameSource: "github" | "google_random" | "manual" | "seed";
 };
 
 export type AuthSession = {
@@ -27,6 +28,8 @@ export type AuthSession = {
 interface BetterAuthUserWithCustomFields {
   id: string;
   name: string;
+  username?: string;
+  usernameSource?: "github" | "google_random" | "manual" | "seed";
   email: string;
   image: string | null;
   role?: "user" | "mod" | "admin";
@@ -47,11 +50,12 @@ export async function getSession(c: Context): Promise<AuthSession | null> {
   return {
     user: {
       id: user.id,
-      name: user.name,
+      username: user.username || user.name,
       email: user.email,
       image: user.image ?? null,
       role: user.role || "user",
       devVerified: user.devVerified || false,
+      usernameSource: user.usernameSource || "manual",
     },
     session: {
       id: session.session.id,

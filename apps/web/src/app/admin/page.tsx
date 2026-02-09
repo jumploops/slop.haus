@@ -166,8 +166,8 @@ export default function ModQueuePage() {
 
                 {/* Author */}
                 <div className="flex items-center gap-2 mb-4">
-                  <Avatar src={item.author.image} alt={item.author.name} size="sm" />
-                  <span className="text-xs text-muted-foreground">{item.author.name}</span>
+                  <Avatar src={item.author.image} alt={item.author.username} size="sm" />
+                  <span className="text-xs text-muted-foreground">{item.author.username}</span>
                 </div>
 
                 {/* Actions */}

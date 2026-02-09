@@ -18,12 +18,12 @@ export default function UsersPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const handleUnverify = async (user: VerifiedDev) => {
-    if (!confirm(`Remove verified dev status from ${user.name}?`)) return;
+    if (!confirm(`Remove verified dev status from ${user.username}?`)) return;
 
     setProcessingId(user.id);
     try {
       await unverifyDev(user.id);
-      showToast(`${user.name} is no longer a verified dev`, "success");
+      showToast(`${user.username} is no longer a verified dev`, "success");
       mutate();
     } catch (error) {
       showToast("Failed to update user", "error");
@@ -78,9 +78,9 @@ export default function UsersPage() {
             >
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
-                  <Avatar src={user.image} alt={user.name} size="md" />
+                  <Avatar src={user.image} alt={user.username} size="md" />
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">{user.name}</h3>
+                    <h3 className="text-sm font-bold text-foreground">{user.username}</h3>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </div>

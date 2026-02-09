@@ -38,7 +38,7 @@ projectCommentRoutes.get("/:slug/comments", async (c) => {
       updatedAt: comments.updatedAt,
       author: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         image: user.image,
         devVerified: user.devVerified,
       },
@@ -141,7 +141,7 @@ projectCommentRoutes.post("/:slug/comments", requireAuth(), async (c) => {
       ...comment,
       author: {
         id: session.user.id,
-        name: session.user.name,
+        username: session.user.username,
         image: session.user.image,
         devVerified: session.user.devVerified,
       },
