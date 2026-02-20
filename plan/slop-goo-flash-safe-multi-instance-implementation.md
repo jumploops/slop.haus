@@ -5,7 +5,8 @@
 **Design Input:** `design/slop-goo-flash-safe-multi-instance.md`  
 **Debug Inputs:**  
 `debug/dark-mode-hover-flash-post-refactor.md`  
-`debug/dark-mode-feed-hover-background-shift.md`
+`debug/dark-mode-feed-hover-background-shift.md`  
+`debug/slop-goo-intro-vs-project-card-smoothness.md`
 
 ## Objective
 Preserve intro/ambient slop goo visuals while eliminating dark-mode hover/de-hover background flash on the feed.
@@ -43,8 +44,9 @@ Implement ambient goo isolation and profile split:
 ## Files Expected To Change
 1. `apps/web/src/components/slop/SlopGoo.tsx`
 2. `apps/web/src/app/page.tsx`
-3. `apps/web/src/components/project/ProjectCard.tsx` (only if fallback arbitration is needed)
+3. `apps/web/src/components/project/ProjectCard.tsx`
 4. `debug/dark-mode-hover-flash-post-refactor.md` (result update)
+5. `debug/slop-goo-intro-vs-project-card-smoothness.md` (result update)
 
 ## Phase Plan
 
@@ -135,7 +137,9 @@ Validation checklist:
    - `renderMode="inline"`
    - local isolated container layering (no negative z-index)
    - lighter ambient profile (`displacementScale={0}`, `animateNoise={false}`, lower goo intensity settings)
-3. Interactive card goo remains on portal mode.
+3. Interactive card goo remains on portal mode and now explicitly uses smoother roughness settings:
+   - `displacementScale={0}`
+   - `animateNoise={false}`
 4. Local checks completed:
    - `pnpm -F @slop/web exec tsc --noEmit` (pass)
    - `pnpm -F @slop/web build` (pass)
@@ -143,6 +147,9 @@ Validation checklist:
    - `apps/web/src/components/project/ProjectCard.tsx`
    - `apps/web/src/app/page.tsx`
 6. User validation confirmed baseline (`http://localhost:3000`, no flags) no longer flashes on hover/de-hover in dark mode with intro visible.
+7. Follow-up visual parity update completed:
+   - debug hypothesis #1 from `debug/slop-goo-intro-vs-project-card-smoothness.md` was implemented in `ProjectCard`.
+   - user confirmed project-card goo now looks smoother and aligned with intro goo behavior.
 
 ## Acceptance Criteria
 1. Flash is not observable in dark-mode hover/de-hover with intro goo enabled.

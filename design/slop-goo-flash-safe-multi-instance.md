@@ -1,6 +1,6 @@
 # Slop Goo Flash-Safe Multi-Instance Design
 
-**Status:** Draft  
+**Status:** Completed  
 **Date:** 2026-02-20
 
 ## Goal
@@ -113,3 +113,11 @@ Rationale:
 1. Do we want ambient goo to remain animated, or is static goo acceptable?
 2. Should all non-interactive goo migrate to inline/local rendering by default?
 3. Is temporary ambient pause during card hover acceptable if needed for stability?
+
+## Post-Implementation Follow-up (Same Workstream)
+
+After the flash fix, we observed intro goo looked smoother than project-card goo.  
+Additional targeted tuning confirmed the top hypothesis:
+1. Card goo was inheriting roughening defaults (`displacementScale=6`, `animateNoise=true`).
+2. Setting card goo to `displacementScale={0}` and `animateNoise={false}` restored visual parity.
+3. Card goo remains portal-rendered; this pass only tuned filter roughness profile.

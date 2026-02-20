@@ -100,6 +100,8 @@ export function ProjectCard({
       edgeInsetLowEnd={isGrid ? 11 : 6}
       edgeFeather={1}
       borderOffset={-3}
+      displacementScale={0}
+      animateNoise={false}
       zIndex={12}
     />
   ) : null;
