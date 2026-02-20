@@ -35,6 +35,22 @@ function usePrefersReducedMotion() {
   return prefersReducedMotion;
 }
 
+function readDebugNoGooFilterFlag() {
+  if (typeof window === "undefined") return false;
+  const value = new URLSearchParams(window.location.search).get("debugNoGooFilter");
+  return value === "1" || value === "true";
+}
+
+function useDebugNoGooFilterFlag() {
+  const [disabled, setDisabled] = useState(readDebugNoGooFilterFlag);
+
+  useEffect(() => {
+    setDisabled(readDebugNoGooFilterFlag());
+  }, []);
+
+  return disabled;
+}
+
 export type SlopGooProps = {
   targetRef: RefObject<HTMLElement | null>;
   seed?: number;
@@ -99,6 +115,7 @@ export function SlopGoo({
   const id = useId().replace(/:/g, "");
   const filterId = `slop-goo-${id}`;
   const prefersReducedMotion = usePrefersReducedMotion();
+  const debugNoGooFilter = useDebugNoGooFilterFlag();
   const showDrips = !prefersReducedMotion && dripCount > 0;
 
   useEffect(() => {
@@ -334,39 +351,41 @@ export function SlopGoo({
     >
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: "visible" }}>
         <defs>
-          <filter
-            id={filterId}
-            filterUnits="userSpaceOnUse"
-            x={-filterPad}
-            y={-filterPad}
-            width={width + filterPad * 2}
-            height={height + filterPad * 2}
-          >
-            <feGaussianBlur in="SourceGraphic" stdDeviation={blur} result="blur" />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values={`
-                1 0 0 0 0
-                0 1 0 0 0
-                0 0 1 0 0
-                0 0 0 ${threshold} -7
-              `}
-              result="goo"
-            />
-            <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed={seedValue % 997} result="noise">
-              {!prefersReducedMotion && (
-                <animate attributeName="baseFrequency" dur="90s" values="0.010;0.014;0.010" repeatCount="indefinite" />
-              )}
-            </feTurbulence>
-            <feDisplacementMap
-              in="goo"
-              in2="noise"
-              scale={displacementScale}
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
+          {!debugNoGooFilter && (
+            <filter
+              id={filterId}
+              filterUnits="userSpaceOnUse"
+              x={-filterPad}
+              y={-filterPad}
+              width={width + filterPad * 2}
+              height={height + filterPad * 2}
+            >
+              <feGaussianBlur in="SourceGraphic" stdDeviation={blur} result="blur" />
+              <feColorMatrix
+                in="blur"
+                mode="matrix"
+                values={`
+                  1 0 0 0 0
+                  0 1 0 0 0
+                  0 0 1 0 0
+                  0 0 0 ${threshold} -7
+                `}
+                result="goo"
+              />
+              <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed={seedValue % 997} result="noise">
+                {!prefersReducedMotion && (
+                  <animate attributeName="baseFrequency" dur="90s" values="0.010;0.014;0.010" repeatCount="indefinite" />
+                )}
+              </feTurbulence>
+              <feDisplacementMap
+                in="goo"
+                in2="noise"
+                scale={displacementScale}
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
+          )}
           <linearGradient
             id={gradientId}
             gradientUnits="userSpaceOnUse"
@@ -383,7 +402,7 @@ export function SlopGoo({
           </mask>
         </defs>
 
-        <g filter={`url(#${filterId})`} mask={`url(#${maskId})`}>
+        <g filter={debugNoGooFilter ? undefined : `url(#${filterId})`} mask={`url(#${maskId})`}>
           <line
             x1={b0.x}
             y1={b0.y}

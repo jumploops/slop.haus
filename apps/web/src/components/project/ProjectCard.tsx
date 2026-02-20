@@ -23,6 +23,86 @@ const SLOP_BADGE_TILTS = ["slop-tilt-1", "slop-tilt-2", "slop-tilt-3"];
 
 const SLOP_GOO_ATTACH = { start: 0, end: 1 } as const;
 
+function readDebugNoCardHoverFxFlag() {
+  if (typeof window === "undefined") return false;
+  const value = new URLSearchParams(window.location.search).get("debugNoCardHoverFx");
+  return value === "1" || value === "true";
+}
+
+function useDebugNoCardHoverFxFlag() {
+  const [disabled, setDisabled] = useState(readDebugNoCardHoverFxFlag);
+
+  useEffect(() => {
+    setDisabled(readDebugNoCardHoverFxFlag());
+  }, []);
+
+  return disabled;
+}
+
+function readDebugNoCardPrefetchFlag() {
+  if (typeof window === "undefined") return false;
+  const value = new URLSearchParams(window.location.search).get("debugNoCardPrefetch");
+  return value === "1" || value === "true";
+}
+
+function useDebugNoCardPrefetchFlag() {
+  const [disabled, setDisabled] = useState(readDebugNoCardPrefetchFlag);
+
+  useEffect(() => {
+    setDisabled(readDebugNoCardPrefetchFlag());
+  }, []);
+
+  return disabled;
+}
+
+function readDebugNoCardBlendOverlayFlag() {
+  if (typeof window === "undefined") return false;
+  const value = new URLSearchParams(window.location.search).get("debugNoCardBlendOverlay");
+  return value === "1" || value === "true";
+}
+
+function useDebugNoCardBlendOverlayFlag() {
+  const [disabled, setDisabled] = useState(readDebugNoCardBlendOverlayFlag);
+
+  useEffect(() => {
+    setDisabled(readDebugNoCardBlendOverlayFlag());
+  }, []);
+
+  return disabled;
+}
+
+function readDebugNoGooRenderFlag() {
+  if (typeof window === "undefined") return false;
+  const value = new URLSearchParams(window.location.search).get("debugNoGooRender");
+  return value === "1" || value === "true";
+}
+
+function useDebugNoGooRenderFlag() {
+  const [disabled, setDisabled] = useState(readDebugNoGooRenderFlag);
+
+  useEffect(() => {
+    setDisabled(readDebugNoGooRenderFlag());
+  }, []);
+
+  return disabled;
+}
+
+function readDebugNoSlopOffsetsFlag() {
+  if (typeof window === "undefined") return false;
+  const value = new URLSearchParams(window.location.search).get("debugNoSlopOffsets");
+  return value === "1" || value === "true";
+}
+
+function useDebugNoSlopOffsetsFlag() {
+  const [disabled, setDisabled] = useState(readDebugNoSlopOffsetsFlag);
+
+  useEffect(() => {
+    setDisabled(readDebugNoSlopOffsetsFlag());
+  }, []);
+
+  return disabled;
+}
+
 interface ProjectCardProps {
   project: ProjectListItem;
   showFavoriteButton?: boolean;
@@ -44,6 +124,11 @@ export function ProjectCard({
   const isLarge = variant === "list-lg";
   const [localLikeCount, setLocalLikeCount] = useState(project.likeCount);
   const [isHovered, setIsHovered] = useState(false);
+  const debugNoCardHoverFx = useDebugNoCardHoverFxFlag();
+  const debugNoCardPrefetch = useDebugNoCardPrefetchFlag();
+  const debugNoCardBlendOverlay = useDebugNoCardBlendOverlayFlag();
+  const debugNoGooRender = useDebugNoGooRenderFlag();
+  const debugNoSlopOffsets = useDebugNoSlopOffsetsFlag();
   const { likeState, submitLike, isLiking } = useLike(project.slug, {
     onLikeSuccess: (result) => setLocalLikeCount(result.likeCount),
   });
@@ -65,14 +150,19 @@ export function ProjectCard({
   const slopTerm = getSlopBandTerm(slopBand);
   const visitUrl = project.mainUrl || project.repoUrl;
   const scoreTone = getSlopBandBadgeClass(slopBand);
-  const rotation = rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
+  const rotation =
+    debugNoCardHoverFx ? "" : rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
+  const cardTransitionClass = debugNoCardHoverFx
+    ? "transition-colors duration-200"
+    : "transition-all duration-200";
+  const cardHoverClass = debugNoCardHoverFx ? "hover:border-primary" : "hover:border-primary hover:shadow-lg";
   const thumbnailSize = isLarge ? "sm:h-32 sm:w-48" : "sm:h-16 sm:w-24";
   const likeButtonSize = isGrid ? "h-12 w-12" : "h-16 w-14";
   const scoreSizeClass = isGrid ? "h-10 w-10 text-base" : "h-12 w-12 text-lg";
   const slopSeed = project.id || project.slug || project.title;
   const slopIndex = sloppy ? getSlopIndex(slopSeed) : 0;
   const slopOffset = sloppy ? SLOP_CARD_OFFSETS[slopIndex % SLOP_CARD_OFFSETS.length] : null;
-  const slopClass = slopOffset?.className ?? "";
+  const slopClass = debugNoSlopOffsets ? "" : slopOffset?.className ?? "";
   const slopRotationDeg = slopOffset?.rotationDeg ?? 0;
   const slopChromeClass = "";
   const slopBadgeClass = sloppy
@@ -81,7 +171,7 @@ export function ProjectCard({
         SLOP_BADGE_TILTS[slopIndex % SLOP_BADGE_TILTS.length]
       )
     : "";
-  const showGoo = sloppy && isHovered;
+  const showGoo = sloppy && isHovered && !debugNoGooRender;
   const goo = showGoo ? (
     <SlopGoo
       targetRef={cardRef}
@@ -108,11 +198,12 @@ export function ProjectCard({
         <article
           ref={cardRef}
           className={cn(
-            "group relative z-10 flex flex-col border-2 border-border bg-card transition-all duration-200",
+            "group relative z-10 flex flex-col border-2 border-border bg-card",
+            cardTransitionClass,
             rotation,
             slopClass,
             slopChromeClass,
-            "hover:border-primary hover:shadow-lg"
+            cardHoverClass
           )}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -125,6 +216,7 @@ export function ProjectCard({
         >
           <Link
             href={`/p/${project.slug}`}
+            prefetch={debugNoCardPrefetch ? false : undefined}
             aria-label={`View ${project.title}`}
             className="absolute inset-0 z-0"
           />
@@ -138,7 +230,9 @@ export function ProjectCard({
             className="relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border"
           >
             <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+            {!debugNoCardBlendOverlay && (
+              <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+            )}
           </div>
 
           <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-3 p-4">
@@ -164,6 +258,7 @@ export function ProjectCard({
               <div className="min-w-0 flex-1 pointer-events-none">
                 <Link
                   href={`/p/${project.slug}`}
+                  prefetch={debugNoCardPrefetch ? false : undefined}
                   className="no-underline hover:no-underline"
                 >
                   <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
@@ -248,11 +343,12 @@ export function ProjectCard({
       <article
         ref={cardRef}
         className={cn(
-          "group relative z-10 flex gap-4 border-2 border-border bg-card p-4 transition-all duration-200",
+          "group relative z-10 flex gap-4 border-2 border-border bg-card p-4",
+          cardTransitionClass,
           rotation,
           slopClass,
           slopChromeClass,
-          "hover:border-primary hover:shadow-lg"
+          cardHoverClass
         )}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -265,6 +361,7 @@ export function ProjectCard({
       >
         <Link
           href={`/p/${project.slug}`}
+          prefetch={debugNoCardPrefetch ? false : undefined}
           aria-label={`View ${project.title}`}
           className="absolute inset-0 z-0"
         />
@@ -294,13 +391,16 @@ export function ProjectCard({
 
         <Link
           href={`/p/${project.slug}`}
+          prefetch={debugNoCardPrefetch ? false : undefined}
           className={cn(
             "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
             thumbnailSize
           )}
         >
           <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+          {!debugNoCardBlendOverlay && (
+            <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+          )}
         </Link>
 
         <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
@@ -308,6 +408,7 @@ export function ProjectCard({
             <div className="min-w-0 flex-1">
               <Link
                 href={`/p/${project.slug}`}
+                prefetch={debugNoCardPrefetch ? false : undefined}
                 className="pointer-events-auto no-underline hover:no-underline"
               >
                 <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
