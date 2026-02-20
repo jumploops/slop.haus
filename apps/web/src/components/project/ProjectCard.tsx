@@ -65,7 +65,10 @@ export function ProjectCard({
   const slopTerm = getSlopBandTerm(slopBand);
   const visitUrl = project.mainUrl || project.repoUrl;
   const scoreTone = getSlopBandBadgeClass(slopBand);
-  const rotation = rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
+  const rotation =
+    rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
+  const cardTransitionClass = "transition-all duration-200";
+  const cardHoverClass = "hover:border-primary hover:shadow-lg";
   const thumbnailSize = isLarge ? "sm:h-32 sm:w-48" : "sm:h-16 sm:w-24";
   const likeButtonSize = isGrid ? "h-12 w-12" : "h-16 w-14";
   const scoreSizeClass = isGrid ? "h-10 w-10 text-base" : "h-12 w-12 text-lg";
@@ -74,7 +77,6 @@ export function ProjectCard({
   const slopOffset = sloppy ? SLOP_CARD_OFFSETS[slopIndex % SLOP_CARD_OFFSETS.length] : null;
   const slopClass = slopOffset?.className ?? "";
   const slopRotationDeg = slopOffset?.rotationDeg ?? 0;
-  const slopChromeClass = "";
   const slopBadgeClass = sloppy
     ? cn(
         "slop-sticky slop-sticky-outline",
@@ -98,6 +100,8 @@ export function ProjectCard({
       edgeInsetLowEnd={isGrid ? 11 : 6}
       edgeFeather={1}
       borderOffset={-3}
+      displacementScale={0}
+      animateNoise={false}
       zIndex={12}
     />
   ) : null;
@@ -107,13 +111,7 @@ export function ProjectCard({
       <>
         <article
           ref={cardRef}
-          className={cn(
-            "group relative z-10 flex flex-col border-2 border-border bg-card transition-all duration-200",
-            rotation,
-            slopClass,
-            slopChromeClass,
-            "hover:border-primary hover:shadow-lg"
-          )}
+          className="group relative z-10"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onFocusCapture={() => setIsHovered(true)}
@@ -128,53 +126,209 @@ export function ProjectCard({
             aria-label={`View ${project.title}`}
             className="absolute inset-0 z-0"
           />
+          <div
+            className={cn(
+              "relative z-10 flex h-full flex-col border-2 border-border bg-card",
+              cardTransitionClass,
+              rotation,
+              slopClass,
+              cardHoverClass
+            )}
+          >
+            {rank && (
+              <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
+                {rank}
+              </div>
+            )}
+
+            <div
+              className="relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border"
+            >
+              <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+            </div>
+
+            <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-3 p-4">
+              <div className="flex items-start gap-3">
+                <button
+                  type="button"
+                  onClick={() => submitLike(likeState?.liked ? 0 : 1)}
+                  disabled={isLiking}
+                  className={cn(
+                    "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto",
+                    likeButtonSize,
+                    likeState?.liked
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+                    isLiking && "opacity-50 cursor-not-allowed"
+                  )}
+                  aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
+                >
+                  <ChevronUp className="h-5 w-5" />
+                  <span className="font-mono text-sm font-bold">{localLikeCount}</span>
+                </button>
+
+                <div className="min-w-0 flex-1 pointer-events-none">
+                  <Link
+                    href={`/p/${project.slug}`}
+                    className="no-underline hover:no-underline"
+                  >
+                    <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
+                      <span className="truncate">{project.title}</span>
+                      <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                    </h3>
+                  </Link>
+                  <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{project.tagline}</p>
+                </div>
+
+                <div className="flex-shrink-0 pointer-events-none">
+                  <div className="flex flex-col items-center gap-1">
+                    <div
+                      className={cn(
+                        "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
+                        scoreSizeClass,
+                        scoreTone,
+                        ""
+                      )}
+                    >
+                      {slopScore}
+                    </div>
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground text-center leading-none">
+                      {slopTerm}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground pointer-events-none">
+                <div className="flex items-center gap-1">
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  <span className="font-mono">{project.reviewCount} reviews</span>
+                </div>
+                <span className="font-mono">by {project.author.username}</span>
+                <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
+                {isNew && (
+                  <span
+                    className={cn(
+                      "bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary",
+                      slopBadgeClass
+                    )}
+                  >
+                    new
+                  </span>
+                )}
+                {visitUrl && (
+                  <a
+                    href={visitUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pointer-events-auto font-mono text-[10px] uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
+                  >
+                    visit
+                  </a>
+                )}
+              </div>
+
+              {showFavoriteButton && (
+                <div className="flex items-center gap-2 pointer-events-auto">
+                  <Button
+                    variant={isFavorited ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={toggleFavorite}
+                    disabled={favoriteLoading}
+                    aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    <HeartIcon filled={isFavorited} />
+                    <span className="sr-only">Favorite</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </article>
+        {goo}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <article
+        ref={cardRef}
+        className="group relative z-10"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocusCapture={() => setIsHovered(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+            setIsHovered(false);
+          }
+        }}
+      >
+        <Link
+          href={`/p/${project.slug}`}
+          aria-label={`View ${project.title}`}
+          className="absolute inset-0 z-0"
+        />
+        <div
+          className={cn(
+            "relative z-10 flex gap-4 border-2 border-border bg-card p-4",
+            cardTransitionClass,
+            rotation,
+            slopClass,
+            cardHoverClass
+          )}
+        >
           {rank && (
             <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
               {rank}
             </div>
           )}
 
-          <div
-            className="relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border"
+          <button
+            type="button"
+            onClick={() => submitLike(likeState?.liked ? 0 : 1)}
+            disabled={isLiking}
+            className={cn(
+              "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors",
+              likeButtonSize,
+              likeState?.liked
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+              isLiking && "opacity-50 cursor-not-allowed"
+            )}
+            aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
+          >
+            <ChevronUp className="h-5 w-5" />
+            <span className="font-mono text-sm font-bold">{localLikeCount}</span>
+          </button>
+
+          <Link
+            href={`/p/${project.slug}`}
+            className={cn(
+              "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
+              thumbnailSize
+            )}
           >
             <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
             <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
-          </div>
+          </Link>
 
-          <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-3 p-4">
-            <div className="flex items-start gap-3">
-              <button
-                type="button"
-                onClick={() => submitLike(likeState?.liked ? 0 : 1)}
-                disabled={isLiking}
-                className={cn(
-                  "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto",
-                  likeButtonSize,
-                  likeState?.liked
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
-                  isLiking && "opacity-50 cursor-not-allowed"
-                )}
-                aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
-              >
-                <ChevronUp className="h-5 w-5" />
-                <span className="font-mono text-sm font-bold">{localLikeCount}</span>
-              </button>
-
-              <div className="min-w-0 flex-1 pointer-events-none">
+          <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
                 <Link
                   href={`/p/${project.slug}`}
-                  className="no-underline hover:no-underline"
+                  className="pointer-events-auto no-underline hover:no-underline"
                 >
                   <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
                     <span className="truncate">{project.title}</span>
                     <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                   </h3>
                 </Link>
-                <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{project.tagline}</p>
+                <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{project.tagline}</p>
               </div>
-
-              <div className="flex-shrink-0 pointer-events-none">
+              <div className="flex-shrink-0">
                 <div className="flex flex-col items-center gap-1">
                   <div
                     className={cn(
@@ -192,8 +346,7 @@ export function ProjectCard({
                 </div>
               </div>
             </div>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground pointer-events-none">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <MessageCircle className="h-3.5 w-3.5" />
                 <span className="font-mono">{project.reviewCount} reviews</span>
@@ -237,149 +390,6 @@ export function ProjectCard({
               </div>
             )}
           </div>
-        </article>
-        {goo}
-      </>
-    );
-  }
-
-  return (
-    <>
-      <article
-        ref={cardRef}
-        className={cn(
-          "group relative z-10 flex gap-4 border-2 border-border bg-card p-4 transition-all duration-200",
-          rotation,
-          slopClass,
-          slopChromeClass,
-          "hover:border-primary hover:shadow-lg"
-        )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onFocusCapture={() => setIsHovered(true)}
-        onBlurCapture={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-            setIsHovered(false);
-          }
-        }}
-      >
-        <Link
-          href={`/p/${project.slug}`}
-          aria-label={`View ${project.title}`}
-          className="absolute inset-0 z-0"
-        />
-        {rank && (
-          <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
-            {rank}
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={() => submitLike(likeState?.liked ? 0 : 1)}
-          disabled={isLiking}
-          className={cn(
-            "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors",
-            likeButtonSize,
-            likeState?.liked
-              ? "border-primary bg-primary/10 text-primary"
-              : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
-            isLiking && "opacity-50 cursor-not-allowed"
-          )}
-          aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
-        >
-          <ChevronUp className="h-5 w-5" />
-          <span className="font-mono text-sm font-bold">{localLikeCount}</span>
-        </button>
-
-        <Link
-          href={`/p/${project.slug}`}
-          className={cn(
-            "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
-            thumbnailSize
-          )}
-        >
-          <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
-        </Link>
-
-        <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <Link
-                href={`/p/${project.slug}`}
-                className="pointer-events-auto no-underline hover:no-underline"
-              >
-                <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
-                  <span className="truncate">{project.title}</span>
-                  <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                </h3>
-              </Link>
-              <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{project.tagline}</p>
-            </div>
-
-            <div className="flex-shrink-0">
-              <div className="flex flex-col items-center gap-1">
-                <div
-                  className={cn(
-                    "flex rotate-3 items-center justify-center rounded-sm font-mono font-black shadow-md",
-                    scoreSizeClass,
-                    scoreTone,
-                    ""
-                  )}
-                >
-                  {slopScore}
-                </div>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground text-center leading-none">
-                  {slopTerm}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <MessageCircle className="h-3.5 w-3.5" />
-              <span className="font-mono">{project.reviewCount} reviews</span>
-            </div>
-            <span className="font-mono">by {project.author.username}</span>
-            <span className="font-mono">{formatRelativeTime(project.createdAt)}</span>
-            {isNew && (
-              <span
-                className={cn(
-                  "bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-primary",
-                  slopBadgeClass
-                )}
-              >
-                new
-              </span>
-            )}
-            {visitUrl && (
-              <a
-                href={visitUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pointer-events-auto font-mono text-[10px] uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
-              >
-                visit
-              </a>
-            )}
-          </div>
-
-          {showFavoriteButton && (
-            <div className="flex items-center gap-2 pointer-events-auto">
-              <Button
-                variant={isFavorited ? "secondary" : "ghost"}
-                size="sm"
-                onClick={toggleFavorite}
-                disabled={favoriteLoading}
-                aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-              >
-                <HeartIcon filled={isFavorited} />
-                <span className="sr-only">Favorite</span>
-              </Button>
-            </div>
-          )}
         </div>
       </article>
       {goo}
