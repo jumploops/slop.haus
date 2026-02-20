@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MessageCircle, ExternalLink, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
@@ -40,6 +40,7 @@ export function ProjectCard({
   variant = "list-sm",
   sloppy = false,
 }: ProjectCardProps) {
+  const router = useRouter();
   const isGrid = variant === "grid";
   const isLarge = variant === "list-lg";
   const [localLikeCount, setLocalLikeCount] = useState(project.likeCount);
@@ -65,6 +66,7 @@ export function ProjectCard({
   const slopTerm = getSlopBandTerm(slopBand);
   const visitUrl = project.mainUrl || project.repoUrl;
   const scoreTone = getSlopBandBadgeClass(slopBand);
+  const projectHref = `/p/${project.slug}`;
   const rotation =
     rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
   const cardTransitionClass = "transition-all duration-200";
@@ -106,12 +108,34 @@ export function ProjectCard({
     />
   ) : null;
 
+  const handleCardClick = (event: MouseEvent<HTMLElement>) => {
+    if (isInteractiveTarget(event.target)) {
+      return;
+    }
+    router.push(projectHref);
+  };
+
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    if (isInteractiveTarget(event.target)) {
+      return;
+    }
+    event.preventDefault();
+    router.push(projectHref);
+  };
+
   if (isGrid) {
     return (
       <>
         <article
           ref={cardRef}
-          className="group relative z-10"
+          className="group relative z-10 cursor-pointer"
+          role="link"
+          tabIndex={0}
+          onClick={handleCardClick}
+          onKeyDown={handleCardKeyDown}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onFocusCapture={() => setIsHovered(true)}
@@ -121,11 +145,6 @@ export function ProjectCard({
             }
           }}
         >
-          <Link
-            href={`/p/${project.slug}`}
-            aria-label={`View ${project.title}`}
-            className="absolute inset-0 z-0"
-          />
           <div
             className={cn(
               "relative z-10 flex h-full flex-col border-2 border-border bg-card",
@@ -155,7 +174,7 @@ export function ProjectCard({
                   onClick={() => submitLike(likeState?.liked ? 0 : 1)}
                   disabled={isLiking}
                   className={cn(
-                    "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto",
+                    "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto cursor-pointer",
                     likeButtonSize,
                     likeState?.liked
                       ? "border-primary bg-primary/10 text-primary"
@@ -169,15 +188,20 @@ export function ProjectCard({
                 </button>
 
                 <div className="min-w-0 flex-1 pointer-events-none">
-                  <Link
-                    href={`/p/${project.slug}`}
-                    className="no-underline hover:no-underline"
-                  >
-                    <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
-                      <span className="truncate">{project.title}</span>
-                      <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                    </h3>
-                  </Link>
+                  <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
+                    <span className="truncate">{project.title}</span>
+                    {visitUrl && (
+                      <a
+                        href={visitUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Visit ${project.title}`}
+                        className="pointer-events-auto no-underline hover:no-underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-primary" />
+                      </a>
+                    )}
+                  </h3>
                   <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{project.tagline}</p>
                 </div>
 
@@ -255,7 +279,11 @@ export function ProjectCard({
     <>
       <article
         ref={cardRef}
-        className="group relative z-10"
+        className="group relative z-10 cursor-pointer"
+        role="link"
+        tabIndex={0}
+        onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onFocusCapture={() => setIsHovered(true)}
@@ -265,11 +293,6 @@ export function ProjectCard({
           }
         }}
       >
-        <Link
-          href={`/p/${project.slug}`}
-          aria-label={`View ${project.title}`}
-          className="absolute inset-0 z-0"
-        />
         <div
           className={cn(
             "relative z-10 flex gap-4 border-2 border-border bg-card p-4",
@@ -290,7 +313,7 @@ export function ProjectCard({
             onClick={() => submitLike(likeState?.liked ? 0 : 1)}
             disabled={isLiking}
             className={cn(
-              "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors",
+              "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors cursor-pointer",
               likeButtonSize,
               likeState?.liked
                 ? "border-primary bg-primary/10 text-primary"
@@ -303,8 +326,7 @@ export function ProjectCard({
             <span className="font-mono text-sm font-bold">{localLikeCount}</span>
           </button>
 
-          <Link
-            href={`/p/${project.slug}`}
+          <div
             className={cn(
               "relative z-10 hidden flex-shrink-0 overflow-hidden border-2 border-border sm:block",
               thumbnailSize
@@ -312,20 +334,25 @@ export function ProjectCard({
           >
             <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
             <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
-          </Link>
+          </div>
 
           <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <Link
-                  href={`/p/${project.slug}`}
-                  className="pointer-events-auto no-underline hover:no-underline"
-                >
-                  <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
-                    <span className="truncate">{project.title}</span>
-                    <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                  </h3>
-                </Link>
+                <h3 className="flex items-center gap-2 font-mono text-lg font-bold text-foreground">
+                  <span className="truncate">{project.title}</span>
+                  {visitUrl && (
+                    <a
+                      href={visitUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Visit ${project.title}`}
+                      className="pointer-events-auto no-underline hover:no-underline"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-primary" />
+                    </a>
+                  )}
+                </h3>
                 <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{project.tagline}</p>
               </div>
               <div className="flex-shrink-0">
@@ -394,6 +421,17 @@ export function ProjectCard({
       </article>
       {goo}
     </>
+  );
+}
+
+function isInteractiveTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  return Boolean(
+    target.closest(
+      'a,button,input,select,textarea,label,[role="button"],[data-card-interactive="true"]'
+    )
   );
 }
 

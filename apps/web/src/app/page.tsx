@@ -36,6 +36,8 @@ const windowOptions: { value: WindowOption; label: string }[] = [
 export default function FeedPage() {
   const { data: session } = useSession();
   const { enabled: slopEnabled } = useSlopMode();
+  const showResetIntroButton =
+    session?.user?.role === "admin" || process.env.NODE_ENV === "development";
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [showIntro, setShowIntro] = useState(false);
@@ -368,7 +370,7 @@ export default function FeedPage() {
           </div>
         </>
       )}
-      {session?.user?.role === "admin" && (
+      {showResetIntroButton && (
         <button
           type="button"
           onClick={() => {
