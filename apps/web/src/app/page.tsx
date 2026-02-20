@@ -33,28 +33,9 @@ const windowOptions: { value: WindowOption; label: string }[] = [
   { value: "all", label: "All time" },
 ];
 
-function readDebugFlag(name: string) {
-  if (typeof window === "undefined") return false;
-  const value = new URLSearchParams(window.location.search).get(name);
-  return value === "1" || value === "true";
-}
-
-function useDebugFlag(name: string) {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    setEnabled(readDebugFlag(name));
-  }, [name]);
-
-  return enabled;
-}
-
 export default function FeedPage() {
   const { data: session } = useSession();
   const { enabled: slopEnabled } = useSlopMode();
-  const debugNoFeedIntroGoo = useDebugFlag("debugNoFeedIntroGoo");
-  const debugHideFeedIntro = useDebugFlag("debugHideFeedIntro");
-  const debugNoSlopFeedSpacing = useDebugFlag("debugNoSlopFeedSpacing");
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [showIntro, setShowIntro] = useState(false);
@@ -158,12 +139,12 @@ export default function FeedPage() {
 
   return (
     <div className="space-y-8">
-      {showIntro && !debugHideFeedIntro && (
-        <div className="flex flex-col items-center text-center pt-6">
+      {showIntro && (
+        <div className="relative isolate flex flex-col items-center text-center pt-6">
           <div
             ref={introRef}
             className={cn(
-              "relative -rotate-2 border-4 border-primary bg-primary/10 px-6 py-3 border-dashed",
+              "relative z-10 -rotate-2 border-4 border-primary bg-primary/10 px-6 py-3 border-dashed",
               slopEnabled ? "mb-8" : "mb-4",
               slopIntroClass
             )}
@@ -189,16 +170,19 @@ export default function FeedPage() {
               ×
             </button>
           </div>
-          {slopEnabled && !debugNoFeedIntroGoo && (
+          {slopEnabled && (
             <SlopGoo
               targetRef={introRef}
+              renderMode="inline"
               seed={42}
               rotationDeg={-2}
+              blur={6}
+              threshold={16}
               attach={{ start: 0, end: 1 }}
-              thickness={12}
-              maxDrop={64}
+              thickness={10}
+              maxDrop={50}
               beadSpacing={18}
-              dripCount={7}
+              dripCount={4}
               poolBias={0.8}
               viscositySeconds={35}
               edgeInset={0}
@@ -206,13 +190,15 @@ export default function FeedPage() {
               edgeOffset={2}
               edgeFeather={1}
               borderOffset={-8}
-              zIndex={-1}
+              displacementScale={0}
+              animateNoise={false}
+              zIndex={0}
             />
           )}
-          <p className="max-w-md text-muted-foreground">
+          <p className="relative z-10 max-w-md text-muted-foreground">
             This is the one place slop is encouraged — share your funny/useful/useless machinations even if they barely function.
           </p>
-          <div className="mt-4 flex w-full max-w-md items-center justify-center">
+          <div className="relative z-10 mt-4 flex w-full max-w-md items-center justify-center">
             <Link
               href="/submit"
               className={cn(
@@ -350,7 +336,6 @@ export default function FeedPage() {
                 ? "space-y-4"
                 : "space-y-3",
               slopEnabled &&
-                !debugNoSlopFeedSpacing &&
                 (displayMode === "grid"
                   ? "gap-6"
                   : displayMode === "list-lg"

@@ -1,6 +1,6 @@
 # Slop Goo Flash-Safe Multi-Instance - Implementation Plan
 
-**Status:** Draft  
+**Status:** Completed  
 **Date:** 2026-02-20  
 **Design Input:** `design/slop-goo-flash-safe-multi-instance.md`  
 **Debug Inputs:**  
@@ -49,7 +49,7 @@ Implement ambient goo isolation and profile split:
 ## Phase Plan
 
 ## Phase 1 - SlopGoo Render-Mode API
-**Status:** Pending
+**Status:** Completed
 
 Tasks:
 1. Add `renderMode?: "portal" | "inline"` to `SlopGoo` (default `"portal"`).
@@ -63,7 +63,7 @@ return renderMode === "inline" ? svg : createPortal(svg, document.body);
 ```
 
 ## Phase 2 - Feed Intro Ambient Migration
-**Status:** Pending
+**Status:** Completed
 
 Tasks:
 1. Render feed intro goo with `renderMode="inline"`.
@@ -74,7 +74,7 @@ Tasks:
 3. Preserve current visual placement and slop style intent.
 
 ## Phase 3 - Ambient Filter Profile Split
-**Status:** Pending
+**Status:** Completed
 
 Tasks:
 1. Introduce an ambient profile (lighter than interactive):
@@ -85,7 +85,7 @@ Tasks:
 3. Ensure ambient profile remains visually acceptable in dark and light themes.
 
 ## Phase 4 - Optional Hover Arbitration Fallback
-**Status:** Pending
+**Status:** Not Needed
 
 Trigger condition:
 1. Run only if flash remains after Phases 1-3.
@@ -95,7 +95,7 @@ Tasks:
 2. Keep this as a narrowly scoped fallback, not default behavior unless needed.
 
 ## Phase 5 - Cleanup Debug Paths
-**Status:** Pending
+**Status:** Completed
 
 Tasks:
 1. Remove temporary investigation flags once the final behavior is confirmed:
@@ -110,7 +110,7 @@ Tasks:
 3. Update debug docs with final outcomes.
 
 ## Phase 6 - Validation + Signoff
-**Status:** Pending
+**Status:** Completed
 
 Validation checklist:
 1. Dark mode + slop mode ON + intro visible:
@@ -125,6 +125,24 @@ Validation checklist:
 5. Build/type checks:
    - `pnpm -F @slop/web exec tsc --noEmit`
    - `pnpm -F @slop/web build`
+
+## Implementation Notes (2026-02-20)
+1. `SlopGoo` now supports:
+   - `renderMode?: "portal" | "inline"` (default portal)
+   - `displacementScale?: number`
+   - `animateNoise?: boolean`
+2. Feed intro goo now uses:
+   - `renderMode="inline"`
+   - local isolated container layering (no negative z-index)
+   - lighter ambient profile (`displacementScale={0}`, `animateNoise={false}`, lower goo intensity settings)
+3. Interactive card goo remains on portal mode.
+4. Local checks completed:
+   - `pnpm -F @slop/web exec tsc --noEmit` (pass)
+   - `pnpm -F @slop/web build` (pass)
+5. Temporary debug toggles were removed after validation from:
+   - `apps/web/src/components/project/ProjectCard.tsx`
+   - `apps/web/src/app/page.tsx`
+6. User validation confirmed baseline (`http://localhost:3000`, no flags) no longer flashes on hover/de-hover in dark mode with intro visible.
 
 ## Acceptance Criteria
 1. Flash is not observable in dark-mode hover/de-hover with intro goo enabled.

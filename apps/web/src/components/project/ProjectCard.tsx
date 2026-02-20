@@ -23,22 +23,6 @@ const SLOP_BADGE_TILTS = ["slop-tilt-1", "slop-tilt-2", "slop-tilt-3"];
 
 const SLOP_GOO_ATTACH = { start: 0, end: 1 } as const;
 
-function readDebugFlag(name: string) {
-  if (typeof window === "undefined") return false;
-  const value = new URLSearchParams(window.location.search).get(name);
-  return value === "1" || value === "true";
-}
-
-function useDebugFlag(name: string) {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    setEnabled(readDebugFlag(name));
-  }, [name]);
-
-  return enabled;
-}
-
 interface ProjectCardProps {
   project: ProjectListItem;
   showFavoriteButton?: boolean;
@@ -60,10 +44,6 @@ export function ProjectCard({
   const isLarge = variant === "list-lg";
   const [localLikeCount, setLocalLikeCount] = useState(project.likeCount);
   const [isHovered, setIsHovered] = useState(false);
-  const debugNoInnerCardTransform = useDebugFlag("debugNoInnerCardTransform");
-  const debugNoCardHoverChurn = useDebugFlag("debugNoCardHoverChurn");
-  const debugNoGooRender = useDebugFlag("debugNoGooRender");
-  const debugKeepGooMounted = useDebugFlag("debugKeepGooMounted");
   const { likeState, submitLike, isLiking } = useLike(project.slug, {
     onLikeSuccess: (result) => setLocalLikeCount(result.likeCount),
   });
@@ -87,12 +67,8 @@ export function ProjectCard({
   const scoreTone = getSlopBandBadgeClass(slopBand);
   const rotation =
     rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
-  const cardTransitionClass = debugNoCardHoverChurn
-    ? "transition-colors duration-200"
-    : "transition-all duration-200";
-  const cardHoverClass = debugNoCardHoverChurn
-    ? "hover:border-primary"
-    : "hover:border-primary hover:shadow-lg";
+  const cardTransitionClass = "transition-all duration-200";
+  const cardHoverClass = "hover:border-primary hover:shadow-lg";
   const thumbnailSize = isLarge ? "sm:h-32 sm:w-48" : "sm:h-16 sm:w-24";
   const likeButtonSize = isGrid ? "h-12 w-12" : "h-16 w-14";
   const scoreSizeClass = isGrid ? "h-10 w-10 text-base" : "h-12 w-12 text-lg";
@@ -101,23 +77,18 @@ export function ProjectCard({
   const slopOffset = sloppy ? SLOP_CARD_OFFSETS[slopIndex % SLOP_CARD_OFFSETS.length] : null;
   const slopClass = slopOffset?.className ?? "";
   const slopRotationDeg = slopOffset?.rotationDeg ?? 0;
-  const innerWrapperStyle = debugNoInnerCardTransform
-    ? ({ transform: "none" } as const)
-    : undefined;
   const slopBadgeClass = sloppy
     ? cn(
         "slop-sticky slop-sticky-outline",
         SLOP_BADGE_TILTS[slopIndex % SLOP_BADGE_TILTS.length]
       )
     : "";
-  const shouldRenderGoo =
-    sloppy && !debugNoGooRender && (isHovered || debugKeepGooMounted);
-  const goo = shouldRenderGoo ? (
+  const showGoo = sloppy && isHovered;
+  const goo = showGoo ? (
     <SlopGoo
       targetRef={cardRef}
       seed={slopIndex}
       rotationDeg={slopRotationDeg}
-      visible={isHovered}
       attach={SLOP_GOO_ATTACH}
       thickness={isGrid ? 10 : 12}
       maxDrop={isGrid ? 55 : 75}
@@ -161,7 +132,6 @@ export function ProjectCard({
               slopClass,
               cardHoverClass
             )}
-            style={innerWrapperStyle}
           >
             {rank && (
               <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
@@ -306,7 +276,6 @@ export function ProjectCard({
             slopClass,
             cardHoverClass
           )}
-          style={innerWrapperStyle}
         >
           {rank && (
             <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">

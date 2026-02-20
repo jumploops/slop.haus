@@ -39,13 +39,15 @@ export type SlopGooProps = {
   targetRef: RefObject<HTMLElement | null>;
   seed?: number;
   rotationDeg?: number;
-  visible?: boolean;
+  renderMode?: "portal" | "inline";
   attach?: Attach;
   color?: string;
   thickness?: number;
   maxDrop?: number;
   blur?: number;
   threshold?: number;
+  displacementScale?: number;
+  animateNoise?: boolean;
   beadSpacing?: number;
   dripCount?: number;
   poolBias?: number;
@@ -64,13 +66,15 @@ export function SlopGoo({
   targetRef,
   seed: seedOverride,
   rotationDeg,
-  visible = true,
+  renderMode = "portal",
   attach = DEFAULT_ATTACH,
   color = "var(--slop-green)",
   thickness = 14,
   maxDrop = 90,
   blur = 8,
   threshold = 18,
+  displacementScale: displacementScaleOverride,
+  animateNoise = true,
   beadSpacing = 18,
   dripCount = 7,
   poolBias = 0.65,
@@ -133,10 +137,21 @@ export function SlopGoo({
         const isFixed = position === "fixed";
         const rotationRad = typeof rotationDeg === "number" ? (rotationDeg * Math.PI) / 180 : undefined;
         let quad = getElementQuad(el, rotationRad !== undefined ? { rotationRad } : undefined);
-        if (!isFixed) {
+        if (renderMode === "portal" && !isFixed) {
           const scrollX = window.scrollX || window.pageXOffset || 0;
           const scrollY = window.scrollY || window.pageYOffset || 0;
           quad = quad.map((p) => ({ x: p.x + scrollX, y: p.y + scrollY }));
+        } else if (renderMode === "inline") {
+          const parent = el.parentElement;
+          if (!parent) {
+            setGeom(null);
+            return;
+          }
+          const parentRect = parent.getBoundingClientRect();
+          quad = quad.map((p) => ({
+            x: p.x - parentRect.left,
+            y: p.y - parentRect.top,
+          }));
         }
         if (quad.length < 4) {
           setGeom(null);
@@ -217,7 +232,7 @@ export function SlopGoo({
           b1: localB1,
           segLen,
           lowEndIsB1,
-          mode: isFixed ? "fixed" : "absolute",
+          mode: renderMode === "inline" ? "absolute" : isFixed ? "fixed" : "absolute",
         });
       });
     };
@@ -240,7 +255,7 @@ export function SlopGoo({
       window.removeEventListener("scroll", measure, true);
       window.removeEventListener("resize", measure);
     };
-  }, [attach, blur, borderOffset, edgeInset, edgeInsetLowEnd, edgeOffset, enabled, maxDrop, targetRef, thickness, useBorderOffset]);
+  }, [attach, blur, borderOffset, edgeInset, edgeInsetLowEnd, edgeOffset, enabled, maxDrop, renderMode, targetRef, thickness, useBorderOffset]);
 
   const shapes = useMemo(() => {
     if (!geom || seed === null) return null;
@@ -316,7 +331,7 @@ export function SlopGoo({
   const maskId = `slop-goo-mask-${id}`;
   const gradientId = `slop-goo-mask-gradient-${id}`;
   const feather = Math.max(0, edgeFeather);
-  const displacementScale = prefersReducedMotion ? 0 : 6;
+  const displacementScale = prefersReducedMotion ? 0 : displacementScaleOverride ?? 6;
   const filterPad = Math.ceil(blur * 3 + displacementScale + 8);
   const gx1 = b0.x - nx * feather;
   const gy1 = b0.y - ny * feather;
@@ -330,7 +345,6 @@ export function SlopGoo({
         top,
         width,
         height,
-        visibility: visible ? "visible" : "hidden",
         pointerEvents: "none",
         zIndex,
       }}
@@ -358,7 +372,7 @@ export function SlopGoo({
               result="goo"
             />
             <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed={seedValue % 997} result="noise">
-              {!prefersReducedMotion && (
+              {!prefersReducedMotion && animateNoise && (
                 <animate attributeName="baseFrequency" dur="90s" values="0.010;0.014;0.010" repeatCount="indefinite" />
               )}
             </feTurbulence>
@@ -439,5 +453,5 @@ export function SlopGoo({
     </div>
   );
 
-  return createPortal(svg, document.body);
+  return renderMode === "inline" ? svg : createPortal(svg, document.body);
 }

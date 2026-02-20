@@ -190,6 +190,32 @@ Quick compare:
 3. Hide intro: `http://localhost:3000?debugHideFeedIntro=1`
 4. No intro + no slop spacing: `http://localhost:3000?debugHideFeedIntro=1&debugNoSlopFeedSpacing=1`
 
+Result:
+1. All three tests removed the hover/de-hover background flash.
+2. Highest-confidence culprit branch: feed-level ambient intro goo layering, not card-local hover/goo behavior.
+
+## Implementation Follow-up (Started)
+
+Applied a first fix pass based on this signal:
+1. Added `SlopGoo` render strategy (`portal` vs `inline`) with default portal behavior.
+2. Migrated feed intro goo to `renderMode="inline"` inside a local `relative isolate` container.
+3. Removed negative-z intro goo layering and switched to local explicit z-order.
+4. Added lighter ambient goo profile knobs (`displacementScale={0}`, `animateNoise={false}` + reduced intensity values).
+
+Files:
+1. `apps/web/src/components/slop/SlopGoo.tsx`
+2. `apps/web/src/app/page.tsx`
+
+Validation needed now:
+1. Re-test baseline dark mode with no flags: `http://localhost:3000`
+2. Confirm intro visible and slop mode ON.
+3. Confirm no hover/de-hover flash across multiple cards.
+
+### Final Validation Result
+1. Baseline dark-mode test on `http://localhost:3000` (no flags) passed.
+2. Hover/de-hover background flash is no longer observable.
+3. Temporary debug toggles used during investigation were removed from production code paths.
+
 ## Decision Gate
 
 Ship direction should prioritize:
