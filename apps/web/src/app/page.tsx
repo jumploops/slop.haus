@@ -33,9 +33,28 @@ const windowOptions: { value: WindowOption; label: string }[] = [
   { value: "all", label: "All time" },
 ];
 
+function readDebugFlag(name: string) {
+  if (typeof window === "undefined") return false;
+  const value = new URLSearchParams(window.location.search).get(name);
+  return value === "1" || value === "true";
+}
+
+function useDebugFlag(name: string) {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    setEnabled(readDebugFlag(name));
+  }, [name]);
+
+  return enabled;
+}
+
 export default function FeedPage() {
   const { data: session } = useSession();
   const { enabled: slopEnabled } = useSlopMode();
+  const debugNoFeedIntroGoo = useDebugFlag("debugNoFeedIntroGoo");
+  const debugHideFeedIntro = useDebugFlag("debugHideFeedIntro");
+  const debugNoSlopFeedSpacing = useDebugFlag("debugNoSlopFeedSpacing");
   const [sort, setSort] = useState<SortOption>("hot");
   const [timeWindow, setTimeWindow] = useState<WindowOption>("all");
   const [showIntro, setShowIntro] = useState(false);
@@ -139,7 +158,7 @@ export default function FeedPage() {
 
   return (
     <div className="space-y-8">
-      {showIntro && (
+      {showIntro && !debugHideFeedIntro && (
         <div className="flex flex-col items-center text-center pt-6">
           <div
             ref={introRef}
@@ -170,7 +189,7 @@ export default function FeedPage() {
               ×
             </button>
           </div>
-          {slopEnabled && (
+          {slopEnabled && !debugNoFeedIntroGoo && (
             <SlopGoo
               targetRef={introRef}
               seed={42}
@@ -331,6 +350,7 @@ export default function FeedPage() {
                 ? "space-y-4"
                 : "space-y-3",
               slopEnabled &&
+                !debugNoSlopFeedSpacing &&
                 (displayMode === "grid"
                   ? "gap-6"
                   : displayMode === "list-lg"

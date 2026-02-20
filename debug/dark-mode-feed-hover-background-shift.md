@@ -436,3 +436,35 @@ Compare flow:
 Interpretation:
 - If F removes/reduces transient: baseline slop transforms are likely interacting with dark-mode compositing.
 - If F has no effect: continue investigating dark-theme token/AA/compositor transitions not tied to card offsets.
+
+### Result (2026-02-20)
+- `debugNoSlopOffsets=1`: no hover/de-hover background transient observed.
+- `debugNoSlopOffsets=1&debugNoGooRender=1`: also clean (same result).
+
+Final implication:
+- Primary trigger is slop offset transforms on the card surface in dark mode production.
+- Goo rendering is correlated, but not causal.
+
+## Final Hypothesis Ranking
+
+| Rank | Hypothesis | Confidence |
+|---|---|---|
+| 1 | Dark-mode compositing/AA artifact from transformed slop card shell (`rotate/translate`) | High |
+| 2 | Production optimization timing amplifies card-shell transform artifact during hover enter/leave | Medium |
+| 3 | Goo lifecycle/filter contributes noise but is not the root trigger | Low-Medium |
+
+## Resolution Direction Chosen
+
+Selected fix path: move slop transforms off the outer interactive shell and onto an inner visual wrapper (`Option B` in design).
+
+Why:
+1. Preserves slop personality.
+2. Keeps outer shell compositor-stable.
+3. Matches experiment evidence that offsets are the root trigger.
+
+## Cleanup Note
+
+The temporary debug toggles used during experiments were removed after implementation cleanup:
+1. `apps/web/src/components/project/ProjectCard.tsx`
+2. `apps/web/src/components/slop/SlopGoo.tsx`
+3. `apps/web/next.config.ts`

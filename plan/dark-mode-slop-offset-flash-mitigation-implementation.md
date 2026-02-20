@@ -1,6 +1,6 @@
 # Dark Mode Slop Offset Flash Mitigation - Implementation Plan
 
-**Status:** Draft  
+**Status:** In Progress (Phases 1-3 complete, Phase 4 in progress)  
 **Date:** 2026-02-20  
 **Design Input:** `design/dark-mode-slop-offset-flash-mitigation.md`  
 **Debug Input:** `debug/dark-mode-feed-hover-background-shift.md`
@@ -40,7 +40,7 @@ Implement **Option B** from design:
 ## Phase Plan
 
 ## Phase 1 - Structural Refactor (Card Shell vs Visual Wrapper)
-**Status:** Pending
+**Status:** Completed
 
 Tasks:
 1. Keep current outer `<article>` as interaction shell (hover/focus handlers, link hit-area, border behavior).
@@ -53,7 +53,7 @@ Notes:
 - Inner visual wrapper carries slop offset personality.
 
 ## Phase 2 - Goo/Alignment Decisions
-**Status:** Pending
+**Status:** Completed
 
 Tasks:
 1. Keep `SlopGoo` target anchored to outer shell first (stability-first default).
@@ -64,7 +64,7 @@ Decision rule:
 - Prefer stability over perfect offset alignment unless misalignment is obvious.
 
 ## Phase 3 - Cleanup Debug Paths
-**Status:** Pending
+**Status:** Completed
 
 Tasks:
 1. Remove temporary URL debug toggles that are no longer needed:
@@ -82,7 +82,7 @@ Tasks:
 3. Keep only intentional production behavior code.
 
 ## Phase 4 - Validation + Signoff
-**Status:** Pending
+**Status:** In Progress
 
 Validation checklist:
 1. Dark mode + slop mode ON + production build:
@@ -97,6 +97,17 @@ Validation checklist:
 5. Build/type checks:
    - `pnpm -F @slop/web exec tsc --noEmit`
    - `pnpm -F @slop/web build`
+
+## Implementation Notes (2026-02-20)
+1. `ProjectCard` now uses a stable outer shell (`article`) and applies slop offsets on an inner visual wrapper for both grid/list variants.
+2. `SlopGoo` remains anchored to the outer shell for stability.
+3. Temporary investigation toggles were removed from:
+   - `apps/web/src/components/project/ProjectCard.tsx`
+   - `apps/web/src/components/slop/SlopGoo.tsx`
+   - `apps/web/next.config.ts`
+4. Local checks completed:
+   - `pnpm -F @slop/web build` (pass)
+   - `pnpm -F @slop/web exec tsc --noEmit` (pass, after build regenerated `.next/types`)
 
 ## Acceptance Criteria
 1. Flash is not observable in dark mode production hover/de-hover.
