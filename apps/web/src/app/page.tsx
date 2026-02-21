@@ -198,7 +198,7 @@ export default function FeedPage() {
             />
           )}
           <p className="relative z-10 max-w-md text-muted-foreground">
-            This is the one place slop is encouraged — share your funny/useful/useless machinations even if they barely function.
+            Not all slop is equal — share your best/funny/useful/useless vibecoded machinations, even if they barely function!
           </p>
           <div className="relative z-10 mt-4 flex w-full max-w-md items-center justify-center">
             <Link
@@ -335,12 +335,12 @@ export default function FeedPage() {
               displayMode === "grid"
                 ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 : displayMode === "list-lg"
-                ? "space-y-4"
-                : "space-y-3",
+                  ? "space-y-4"
+                  : "space-y-3",
               slopEnabled &&
-                (displayMode === "grid"
-                  ? "gap-6"
-                  : displayMode === "list-lg"
+              (displayMode === "grid"
+                ? "gap-6"
+                : displayMode === "list-lg"
                   ? "space-y-6"
                   : "space-y-5")
             )}

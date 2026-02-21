@@ -164,13 +164,21 @@ function MyProjectCard({ project, onEdit, onDelete }: MyProjectCardProps) {
           </div>
         </div>
 
-        <div className="flex gap-2 shrink-0 w-full sm:w-auto justify-start">
+        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto sm:self-center justify-start">
           {project.status !== "removed" && (
             <>
-              <Button variant="secondary" size="sm" onClick={onEdit}>
+              <Button
+                variant="secondary"
+                size="compact"
+                onClick={onEdit}
+              >
                 <PencilIcon /> Edit
               </Button>
-              <Button variant="danger" size="sm" onClick={onDelete}>
+              <Button
+                variant="danger"
+                size="compact"
+                onClick={onDelete}
+              >
                 <TrashIcon /> Delete
               </Button>
             </>
