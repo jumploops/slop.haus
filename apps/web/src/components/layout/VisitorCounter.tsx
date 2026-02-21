@@ -53,7 +53,6 @@ export function VisitorCounter({ compact = false }: VisitorCounterProps) {
           </div>
         ))}
       </div>
-      <div className="text-[10px] text-muted-foreground">Since Jan 1, 1999</div>
     </div>
   );
 }

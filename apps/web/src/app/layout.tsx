@@ -66,12 +66,8 @@ export default function RootLayout({
               <div className="mb-4 flex justify-center">
                 <VisitorCounter />
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
-                <span>webmaster@slop.haus</span>
-                <span>|</span>
-                <span>© 1999-2025 slop.haus</span>
-                <span>|</span>
-                <span className="text-[10px]">Best viewed at 800x600</span>
+              <div className="text-xs text-muted-foreground">
+                <span>© 2026 slop.haus</span>
               </div>
             </div>
           </footer>
