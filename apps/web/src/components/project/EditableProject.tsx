@@ -22,7 +22,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { refreshProject, type ProjectDetail, type ProjectRevision } from "@/lib/api/projects";
-import { getSlopBandTextClass } from "@/lib/slop-score-presentation";
+import { formatSlopScore, getSlopBandTextClass } from "@/lib/slop-score-presentation";
 
 interface EditableProjectProps {
   project: ProjectDetail;
@@ -63,6 +63,7 @@ export function EditableProject({
   const primaryMedia = project.media.find((m) => m.isPrimary) || project.media[0];
   const [screenshotUrl, setScreenshotUrl] = useState(primaryMedia?.url || null);
   const slopBand = getSlopBandForAggregateScore(project.slopScore, project.reviewCount);
+  const slopScore = project.reviewCount > 0 ? formatSlopScore(project.slopScore) : "—";
   const slopTerm = getSlopBandTerm(slopBand);
 
   // URL change modal state - now triggered on submit, not blur
@@ -429,7 +430,7 @@ export function EditableProject({
                     </span>
                     <div className="flex items-center gap-1">
                       <span className="font-mono text-xs text-foreground">
-                        {project.reviewCount > 0 ? project.slopScore.toFixed(1) : "—"}
+                        {slopScore}
                       </span>
                       <span
                         className={cn(

@@ -10,7 +10,7 @@ import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
 import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
 import { getSlopBandForAggregateScore, getSlopBandTerm } from "@slop/shared";
-import { getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
+import { formatSlopScore, getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
 
 const SLOP_CARD_OFFSETS = [
   { className: "rotate-[0.6deg] translate-x-[1px] translate-y-[1px]", rotationDeg: 0.6 },
@@ -62,7 +62,7 @@ export function ProjectCard({
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
   const isNew = Date.now() - new Date(project.createdAt).getTime() < 2 * 24 * 60 * 60 * 1000;
   const slopBand = getSlopBandForAggregateScore(project.slopScore, project.reviewCount);
-  const slopScore = project.reviewCount === 0 ? "—" : project.slopScore.toFixed(1);
+  const slopScore = project.reviewCount === 0 ? "—" : formatSlopScore(project.slopScore);
   const slopTerm = getSlopBandTerm(slopBand);
   const visitUrl = project.mainUrl || project.repoUrl;
   const scoreTone = getSlopBandBadgeClass(slopBand);

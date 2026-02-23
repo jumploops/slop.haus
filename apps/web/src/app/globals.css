@@ -160,8 +160,17 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+  html {
+    height: 100%;
+  }
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 }
 

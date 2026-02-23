@@ -123,8 +123,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 
 | File | Purpose |
 |------|---------|
-| `src/styles/theme.css` | `@theme` token definitions + Tailwind mapping |
-| `src/app/globals.css` | Page-specific layouts + legacy CSS (being migrated) |
+| `src/app/globals.css` | Tailwind import, `:root`/`.dark` tokens, and `@theme` Tailwind mapping |
 
 ## Usage Guidelines
 
@@ -153,6 +152,6 @@ As of the retro reskin:
 ## Adding New Tokens
 
 1. Add to `:root` in `globals.css` (base value)
-2. Add to `@theme` block in `theme.css` (Tailwind mapping)
+2. Add to `@theme` block in `globals.css` (Tailwind mapping)
 3. Update this document
 4. Verify light/dark mode rendering

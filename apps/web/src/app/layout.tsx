@@ -56,7 +56,7 @@ export default function RootLayout({
             </div>
           </div>
           <Header />
-          <main className="py-6 min-h-[calc(100vh-var(--app-header-height))]">
+          <main className="bg-background py-6 min-h-[calc(100vh-var(--app-header-height))]">
             <div className="mx-auto max-w-5xl px-4">
               {children}
             </div>

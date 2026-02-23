@@ -7,7 +7,7 @@ import { useLike } from "@/hooks/useLike";
 import { useSlopMode } from "@/lib/slop-mode";
 import { cn } from "@/lib/utils";
 import { getSlopBandForAggregateScore, getSlopBandTerm } from "@slop/shared";
-import { getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
+import { formatSlopScore, getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
 
 interface ScoreWidgetProps {
   projectSlug: string;
@@ -36,7 +36,7 @@ export function ScoreWidget({
 
   const displayScore = useMemo(() => {
     if (reviewCount === 0) return "—";
-    return slopScore.toFixed(1);
+    return formatSlopScore(slopScore);
   }, [reviewCount, slopScore]);
   const slopBand = useMemo(
     () => getSlopBandForAggregateScore(slopScore, reviewCount),

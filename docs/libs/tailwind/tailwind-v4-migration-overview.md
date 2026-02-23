@@ -319,7 +319,7 @@ The `corePlugins` option is no longer supported in v4.
 If you use `@apply` (or `@variant`) inside CSS modules, Vue, or Svelte component style blocks, import your main stylesheet for reference:
 
 ```css
-@reference "../../app.css";
+@reference "../../globals.css";
 
 .btn {
   @apply px-4 py-2 rounded bg-blue-600 text-white;
