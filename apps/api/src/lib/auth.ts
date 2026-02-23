@@ -1,7 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { anonymous } from "better-auth/plugins";
 import { db } from "@slop/db";
 import * as schema from "@slop/db/schema";
+import { sql } from "drizzle-orm";
 import {
   normalizeUsername,
   validateUsername,
@@ -28,6 +30,55 @@ function resolveCreateUsernameCandidate(userData: Record<string, unknown>): stri
   }
 
   return generateRandomUsernameCandidate();
+}
+
+async function migrateAnonymousUserState(params: {
+  anonymousUserId: string;
+  newUserId: string;
+}): Promise<void> {
+  const { anonymousUserId, newUserId } = params;
+  if (!anonymousUserId || !newUserId || anonymousUserId === newUserId) {
+    return;
+  }
+
+  // Placeholder transaction boundary for future anon->registered data migration.
+  await db.transaction(async () => {});
+}
+
+async function incrementUniqueVisitorCounter(): Promise<void> {
+  await db
+    .insert(schema.siteCounters)
+    .values({
+      key: "unique_visitors",
+      // Baseline starts at 1, so first anonymous visitor inserts 2.
+      value: 2,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: schema.siteCounters.key,
+      set: {
+        value: sql`${schema.siteCounters.value} + 1`,
+        updatedAt: new Date(),
+      },
+    });
+}
+
+function isAnonymousUserCreation(
+  createdUser: { isAnonymous?: boolean; email?: string | null },
+  path?: string
+): boolean {
+  if (createdUser.isAnonymous === true) {
+    return true;
+  }
+
+  if (
+    typeof createdUser.email === "string" &&
+    createdUser.email.endsWith("@anon.slop.haus")
+  ) {
+    return true;
+  }
+
+  return path === "/sign-in/anonymous";
 }
 
 export const auth = betterAuth({
@@ -82,6 +133,21 @@ export const auth = betterAuth({
       // This prevents auto-merging accounts by email on sign-in
     },
   },
+  plugins: [
+    anonymous({
+      emailDomainName: "anon.slop.haus",
+      onLinkAccount: async ({ anonymousUser, newUser }) => {
+        await migrateAnonymousUserState({
+          anonymousUserId: anonymousUser.user.id,
+          newUserId: newUser.user.id,
+        });
+
+        console.info(
+          `[auth] linked anonymous user ${anonymousUser.user.id} -> ${newUser.user.id}`
+        );
+      },
+    }),
+  ],
   session: {
     cookieCache: {
       enabled: true,
@@ -131,6 +197,18 @@ export const auth = betterAuth({
               name: username,
             },
           };
+        },
+        after: async (createdUser, context) => {
+          if (!isAnonymousUserCreation(createdUser, context?.path)) {
+            return;
+          }
+
+          try {
+            await incrementUniqueVisitorCounter();
+          } catch (error) {
+            // Never block auth if counter writes fail.
+            console.error("[auth] failed to increment unique visitor counter", error);
+          }
         },
       },
       update: {

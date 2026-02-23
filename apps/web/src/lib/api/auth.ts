@@ -8,6 +8,7 @@ export interface CurrentUser {
   image: string | null;
   role: "user" | "mod" | "admin";
   devVerified: boolean;
+  isAnonymous: boolean;
   providers: string[];
   hasGitHub: boolean;
   hasGoogle: boolean;

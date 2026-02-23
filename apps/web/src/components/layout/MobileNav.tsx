@@ -52,8 +52,9 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
     }
   };
 
-  const isAdmin = session?.user?.role === "admin";
-  const isMod = session?.user?.role === "mod";
+  const isRegisteredUser = Boolean(session?.user && !session.user.isAnonymous);
+  const isAdmin = isRegisteredUser && session?.user?.role === "admin";
+  const isMod = isRegisteredUser && session?.user?.role === "mod";
   const showAdminLink = isAdmin || isMod;
   const themeLabel = mounted ? getThemeLabel(theme) : "System";
   const slopLabel = slopEnabled ? "On" : "Off";
@@ -111,7 +112,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           <MobileNavLink href="/submit" active={pathname === "/submit"}>
             Submit
           </MobileNavLink>
-          {session?.user && (
+          {isRegisteredUser && (
             <>
               <MobileNavLink href="/favorites" active={pathname === "/favorites"}>
                 Favorites
@@ -135,7 +136,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
         <div className="p-4 border-t-2 border-dashed border-border flex flex-col gap-3">
           {isPending ? (
             <span className="text-muted-foreground text-sm">Loading...</span>
-          ) : session?.user ? (
+          ) : isRegisteredUser && session?.user ? (
             <>
               <span className="text-sm text-muted-foreground truncate">
                 {session.user.username || "User"}

@@ -32,11 +32,12 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
     setLocalUpvotes(comment.upvoteCount);
   }, [comment.upvoteCount]);
 
-  const isOwner = session?.user?.id === comment.author.id;
+  const isRegisteredUser = Boolean(session?.user && !session.user.isAnonymous);
+  const isOwner = isRegisteredUser && session?.user?.id === comment.author.id;
   const canDelete =
     isOwner ||
-    session?.user?.role === "admin" ||
-    session?.user?.role === "mod";
+    (isRegisteredUser && session?.user?.role === "admin") ||
+    (isRegisteredUser && session?.user?.role === "mod");
 
   const handleDelete = async () => {
     const label = comment.reviewScore !== null ? "review" : "comment";
@@ -60,7 +61,7 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
   };
 
   const handleVote = async () => {
-    if (!session?.user || isVoting) return;
+    if (!isRegisteredUser || isVoting) return;
     setIsVoting(true);
 
     const nextValue = hasUpvoted ? 0 : 1;
@@ -130,11 +131,11 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
             <button
               type="button"
               onClick={handleVote}
-              disabled={!session?.user || isVoting}
+              disabled={!isRegisteredUser || isVoting}
               className={cn(
                 "flex items-center gap-1.5 font-mono transition-colors",
                 hasUpvoted ? "text-primary" : "hover:text-foreground",
-                (!session?.user || isVoting) && "opacity-50 cursor-not-allowed"
+                (!isRegisteredUser || isVoting) && "opacity-50 cursor-not-allowed"
               )}
             >
               <ThumbsUp className="h-3.5 w-3.5" />
@@ -142,7 +143,7 @@ export function CommentItem({ comment, projectSlug, onCommentUpdate }: CommentIt
                 {localUpvotes} {comment.reviewScore !== null ? "helpful" : "upvotes"}
               </span>
             </button>
-            {session?.user && comment.depth < 10 && (
+            {isRegisteredUser && comment.depth < 10 && (
               <button
                 type="button"
                 onClick={() => setIsReplying(!isReplying)}

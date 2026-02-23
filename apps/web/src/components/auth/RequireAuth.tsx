@@ -13,12 +13,13 @@ interface RequireAuthProps {
 export function RequireAuth({ children, fallback }: RequireAuthProps) {
   const { data: session, isPending } = useSession();
   const { openLoginModal } = useLoginModal();
+  const isRegisteredUser = Boolean(session?.user && !session.user.isAnonymous);
 
   useEffect(() => {
-    if (!isPending && !session?.user) {
+    if (!isPending && !isRegisteredUser) {
       openLoginModal();
     }
-  }, [isPending, session, openLoginModal]);
+  }, [isPending, isRegisteredUser, openLoginModal]);
 
   if (isPending) {
     return (
@@ -29,7 +30,7 @@ export function RequireAuth({ children, fallback }: RequireAuthProps) {
     );
   }
 
-  if (!session?.user) {
+  if (!isRegisteredUser) {
     return fallback || (
       <div className="border-2 border-dashed border-border bg-card p-6 text-center">
         <p className="text-sm text-muted-foreground font-mono">Please sign in to continue</p>

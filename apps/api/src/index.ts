@@ -17,6 +17,7 @@ import { adminRoutes } from "./routes/admin";
 import { flagRoutes } from "./routes/flags";
 import { draftRoutes } from "./routes/drafts";
 import { sitemapRoutes } from "./routes/sitemap";
+import { visitorCountRoutes } from "./routes/visitorCount";
 import type { AuthSession } from "./middleware/auth";
 
 // Extend Hono context with session
@@ -77,6 +78,7 @@ app.route("/api/v1/flags", flagRoutes); // Flagging routes
 app.route("/api/v1/tools", toolRoutes);
 app.route("/api/v1/drafts", draftRoutes); // Draft submission routes
 app.route("/api/v1/sitemap", sitemapRoutes);
+app.route("/api/v1/visitor-count", visitorCountRoutes);
 
 // API info
 app.get("/api/v1", (c) => {

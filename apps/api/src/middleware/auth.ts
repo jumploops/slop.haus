@@ -11,6 +11,7 @@ export type AuthUser = {
   image: string | null;
   role: "user" | "mod" | "admin";
   devVerified: boolean;
+  isAnonymous: boolean;
   usernameSource: "github" | "google_random" | "manual" | "seed";
 };
 
@@ -34,6 +35,7 @@ interface BetterAuthUserWithCustomFields {
   image: string | null;
   role?: "user" | "mod" | "admin";
   devVerified?: boolean;
+  isAnonymous?: boolean;
 }
 
 // Get session from request (returns null if not authenticated)
@@ -55,6 +57,7 @@ export async function getSession(c: Context): Promise<AuthSession | null> {
       image: user.image ?? null,
       role: user.role || "user",
       devVerified: user.devVerified || false,
+      isAnonymous: user.isAnonymous || false,
       usernameSource: user.usernameSource || "manual",
     },
     session: {
@@ -96,7 +99,7 @@ export function requireAuth() {
   return async (c: Context, next: Next) => {
     const session = await getSession(c);
 
-    if (!session) {
+    if (!session || session.user.isAnonymous) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
@@ -110,7 +113,7 @@ export function requireGitHub() {
   return async (c: Context, next: Next) => {
     const session = await getSession(c);
 
-    if (!session) {
+    if (!session || session.user.isAnonymous) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
@@ -132,7 +135,7 @@ export function requireMod() {
   return async (c: Context, next: Next) => {
     const session = await getSession(c);
 
-    if (!session) {
+    if (!session || session.user.isAnonymous) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
@@ -150,7 +153,7 @@ export function requireAdmin() {
   return async (c: Context, next: Next) => {
     const session = await getSession(c);
 
-    if (!session) {
+    if (!session || session.user.isAnonymous) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 

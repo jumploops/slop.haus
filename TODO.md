@@ -26,7 +26,7 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **Fixture user for seeding/tests** - Add an optional seed user for quick local logins and test flows.
 
-- [ ] **Server-based visitor counter** - Replace localStorage-based counter with server values that increment using Cloudflare unique user data.
+- [ ] **Anonymous user actions (future)** - Expand anonymous accounts beyond visitor counting so anon sessions can like/comment (with anti-abuse controls like Captcha/Turnstile/rate limits) while still supporting seamless anon → real account linking/migration.
 
 - [ ] **Field save indicator** - No visual feedback when auto-saving fields on blur. Add "Saving..."/"Saved" indicator.
 

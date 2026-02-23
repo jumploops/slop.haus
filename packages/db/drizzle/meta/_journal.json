@@ -43,6 +43,13 @@
       "when": 1770628614457,
       "tag": "0005_sharp_alex_power",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1771663112351,
+      "tag": "0006_freezing_harry_osborn",
+      "breakpoints": true
     }
   ]
 }
