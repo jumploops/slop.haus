@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { LoginModalContext, useLoginModalState } from "@/hooks/useLoginModal";
 import { LoginModal } from "@/components/auth/LoginModal";
+import { EnsureAnonymous } from "@/components/auth/EnsureAnonymous";
 import { SlopModeProvider } from "@/lib/slop-mode";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -16,6 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <SWRProvider>
           <ToastProvider>
             <LoginModalContext.Provider value={loginModalState}>
+              <EnsureAnonymous />
               {children}
               <LoginModal />
             </LoginModalContext.Provider>

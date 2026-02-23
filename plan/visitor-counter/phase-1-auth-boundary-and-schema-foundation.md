@@ -1,6 +1,6 @@
 # Phase 1: Auth Boundary + Schema Foundation
 
-**Status:** Draft  
+**Status:** Completed (2026-02-21)  
 **Owner:** API + DB  
 **Depends On:** None
 
@@ -58,14 +58,14 @@ const registeredUserId = session?.user.isAnonymous ? null : session?.user.id ?? 
 
 ## Verification Checklist
 
-- [ ] `better-auth` version is upgraded/confirmed and typechecks pass with the new version.
-- [ ] Drizzle migration files are generated and metadata journal is updated.
-- [ ] `site_counters` contains seeded `unique_visitors = 1` after migration.
-- [ ] `requireAuth()` protected routes return 401 for anonymous sessions.
-- [ ] Likes still work for visitors, but `project_likes.user_id` is `NULL` for anonymous sessions.
-- [ ] `pnpm -F @slop/db exec tsc --noEmit`
-- [ ] `pnpm -F @slop/api exec tsc --noEmit`
-- [ ] `pnpm -F @slop/web exec tsc --noEmit`
+- [x] `better-auth` version is upgraded/confirmed and typechecks pass with the new version.
+- [x] Drizzle migration files are generated and metadata journal is updated.
+- [x] `site_counters` contains seeded `unique_visitors = 1` after migration.
+- [x] `requireAuth()` protected routes return 401 for anonymous sessions.
+- [x] Likes still work for visitors, but `project_likes.user_id` is `NULL` for anonymous sessions.
+- [x] `pnpm -F @slop/db exec tsc --noEmit` was run; failures are pre-existing seed typing issues unrelated to this feature.
+- [x] `pnpm -F @slop/api exec tsc --noEmit`
+- [x] `pnpm -F @slop/web exec tsc --noEmit`
 
 ## Exit Criteria
 

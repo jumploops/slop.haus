@@ -13,9 +13,10 @@ interface UseFavoriteOptions {
 export function useFavorite(projectSlug: string, options?: UseFavoriteOptions) {
   const { data: session } = useSession();
   const { showToast } = useToast();
+  const isRegisteredUser = Boolean(session?.user && !session.user.isAnonymous);
 
   const { data: isFavorited, mutate, isLoading } = useSWR(
-    session?.user ? `/projects/${projectSlug}/favorite` : null,
+    isRegisteredUser ? `/projects/${projectSlug}/favorite` : null,
     () => checkFavorite(projectSlug),
     {
       revalidateOnFocus: false,
@@ -23,7 +24,7 @@ export function useFavorite(projectSlug: string, options?: UseFavoriteOptions) {
   );
 
   const toggleFavorite = useCallback(async () => {
-    if (!session?.user) {
+    if (!isRegisteredUser) {
       showToast("Sign in to add favorites", "info");
       return;
     }
@@ -46,7 +47,7 @@ export function useFavorite(projectSlug: string, options?: UseFavoriteOptions) {
       mutate(isFavorited, false);
       showToast("Failed to update favorites", "error");
     }
-  }, [projectSlug, isFavorited, mutate, session, showToast, options]);
+  }, [projectSlug, isFavorited, mutate, isRegisteredUser, showToast, options]);
 
   return {
     isFavorited: isFavorited ?? false,

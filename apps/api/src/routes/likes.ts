@@ -38,6 +38,9 @@ likeRoutes.post("/:slug/like", async (c) => {
   }
 
   const session = await getSession(c);
+  const registeredUserId = session?.user.isAnonymous
+    ? null
+    : session?.user.id ?? null;
   const raterKeyHash = getOrCreatePublicRater(c);
   const raterType = session?.user.devVerified || getDevRater(c) ? "dev" : "public";
 
@@ -99,7 +102,7 @@ likeRoutes.post("/:slug/like", async (c) => {
     if (!existingLike) {
       await tx.insert(projectLikes).values({
         projectId: project.id,
-        userId: session?.user.id ?? null,
+        userId: registeredUserId,
         raterType,
         raterKeyHash,
       });
@@ -113,8 +116,8 @@ likeRoutes.post("/:slug/like", async (c) => {
       if (existingLike.raterType !== raterType) {
         updates.raterType = raterType;
       }
-      if (!existingLike.userId && session?.user.id) {
-        updates.userId = session.user.id;
+      if (!existingLike.userId && registeredUserId) {
+        updates.userId = registeredUserId;
       }
       if (Object.keys(updates).length > 0) {
         await tx

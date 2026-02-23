@@ -31,13 +31,14 @@ export function CommentForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isTopLevel = !parentCommentId;
   const selectedBand = reviewScore === null ? null : getSlopBandForReviewScore(reviewScore);
+  const isRegisteredUser = Boolean(session?.user && !session.user.isAnonymous);
 
   // Render placeholder during session loading to avoid hydration mismatch
   if (isPending) {
     return <div className="py-4 h-[120px]" />;
   }
 
-  if (!session?.user) {
+  if (!isRegisteredUser) {
     return (
       <div className="border-2 border-dashed border-border bg-card p-4 text-center">
         <p className="text-muted-foreground text-sm font-mono">Sign in to leave a review</p>

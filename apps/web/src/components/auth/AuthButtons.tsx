@@ -46,6 +46,7 @@ export function AuthButtons() {
 
   const themeLabel = mounted ? getThemeLabel(theme) : "System";
   const slopLabel = slopEnabled ? "On" : "Off";
+  const isRegisteredUser = Boolean(session?.user && !session.user.isAnonymous);
 
   if (isPending) {
     return (
@@ -55,7 +56,7 @@ export function AuthButtons() {
     );
   }
 
-  if (session?.user) {
+  if (isRegisteredUser && session?.user) {
     const isAdmin = session.user.role === "admin";
     const isMod = session.user.role === "mod";
     const showAdminLink = isAdmin || isMod;

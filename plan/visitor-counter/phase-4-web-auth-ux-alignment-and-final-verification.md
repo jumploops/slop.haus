@@ -1,6 +1,6 @@
 # Phase 4: Web Auth UX Alignment + Final Verification
 
-**Status:** Draft  
+**Status:** Completed (2026-02-23)  
 **Owner:** Web + API  
 **Depends On:** Phase 3
 
@@ -50,13 +50,13 @@ if (!isPending && (!session?.user || session.user.isAnonymous)) {
 
 ## Verification Checklist
 
-- [ ] Anonymous visitors still see Sign In CTA in header/nav.
-- [ ] Anonymous visitors are prompted to sign in for favorites/comments/submit/settings.
-- [ ] Protected API endpoints return 401 for anonymous sessions.
-- [ ] Anonymous users can convert to real account via social sign-in without FK/delete errors.
-- [ ] Visitor counter still increments once on fresh browser and not on repeat loads.
-- [ ] `pnpm -F @slop/api exec tsc --noEmit`
-- [ ] `pnpm -F @slop/web exec tsc --noEmit`
+- [x] Anonymous visitors still see Sign In CTA in header/nav.
+- [x] Anonymous visitors are prompted to sign in for favorites/comments/submit/settings.
+- [x] Protected API endpoints return 401 for anonymous sessions.
+- [x] Anonymous users can convert to real account via social sign-in without FK/delete errors.
+- [x] Visitor counter still increments once on fresh browser and not on repeat loads.
+- [x] `pnpm -F @slop/api exec tsc --noEmit`
+- [x] `pnpm -F @slop/web exec tsc --noEmit`
 
 ## Exit Criteria
 

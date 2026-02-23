@@ -1,22 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { fetchVisitorCount } from "@/lib/api/visitor-count";
 
 interface VisitorCounterProps {
   compact?: boolean;
 }
 
-export function VisitorCounter({ compact = false }: VisitorCounterProps) {
-  const [count, setCount] = useState(0);
+const BASELINE_VISITOR_COUNT = 1;
 
-  useEffect(() => {
-    const stored = localStorage.getItem("slop-visitor-count");
-    const baseCount = 13847;
-    const currentCount = stored ? Number.parseInt(stored, 10) : baseCount;
-    const newCount = currentCount + 1;
-    localStorage.setItem("slop-visitor-count", newCount.toString());
-    setCount(newCount);
-  }, []);
+export function VisitorCounter({ compact = false }: VisitorCounterProps) {
+  const { data } = useSWR("visitor-count", fetchVisitorCount, {
+    refreshInterval: 60_000,
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  });
+
+  const count =
+    typeof data === "number" && Number.isFinite(data) && data > 0
+      ? Math.floor(data)
+      : BASELINE_VISITOR_COUNT;
 
   const digits = count.toString().padStart(6, "0").split("");
 

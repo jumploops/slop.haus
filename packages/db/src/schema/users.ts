@@ -31,6 +31,7 @@ export const user = pgTable("user", {
   // Custom fields
   role: userRoleEnum("role").default("user").notNull(),
   devVerified: boolean("devVerified").default(false).notNull(),
+  isAnonymous: boolean("isAnonymous").default(false).notNull(),
 });
 
 // Better Auth compatible session table

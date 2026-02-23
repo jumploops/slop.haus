@@ -1,7 +1,7 @@
 # Visitor Counter Implementation Plan
 
-**Status:** Draft  
-**Last Updated:** 2026-02-21  
+**Status:** Completed  
+**Last Updated:** 2026-02-23  
 **Owner:** API + Web + DB
 
 ## Overview
@@ -32,10 +32,10 @@ Implement the 90s/early-2000s visitor counter from `design/anon-user-based-visit
 
 | Phase | Name | Status | Description |
 | --- | --- | --- | --- |
-| 1 | [Auth Boundary + Schema Foundation](./phase-1-auth-boundary-and-schema-foundation.md) | Draft | Upgrade/verify Better Auth baseline, add `isAnonymous`, add counter table, and harden API auth semantics |
-| 2 | [Anonymous Plugin + Counter Write Path](./phase-2-anonymous-plugin-and-counter-write-path.md) | Draft | Enable anonymous auth, implement `onLinkAccount`, and increment counter atomically on anonymous user creation |
-| 3 | [Counter Read API + UI Wiring](./phase-3-counter-read-api-and-ui-wiring.md) | Draft | Add cacheable visitor-count API endpoint and connect existing counter UI |
-| 4 | [Web Auth UX Alignment + Final Verification](./phase-4-web-auth-ux-alignment-and-final-verification.md) | Draft | Ensure anonymous users are treated as guests in UI and run end-to-end verification |
+| 1 | [Auth Boundary + Schema Foundation](./phase-1-auth-boundary-and-schema-foundation.md) | Completed | Upgrade/verify Better Auth baseline, add `isAnonymous`, add counter table, and harden API auth semantics |
+| 2 | [Anonymous Plugin + Counter Write Path](./phase-2-anonymous-plugin-and-counter-write-path.md) | Completed | Enable anonymous auth, implement `onLinkAccount`, and increment counter atomically on anonymous user creation |
+| 3 | [Counter Read API + UI Wiring](./phase-3-counter-read-api-and-ui-wiring.md) | Completed | Add cacheable visitor-count API endpoint and connect existing counter UI |
+| 4 | [Web Auth UX Alignment + Final Verification](./phase-4-web-auth-ux-alignment-and-final-verification.md) | Completed | Ensure anonymous users are treated as guests in UI and run end-to-end verification |
 
 ## Dependency Graph
 

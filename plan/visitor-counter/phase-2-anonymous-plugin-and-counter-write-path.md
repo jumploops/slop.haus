@@ -1,6 +1,6 @@
 # Phase 2: Anonymous Plugin + Counter Write Path
 
-**Status:** Draft  
+**Status:** Completed (2026-02-21)  
 **Owner:** API + Web  
 **Depends On:** Phase 1
 
@@ -78,13 +78,13 @@ if (!isPending && !session) {
 
 ## Verification Checklist
 
-- [ ] Fresh browser session gets anonymous user/session automatically.
-- [ ] Repeated navigation/refresh in same session does not increment counter again.
-- [ ] Anonymous sign-in errors for already-anonymous sessions are handled gracefully.
-- [ ] Linking anonymous session to real social sign-in completes cleanly via `onLinkAccount`.
-- [ ] Anonymous user cleanup after linking succeeds without FK errors.
-- [ ] `pnpm -F @slop/api exec tsc --noEmit`
-- [ ] `pnpm -F @slop/web exec tsc --noEmit`
+- [x] Fresh browser session gets anonymous user/session automatically.
+- [x] Repeated navigation/refresh in same session does not increment counter again.
+- [x] Anonymous sign-in errors for already-anonymous sessions are handled gracefully.
+- [x] Linking anonymous session to real social sign-in completes cleanly via `onLinkAccount`.
+- [x] Anonymous user cleanup after linking succeeds without FK errors.
+- [x] `pnpm -F @slop/api exec tsc --noEmit`
+- [x] `pnpm -F @slop/web exec tsc --noEmit`
 
 ## Exit Criteria
 

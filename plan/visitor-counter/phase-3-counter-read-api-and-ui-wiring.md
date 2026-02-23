@@ -1,6 +1,6 @@
 # Phase 3: Counter Read API + UI Wiring
 
-**Status:** Draft  
+**Status:** Completed (2026-02-21)  
 **Owner:** API + Web  
 **Depends On:** Phase 2
 
@@ -44,13 +44,13 @@ export async function fetchVisitorCount(): Promise<number> { ... }
 
 ## Verification Checklist
 
-- [ ] Endpoint returns numeric counter value.
-- [ ] Response includes expected cache headers.
-- [ ] Footer counter renders DB-backed value and preserves current visual design.
-- [ ] Initial rendered value path reflects baseline of `1` if backend value is unavailable.
-- [ ] No localStorage read/write remains in `VisitorCounter`.
-- [ ] `pnpm -F @slop/api exec tsc --noEmit`
-- [ ] `pnpm -F @slop/web exec tsc --noEmit`
+- [x] Endpoint returns numeric counter value.
+- [x] Response includes expected cache headers.
+- [x] Footer counter renders DB-backed value and preserves current visual design.
+- [x] Initial rendered value path reflects baseline of `1` if backend value is unavailable.
+- [x] No localStorage read/write remains in `VisitorCounter`.
+- [x] `pnpm -F @slop/api exec tsc --noEmit`
+- [x] `pnpm -F @slop/web exec tsc --noEmit`
 
 ## Exit Criteria
 
