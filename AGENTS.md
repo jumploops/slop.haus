@@ -220,9 +220,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 
 | File | Purpose |
 |------|---------|
-| `src/styles/theme.css` | Tailwind `@theme` token definitions |
-| `src/styles/presets.css` | Preset theme overrides |
-| `src/app/globals.css` | Base variables + page layouts |
+| `src/app/globals.css` | Tailwind import, theme tokens, and global base/layout styles |
 | `src/styles/TOKEN-CONTRACT.md` | Full token documentation |
 
 **Class merging:**

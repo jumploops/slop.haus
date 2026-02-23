@@ -216,16 +216,18 @@ export default function FeedPage() {
 
       <div
         className={cn(
-          "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+          "flex items-center justify-between gap-2 overflow-x-auto",
+          "pb-1 sm:pb-1",
+          slopEnabled && "pb-2 sm:pb-1",
           slopControlRowClass
         )}
       >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-2">
           <Tabs
             tabs={sortTabs}
             activeTab={sort}
             onTabChange={handleSortChange}
-            className="mb-0 w-full sm:w-auto"
+            className="mb-0 w-auto flex-nowrap shrink-0"
             sloppy={slopEnabled}
           />
 
@@ -234,7 +236,7 @@ export default function FeedPage() {
               value={timeWindow}
               onChange={handleWindowChange}
               className={cn(
-                "w-full sm:w-auto",
+                "w-auto shrink-0",
                 "min-h-10 sm:min-h-0 px-3 py-2 sm:py-1 text-xs font-bold font-mono uppercase tracking-wide",
                 "bg-background text-foreground",
                 "border-2 border-dashed border-border",
@@ -251,14 +253,14 @@ export default function FeedPage() {
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-1">
+        <div className="flex shrink-0 items-center justify-end gap-1">
           <button
             type="button"
             onClick={() => handleDisplayModeChange("list-sm")}
             aria-label="List view (small screenshots)"
             title="List (small)"
             className={cn(
-              "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors cursor-pointer",
               slopToggleSm,
               displayMode === "list-sm"
                 ? "bg-primary/10 text-primary border-primary"
@@ -273,7 +275,7 @@ export default function FeedPage() {
             aria-label="List view (large screenshots)"
             title="List (large)"
             className={cn(
-              "hidden sm:inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              "hidden sm:inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors cursor-pointer",
               slopToggleLg,
               displayMode === "list-lg"
                 ? "bg-primary/10 text-primary border-primary"
@@ -288,7 +290,7 @@ export default function FeedPage() {
             aria-label="Grid view"
             title="Grid"
             className={cn(
-              "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors",
+              "inline-flex h-10 w-10 items-center justify-center border-2 border-dashed transition-colors cursor-pointer",
               slopToggleGrid,
               displayMode === "grid"
                 ? "bg-primary/10 text-primary border-primary"
