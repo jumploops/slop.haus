@@ -24,6 +24,8 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **Duplicate URL detection** - Same URL can be submitted multiple times by the same user. Check for existing draft/project with same URL.
 
+- [ ] **Manual pre-publish LLM check flow** - Before publishing manual submissions, run the same standalone analyzing view used by URL/Repo submissions (no tabs/back during analysis) and only proceed to publish after the check completes.
+
 - [ ] **Fixture user for seeding/tests** - Add an optional seed user for quick local logins and test flows.
 
 - [ ] **Anonymous user actions (future)** - Expand anonymous accounts beyond visitor counting so anon sessions can like/comment (with anti-abuse controls like Captcha/Turnstile/rate limits) while still supporting seamless anon → real account linking/migration.

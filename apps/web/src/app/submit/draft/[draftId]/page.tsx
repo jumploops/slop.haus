@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { RequireAuth } from "@/components/auth/RequireAuth";
-import { RequireGitHub } from "@/components/auth/RequireGitHub";
 import { EditableProjectPreview } from "@/components/submit/EditableProjectPreview";
 import { getDraft, updateDraft, submitDraft, deleteDraft } from "@/lib/api/drafts";
 import { Button } from "@/components/ui/Button";
@@ -40,9 +39,7 @@ export default function DraftReviewPage() {
 
   return (
     <RequireAuth>
-      <RequireGitHub>
-        <DraftReviewContent draftId={draftId} />
-      </RequireGitHub>
+      <DraftReviewContent draftId={draftId} />
     </RequireAuth>
   );
 }

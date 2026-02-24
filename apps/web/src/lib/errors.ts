@@ -18,7 +18,7 @@ export function getErrorMessage(error: unknown): string {
       return "This website doesn't allow automated access. Try manual entry instead.";
     }
     if (message.includes("github not linked")) {
-      return "Please link your GitHub account to submit projects.";
+      return "Link your GitHub account to use the repo picker, or continue with URL/manual submission.";
     }
     if (message.includes("unauthorized")) {
       return "Please sign in to continue.";

@@ -22,7 +22,7 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
 
   if (isLoading) {
     return (
-      <div className="border-2 border-dashed border-border bg-card p-4">
+      <div className="border-y-2 border-dashed border-border bg-card p-4 md:border-2">
         <div className="space-y-3">
           <Skeleton className="h-5 w-40" />
           <Skeleton className="h-4 w-full" />
@@ -35,7 +35,7 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
 
   if (!user?.hasGitHub) {
     return (
-      <div className="border-2 border-dashed border-border bg-card p-6 text-center space-y-3">
+      <div className="border-y-2 border-dashed border-border bg-card p-6 text-center space-y-3 md:border-2">
         <div className="mx-auto flex h-10 w-10 items-center justify-center border-2 border-border bg-muted text-foreground">
           <GithubIcon />
         </div>
@@ -43,8 +43,9 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
           GitHub Connection Required
         </h3>
         <p className="text-xs text-muted-foreground">
-          To submit a project, you need to link your GitHub account. This helps verify project
-          ownership and enables repo integration features.
+          Link your GitHub account to continue with this action. Linking also unlocks one-click
+          selection from your public repositories. Use the same email as your current account when
+          linking providers.
         </p>
         <Button variant="primary" onClick={handleLinkGitHub}>
           <GithubIcon /> Link GitHub Account

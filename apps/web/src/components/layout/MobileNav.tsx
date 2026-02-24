@@ -109,7 +109,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           <MobileNavLink href="/" active={pathname === "/"}>
             Feed
           </MobileNavLink>
-          <MobileNavLink href="/submit" active={pathname === "/submit"}>
+          <MobileNavLink href="/submit" active={pathname?.startsWith("/submit") ?? false}>
             Submit
           </MobileNavLink>
           {isRegisteredUser && (

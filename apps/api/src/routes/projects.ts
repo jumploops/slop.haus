@@ -11,7 +11,7 @@ import {
   moderationEvents,
 } from "@slop/db/schema";
 import { eq, desc, and, gte, sql, inArray, like } from "drizzle-orm";
-import { requireAuth, requireGitHub, getSession } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 import {
   createProjectSchema,
   updateProjectSchema,
@@ -263,7 +263,7 @@ projectRoutes.get("/:slug", async (c) => {
 });
 
 // Create project
-projectRoutes.post("/", requireGitHub(), async (c) => {
+projectRoutes.post("/", requireAuth(), async (c) => {
   const session = c.get("session");
   const body = await c.req.json();
 

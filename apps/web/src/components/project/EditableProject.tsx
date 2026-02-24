@@ -12,7 +12,6 @@ import { InlineEditText } from "@/components/submit/InlineEditText";
 import { InlineEditTextarea } from "@/components/submit/InlineEditTextarea";
 import { TagEditor } from "@/components/submit/TagEditor";
 import { VibeInput } from "@/components/form/VibeInput";
-import { VibeMeter } from "@/components/project/VibeMeter";
 import { ScreenshotEditor } from "@/components/project/ScreenshotEditor";
 import { UrlChangeModal } from "@/components/project/UrlChangeModal";
 import { RevisionStatusBanner } from "@/components/project/RevisionStatusBanner";
@@ -408,7 +407,6 @@ export function EditableProject({
                 <h4 className="font-mono text-xs font-bold uppercase tracking-wide text-foreground text-center">
                   Vibe score
                 </h4>
-                <VibeMeter percent={vibePercent} showLabel />
                 <VibeInput
                   mode={vibeMode}
                   onModeChange={handleVibeModeChange}

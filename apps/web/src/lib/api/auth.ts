@@ -23,6 +23,25 @@ export interface DevCredentialStatus {
   hasCredential: boolean;
 }
 
+export interface GitHubRepoSummary {
+  id: number;
+  name: string;
+  fullName: string;
+  htmlUrl: string;
+  description: string | null;
+  isPrivate: boolean;
+  isFork: boolean;
+  isArchived: boolean;
+  language: string | null;
+  stargazersCount: number;
+  updatedAt: string;
+}
+
+export interface GitHubRepoListResponse {
+  githubLinked: boolean;
+  repos: GitHubRepoSummary[];
+}
+
 export async function fetchCurrentUser(): Promise<CurrentUser | null> {
   const response = await apiGet<{ user: CurrentUser | null }>("/auth/me");
   return response.user;
@@ -44,4 +63,8 @@ export async function issueDevCredential(): Promise<void> {
 export async function checkDevCredential(): Promise<boolean> {
   const response = await apiGet<DevCredentialStatus>("/auth/dev-credential");
   return response.hasCredential;
+}
+
+export async function fetchGitHubRepos(): Promise<GitHubRepoListResponse> {
+  return apiGet<GitHubRepoListResponse>("/auth/github/repos");
 }

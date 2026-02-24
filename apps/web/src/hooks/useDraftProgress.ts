@@ -30,7 +30,7 @@ const initialState: ProgressState = {
   errorCode: null,
   isComplete: false,
   steps: {
-    scraping: "pending",
+    scraping: "in_progress",
     analyzing: "pending",
   },
 };
@@ -56,7 +56,7 @@ export function useDraftProgress(
         message: data.message,
         steps: {
           scraping:
-            data.status === "scraping"
+            data.status === "pending" || data.status === "scraping"
               ? "in_progress"
               : data.status === "analyzing" || data.status === "ready"
                 ? "completed"

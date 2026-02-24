@@ -7,9 +7,7 @@ import { InlineEditText } from "./InlineEditText";
 import { InlineEditTextarea } from "./InlineEditTextarea";
 import { TagEditor } from "./TagEditor";
 import { VibeInput } from "@/components/form/VibeInput";
-import { VibeMeter } from "@/components/project/VibeMeter";
 import { Avatar } from "@/components/ui/Avatar";
-import { Badge } from "@/components/ui/Badge";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn, getPlaceholderImage } from "@/lib/utils";
@@ -237,17 +235,6 @@ export function EditableProjectPreview({
           {/* Tools section */}
           <div className="border-2 border-border bg-card p-4 space-y-3">
               <h3 className="font-mono text-sm font-bold text-foreground">Built with</h3>
-              {tools.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {tools.map((tool) => (
-                    <Badge key={tool} variant="default">
-                      #{tool}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">Add technologies...</span>
-              )}
               <TagEditor selected={tools} onChange={handleToolsChange} />
           </div>
         </div>
@@ -256,7 +243,6 @@ export function EditableProjectPreview({
         <div className="space-y-4">
           <div className="border-2 border-border bg-card p-4 space-y-3">
               <h4 className="font-mono text-xs font-bold text-foreground text-center">Vibe Score</h4>
-              <VibeMeter percent={vibePercent} showLabel />
               <VibeInput
                 mode={vibeMode}
                 onModeChange={setVibeMode}

@@ -10,7 +10,7 @@ import {
   jobs,
 } from "@slop/db/schema";
 import { eq, and, isNull, inArray, desc, like } from "drizzle-orm";
-import { requireAuth, requireGitHub } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth";
 import { checkRateLimit, DRAFT_ANALYSIS_RATE_LIMITS } from "../lib/rateLimit";
 import {
   detectUrlType,
@@ -62,7 +62,7 @@ draftRoutes.get("/", requireAuth(), async (c) => {
 });
 
 // POST /api/v1/drafts/analyze - Start URL analysis
-draftRoutes.post("/analyze", requireGitHub(), async (c) => {
+draftRoutes.post("/analyze", requireAuth(), async (c) => {
   const session = c.get("session");
   const body = await c.req.json();
 
@@ -253,7 +253,7 @@ draftRoutes.patch("/:draftId", requireAuth(), async (c) => {
 });
 
 // POST /api/v1/drafts/:draftId/submit - Convert draft to project
-draftRoutes.post("/:draftId/submit", requireGitHub(), async (c) => {
+draftRoutes.post("/:draftId/submit", requireAuth(), async (c) => {
   const session = c.get("session");
   const draftId = c.req.param("draftId");
   const body = await c.req.json();
