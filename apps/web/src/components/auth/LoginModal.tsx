@@ -50,8 +50,8 @@ export function LoginModal() {
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-6">
-          GitHub is required to submit projects. You can link additional
-          accounts later in settings.
+          GitHub is required to submit projects and enables one-click public-repo
+          selection during submission. You can link accounts later in settings.
         </p>
       </div>
     </Modal>

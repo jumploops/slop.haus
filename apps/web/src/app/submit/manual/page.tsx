@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { VibeInput } from "@/components/form/VibeInput";
 import { ToolsSelector } from "@/components/form/ToolsSelector";
+import { GitHubRepoPicker } from "@/components/submit/GitHubRepoPicker";
 import { createProject } from "@/lib/api/projects";
 import { useToast } from "@/components/ui/Toast";
 import {
@@ -20,9 +21,11 @@ import {
 export default function ManualSubmitPage() {
   return (
     <RequireAuth>
-      <RequireGitHub>
-        <SubmitForm />
-      </RequireGitHub>
+      <div className="-mx-4 md:mx-0">
+        <RequireGitHub>
+          <SubmitForm />
+        </RequireGitHub>
+      </div>
     </RequireAuth>
   );
 }
@@ -92,7 +95,7 @@ function SubmitForm() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="border-2 border-dashed border-border bg-card p-6">
+      <div className="border-y-2 border-dashed border-border bg-card p-6 md:border-2">
         <h1 className="font-mono text-2xl font-black text-foreground mb-2">
           Submit a Project
         </h1>
@@ -147,6 +150,10 @@ function SubmitForm() {
             <p className="text-xs text-muted-foreground">
               At least one URL (live site or repository) is required
             </p>
+            <GitHubRepoPicker
+              onSelectRepo={setRepoUrl}
+              selectedRepoUrl={repoUrl || undefined}
+            />
             <Input
               label="Live URL"
               type="url"

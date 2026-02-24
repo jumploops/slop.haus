@@ -8,11 +8,21 @@ interface UrlInputProps {
   onAnalyze: (url: string) => void;
   isLoading: boolean;
   error: string | null;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
-export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
-  const [url, setUrl] = useState("");
+export function UrlInput({
+  onAnalyze,
+  isLoading,
+  error,
+  value,
+  onChange,
+}: UrlInputProps) {
+  const [internalUrl, setInternalUrl] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
+  const isControlled = typeof value === "string";
+  const url = isControlled ? value : internalUrl;
 
   const validateUrl = (value: string): boolean => {
     if (!value.trim()) {
@@ -42,7 +52,12 @@ export function UrlInput({ onAnalyze, isLoading, error }: UrlInputProps) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value);
+    const nextValue = e.target.value;
+    if (isControlled) {
+      onChange?.(nextValue);
+    } else {
+      setInternalUrl(nextValue);
+    }
     if (validationError) {
       setValidationError(null);
     }

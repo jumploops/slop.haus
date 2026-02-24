@@ -132,7 +132,8 @@ export default function ConnectionsPage() {
         <div className="border-2 border-dashed border-border bg-slop-orange/15 p-4">
           <p className="text-xs text-foreground">
             <strong>Note:</strong> A GitHub account is required to submit projects.
-            Link your GitHub account to enable project submissions.
+            Link your GitHub account to enable project submissions and easy public-repo selection.
+            Use the same email as your current sign-in account when linking.
           </p>
         </div>
       )}

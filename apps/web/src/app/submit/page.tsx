@@ -6,6 +6,7 @@ import Link from "next/link";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { RequireGitHub } from "@/components/auth/RequireGitHub";
 import { UrlInput } from "@/components/submit/UrlInput";
+import { GitHubRepoPicker } from "@/components/submit/GitHubRepoPicker";
 import { AnalysisProgress } from "@/components/submit/AnalysisProgress";
 import { AnalysisError } from "@/components/submit/AnalysisError";
 import { analyzeUrl, deleteDraft, retryDraft } from "@/lib/api/drafts";
@@ -27,9 +28,11 @@ interface ErrorState {
 export default function SubmitPage() {
   return (
     <RequireAuth>
-      <RequireGitHub>
-        <SubmitFlow />
-      </RequireGitHub>
+      <div className="-mx-4 md:mx-0">
+        <RequireGitHub>
+          <SubmitFlow />
+        </RequireGitHub>
+      </div>
     </RequireAuth>
   );
 }
@@ -37,11 +40,13 @@ export default function SubmitPage() {
 function SubmitFlow() {
   const router = useRouter();
   const [step, setStep] = useState<SubmitStep>("input");
+  const [urlInput, setUrlInput] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisState | null>(null);
   const [error, setError] = useState<ErrorState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAnalyze = async (url: string) => {
+    setUrlInput(url);
     setIsLoading(true);
     setError(null);
 
@@ -117,11 +122,21 @@ function SubmitFlow() {
     <div className="mx-auto max-w-2xl space-y-6">
         {step === "input" && (
           <>
-            <div className="border-2 border-dashed border-border bg-card p-6">
+            <div className="border-y-2 border-dashed border-border bg-card p-6 md:border-2">
               <UrlInput
+                value={urlInput}
+                onChange={setUrlInput}
                 onAnalyze={handleAnalyze}
                 isLoading={isLoading}
                 error={error?.message ?? null}
+              />
+              <GitHubRepoPicker
+                onSelectRepo={(repoUrl) => {
+                  void handleAnalyze(repoUrl);
+                }}
+                selectedRepoUrl={urlInput || undefined}
+                isLoading={isLoading}
+                className="mt-6"
               />
               <div className="mt-4 text-center">
                 <Link
