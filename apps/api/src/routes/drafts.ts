@@ -20,8 +20,14 @@ import {
   analyzeUrlSchema,
   updateDraftSchema,
   submitDraftSchema,
+  TOOL_MAX_PER_PROJECT,
 } from "@slop/shared";
 import { moderateProject } from "../lib/moderation";
+import {
+  resolveAndUpsertTools,
+  ToolBlockedError,
+  ToolRateLimitError,
+} from "../lib/tools";
 
 const draftRoutes = new Hono();
 
@@ -291,7 +297,8 @@ draftRoutes.post("/:draftId/submit", requireAuth(), async (c) => {
   const title = draft.finalTitle || draft.suggestedTitle;
   const tagline = draft.finalTagline || draft.suggestedTagline;
   const description = draft.finalDescription || draft.suggestedDescription;
-  const toolSlugs = (draft.finalTools || draft.suggestedTools || []) as string[];
+  const rawTools = (draft.finalTools || draft.suggestedTools || []) as string[];
+  const toolSource = draft.finalTools ? "user" : "llm";
   const vibePercent = draft.finalVibePercent ?? draft.suggestedVibePercent ?? 50;
   const mainUrl = draft.finalMainUrl ?? draft.suggestedMainUrl;
   const repoUrl = draft.finalRepoUrl ?? draft.suggestedRepoUrl;
@@ -361,21 +368,46 @@ draftRoutes.post("/:draftId/submit", requireAuth(), async (c) => {
     });
   }
 
-  // Link tools
-  if (toolSlugs.length > 0) {
-    const toolRecords = await db
-      .select({ id: tools.id, slug: tools.slug })
-      .from(tools)
-      .where(inArray(tools.slug, toolSlugs));
-
-    if (toolRecords.length > 0) {
-      await db.insert(projectTools).values(
-        toolRecords.map((tool) => ({
-          projectId: project.id,
-          toolId: tool.id,
-        }))
+  // Link tools (existing + new)
+  let resolvedTools: Awaited<ReturnType<typeof resolveAndUpsertTools>> = [];
+  try {
+    resolvedTools = await resolveAndUpsertTools({
+      rawTools,
+      source: toolSource,
+      createdByUserId: session.user.id,
+      maxNewTools: TOOL_MAX_PER_PROJECT,
+    });
+  } catch (error) {
+    if (error instanceof ToolRateLimitError) {
+      return c.json(
+        {
+          error: "Daily new tag limit reached",
+          code: "TOOL_RATE_LIMITED",
+          retryAfter: Math.ceil((error.resetAt - Date.now()) / 1000),
+        },
+        429
       );
     }
+    if (error instanceof ToolBlockedError) {
+      return c.json(
+        {
+          error: "One or more tags are blocked",
+          code: "TOOL_BLOCKED",
+          blockedTools: error.blockedTools,
+        },
+        400
+      );
+    }
+    throw error;
+  }
+
+  if (resolvedTools.length > 0) {
+    await db.insert(projectTools).values(
+      resolvedTools.map((tool) => ({
+        projectId: project.id,
+        toolId: tool.id,
+      }))
+    );
   }
 
   // Run moderation

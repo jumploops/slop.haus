@@ -36,6 +36,8 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **Discard confirmation** - "Start Over" button discards without confirmation. Add modal for confirmation.
 
+- [ ] **Admin tag alias/merge tooling (deferred)** - Add admin UI/workflow to merge duplicate technology tags and manage aliases after open tag creation ships. Context: `design/project-tags-open-taxonomy.md`.
+
 ---
 
 ## Performance

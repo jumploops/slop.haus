@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  TOOL_MAX_NAME_LENGTH,
+  TOOL_MAX_PER_PROJECT,
+  isValidToolName,
+} from "./tools";
 
 // =============================================================================
 // Vibe Configuration - Centralized vibe categories and defaults
@@ -66,6 +71,16 @@ export function isEqualVibeDetails(
   return true;
 }
 
+const toolInputSchema = z
+  .string()
+  .min(1)
+  .max(TOOL_MAX_NAME_LENGTH)
+  .refine(isValidToolName, {
+    message: "Tool names may include letters, numbers, spaces, and + # . / ( ) ' & -",
+  });
+
+const toolsInputSchema = z.array(toolInputSchema).max(TOOL_MAX_PER_PROJECT);
+
 // =============================================================================
 // Project Schemas
 // =============================================================================
@@ -80,7 +95,7 @@ export const createProjectSchema = z
     vibeMode: z.enum(["overview", "detailed"]),
     vibePercent: z.number().min(0).max(100).optional(),
     vibeDetails: z.record(z.number()).optional(),
-    tools: z.array(z.string()).optional(),
+    tools: toolsInputSchema.optional(),
   })
   .refine((data) => data.mainUrl || data.repoUrl, {
     message: "At least one of mainUrl or repoUrl is required",
@@ -113,7 +128,7 @@ export const updateProjectSchema = z.object({
   vibeMode: z.enum(["overview", "detailed"]).optional(),
   vibePercent: z.number().min(0).max(100).optional(),
   vibeDetails: z.record(z.number()).optional(),
-  tools: z.array(z.string()).optional(),
+  tools: toolsInputSchema.optional(),
 });
 
 export const likeSchema = z.object({
@@ -159,7 +174,7 @@ export const updateDraftSchema = z.object({
   title: z.string().max(255).optional(),
   tagline: z.string().max(500).optional(),
   description: z.string().max(10000).optional(),
-  tools: z.array(z.string()).max(10).optional(),
+  tools: toolsInputSchema.optional(),
   vibePercent: z.number().min(0).max(100).optional(),
   mainUrl: z.string().url().optional().nullable(),
   repoUrl: z.string().url().optional().nullable(),

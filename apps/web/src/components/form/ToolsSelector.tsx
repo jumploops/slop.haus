@@ -28,15 +28,49 @@ export function ToolsSelector({
     { keepPreviousData: true }
   );
 
-  // Filter out already selected tools
-  const availableTools = tools?.filter(
-    (tool) => !selectedTools.includes(tool.name)
-  );
+  const selectedLower = new Set(selectedTools.map((tool) => tool.toLowerCase()));
+
+  // Filter out already selected tools (whether selected by slug or name)
+  const availableTools = tools?.filter((tool) => {
+    return (
+      !selectedLower.has(tool.slug.toLowerCase()) &&
+      !selectedLower.has(tool.name.toLowerCase())
+    );
+  });
+
+  const findMatchingTool = (input: string): Tool | undefined => {
+    const normalized = input.trim().toLowerCase();
+    return tools?.find(
+      (tool) =>
+        tool.slug.toLowerCase() === normalized ||
+        tool.name.toLowerCase() === normalized
+    );
+  };
 
   const handleSelect = (tool: Tool) => {
     if (selectedTools.length >= maxTools) return;
-    onToolsChange([...selectedTools, tool.name]);
+    if (selectedLower.has(tool.slug.toLowerCase())) return;
+    onToolsChange([...selectedTools, tool.slug]);
     setSearch("");
+    inputRef.current?.focus();
+  };
+
+  const handleCreateFromInput = () => {
+    if (selectedTools.length >= maxTools) return;
+    const normalized = search.trim().replace(/\s+/g, " ");
+    if (!normalized) return;
+
+    const existing = findMatchingTool(normalized);
+    const value = existing ? existing.slug : normalized;
+
+    if (selectedTools.some((tool) => tool.toLowerCase() === value.toLowerCase())) {
+      setSearch("");
+      return;
+    }
+
+    onToolsChange([...selectedTools, value]);
+    setSearch("");
+    setIsOpen(false);
     inputRef.current?.focus();
   };
 
@@ -51,9 +85,9 @@ export function ToolsSelector({
     if (e.key === "Escape") {
       setIsOpen(false);
     }
-    if (e.key === "Enter" && availableTools && availableTools.length > 0) {
+    if ((e.key === "Enter" || e.key === ",") && search.trim()) {
       e.preventDefault();
-      handleSelect(availableTools[0]);
+      handleCreateFromInput();
     }
   };
 
@@ -88,7 +122,7 @@ export function ToolsSelector({
       >
         {selectedTools.map((tool) => (
           <Badge key={tool} variant="default" className="flex items-center gap-1 pr-1">
-            {tool}
+            {tools?.find((item) => item.slug === tool)?.name || tool}
             <button
               type="button"
               onClick={(e) => {
@@ -128,8 +162,9 @@ export function ToolsSelector({
             <div className="px-4 py-3 text-xs text-muted-foreground">Loading...</div>
           )}
           {!isLoading && availableTools?.length === 0 && search && (
-            <div className="px-4 py-3 text-xs text-muted-foreground">
-              No tools found for "{search}"
+            <div className="px-4 py-3 text-xs text-muted-foreground space-y-1">
+              <div>No tools found for "{search}"</div>
+              <div>Press Enter to add it as a new tag.</div>
             </div>
           )}
           {!isLoading &&
