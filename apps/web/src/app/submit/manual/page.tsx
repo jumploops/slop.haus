@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { RequireAuth } from "@/components/auth/RequireAuth";
-import { RequireGitHub } from "@/components/auth/RequireGitHub";
+import { SubmitHeaderCard } from "@/components/submit/SubmitHeaderCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { VibeInput } from "@/components/form/VibeInput";
 import { ToolsSelector } from "@/components/form/ToolsSelector";
-import { GitHubRepoPicker } from "@/components/submit/GitHubRepoPicker";
 import { createProject } from "@/lib/api/projects";
 import { useToast } from "@/components/ui/Toast";
 import {
@@ -21,10 +19,9 @@ import {
 export default function ManualSubmitPage() {
   return (
     <RequireAuth>
-      <div className="-mx-4 md:mx-0">
-        <RequireGitHub>
-          <SubmitForm />
-        </RequireGitHub>
+      <div className="-mx-4 space-y-6 md:mx-0">
+        <SubmitHeaderCard activeTab="manual" maxWidthClassName="max-w-3xl" />
+        <SubmitForm />
       </div>
     </RequireAuth>
   );
@@ -36,7 +33,6 @@ function SubmitForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Form state
   const [title, setTitle] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
@@ -65,7 +61,6 @@ function SubmitForm() {
       tools: tools.length > 0 ? tools : undefined,
     };
 
-    // Validate with Zod
     const result = createProjectSchema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -95,113 +90,91 @@ function SubmitForm() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="border-y-2 border-dashed border-border bg-card p-6 md:border-2">
-        <h1 className="font-mono text-2xl font-black text-foreground mb-2">
-          Submit a Project
-        </h1>
-        <p className="text-sm text-muted-foreground mb-3">
-          Share your vibecoded creation with the community. Projects go through a
-          brief moderation review before being published.
-        </p>
-        <Link
-          href="/submit"
-          className="font-mono text-xs uppercase tracking-wide text-muted-foreground hover:text-primary no-underline hover:no-underline"
-        >
-          Or let us extract details from a URL
-        </Link>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="border-2 border-border bg-card p-4 space-y-4">
-            <h2 className="font-mono text-sm font-bold text-foreground">Basic Info</h2>
-            <Input
-              label="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              error={errors.title}
-              required
-              maxLength={255}
-              placeholder="My Awesome Project"
-            />
+        <div className="space-y-4 border-2 border-border bg-card p-4">
+          <h2 className="font-mono text-sm font-bold text-foreground">Basic Info</h2>
+          <Input
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            error={errors.title}
+            required
+            maxLength={255}
+            placeholder="My Awesome Project"
+          />
 
-            <Input
-              label="Tagline"
-              value={tagline}
-              onChange={(e) => setTagline(e.target.value)}
-              error={errors.tagline}
-              required
-              maxLength={500}
-              placeholder="A brief description of what it does"
-            />
+          <Input
+            label="Tagline"
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+            error={errors.tagline}
+            required
+            maxLength={500}
+            placeholder="A brief description of what it does"
+          />
 
-            <Input
-              label="Description"
-              type="textarea"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              error={errors.description}
-              maxLength={10000}
-              placeholder="Tell the story of your project. What problem does it solve? How did you build it? What AI tools did you use?"
-            />
+          <Input
+            label="Description"
+            type="textarea"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            error={errors.description}
+            maxLength={10000}
+            placeholder="Tell the story of your project. What problem does it solve? How did you build it? What AI tools did you use?"
+          />
         </div>
 
-        <div className="border-2 border-border bg-card p-4 space-y-4">
-            <h2 className="font-mono text-sm font-bold text-foreground">Links</h2>
-            <p className="text-xs text-muted-foreground">
-              At least one URL (live site or repository) is required
-            </p>
-            <GitHubRepoPicker
-              onSelectRepo={setRepoUrl}
-              selectedRepoUrl={repoUrl || undefined}
-            />
-            <Input
-              label="Live URL"
-              type="url"
-              value={mainUrl}
-              onChange={(e) => setMainUrl(e.target.value)}
-              error={errors.mainUrl}
-              placeholder="https://myproject.com"
-            />
+        <div className="space-y-4 border-2 border-border bg-card p-4">
+          <h2 className="font-mono text-sm font-bold text-foreground">Links</h2>
+          <p className="text-xs text-muted-foreground">
+            At least one URL (live site or repository) is required
+          </p>
+          <Input
+            label="Live URL"
+            type="url"
+            value={mainUrl}
+            onChange={(e) => setMainUrl(e.target.value)}
+            error={errors.mainUrl}
+            placeholder="https://myproject.com"
+          />
 
-            <Input
-              label="Repository URL"
-              type="url"
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-              error={errors.repoUrl}
-              placeholder="https://github.com/username/project"
-            />
+          <Input
+            label="Repository URL"
+            type="url"
+            value={repoUrl}
+            onChange={(e) => setRepoUrl(e.target.value)}
+            error={errors.repoUrl}
+            placeholder="https://github.com/username/project"
+          />
 
-            {errors.form && (
-              <p className="text-xs text-destructive">{errors.form}</p>
-            )}
+          {errors.form && <p className="text-xs text-destructive">{errors.form}</p>}
         </div>
 
-        <div className="border-2 border-border bg-card p-4 space-y-4">
-            <h2 className="font-mono text-sm font-bold text-foreground">Vibe Score</h2>
-            <VibeInput
-              mode={vibeMode}
-              onModeChange={setVibeMode}
-              vibePercent={vibePercent}
-              onVibePercentChange={setVibePercent}
-              vibeDetails={vibeDetails}
-              onVibeDetailsChange={setVibeDetails}
-            />
+        <div className="space-y-4 border-2 border-border bg-card p-4">
+          <h2 className="font-mono text-sm font-bold text-foreground">Vibe Score</h2>
+          <VibeInput
+            mode={vibeMode}
+            onModeChange={setVibeMode}
+            vibePercent={vibePercent}
+            onVibePercentChange={setVibePercent}
+            vibeDetails={vibeDetails}
+            onVibeDetailsChange={setVibeDetails}
+          />
         </div>
 
-        <div className="border-2 border-border bg-card p-4 space-y-4">
-            <h2 className="font-mono text-sm font-bold text-foreground">Tools</h2>
-            <ToolsSelector selectedTools={tools} onToolsChange={setTools} />
+        <div className="space-y-4 border-2 border-border bg-card p-4">
+          <h2 className="font-mono text-sm font-bold text-foreground">Tools</h2>
+          <ToolsSelector selectedTools={tools} onToolsChange={setTools} />
         </div>
 
-        <div className="border-2 border-dashed border-border bg-card p-4 flex flex-col gap-3">
-            <Button type="submit" variant="primary" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit Project"}
-            </Button>
-            <p className="text-[10px] text-muted-foreground">
-              By submitting, you confirm that you have the rights to share this
-              project and agree to our community guidelines.
-            </p>
+        <div className="flex flex-col gap-3 border-2 border-dashed border-border bg-card p-4">
+          <Button type="submit" variant="primary" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Project"}
+          </Button>
+          <p className="text-[10px] text-muted-foreground">
+            By submitting, you confirm that you have the rights to share this project and agree to
+            our community guidelines.
+          </p>
         </div>
       </form>
     </div>

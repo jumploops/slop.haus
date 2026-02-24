@@ -43,7 +43,7 @@ export function RequireGitHub({ children }: RequireGitHubProps) {
           GitHub Connection Required
         </h3>
         <p className="text-xs text-muted-foreground">
-          To submit a project, you need to link your GitHub account. Linking also unlocks one-click
+          Link your GitHub account to continue with this action. Linking also unlocks one-click
           selection from your public repositories. Use the same email as your current account when
           linking providers.
         </p>

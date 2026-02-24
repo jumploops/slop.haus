@@ -38,7 +38,7 @@ export function Header() {
             <NavLink href="/" active={pathname === "/"}>
               Feed
             </NavLink>
-            <NavLink href="/submit" active={pathname === "/submit"}>
+            <NavLink href="/submit" active={pathname?.startsWith("/submit") ?? false}>
               Submit
             </NavLink>
           </nav>

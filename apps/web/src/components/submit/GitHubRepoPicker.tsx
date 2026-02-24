@@ -39,7 +39,7 @@ export function GitHubRepoPicker({
 
   if (isRepoListLoading) {
     return (
-      <div className={cn("border-0 md:border-2 border-border bg-card p-0 md:p-4", className)}>
+      <div className={cn("space-y-2", className)}>
         <p className="text-xs text-muted-foreground">Loading public GitHub repositories...</p>
       </div>
     );
@@ -47,10 +47,7 @@ export function GitHubRepoPicker({
 
   if (error) {
     return (
-      <div className={cn("border-0 md:border-2 border-border bg-card p-0 md:p-4 space-y-2", className)}>
-        <p className="text-xs font-mono font-bold uppercase tracking-wide text-foreground">
-          Public Repositories
-        </p>
+      <div className={cn("space-y-2", className)}>
         <p className="text-xs text-destructive">
           Could not load GitHub repositories right now. You can still paste a repo URL manually.
         </p>
@@ -63,14 +60,7 @@ export function GitHubRepoPicker({
   }
 
   return (
-    <div className={cn("border-0 md:border-2 border-border bg-card p-0 md:p-4 space-y-3", className)}>
-      <div className="space-y-1">
-        <h3 className="font-mono text-sm font-bold text-foreground">Pick a GitHub Repo</h3>
-        <p className="text-xs text-muted-foreground">
-          Select a public repository to prefill the repo URL, or enter a URL manually.
-        </p>
-      </div>
-
+    <div className={cn("space-y-3", className)}>
       <Input
         name="github-repo-search"
         label="Search Repositories"
@@ -87,7 +77,7 @@ export function GitHubRepoPicker({
             : "No repositories match your search."}
         </p>
       ) : (
-        <div className="max-h-72 overflow-y-auto border-2 border-border">
+        <div className="max-h-[36rem] overflow-y-auto border-2 border-border">
           {repos.map((repo) => {
             const isSelected = selectedRepoUrl === repo.htmlUrl;
             return (

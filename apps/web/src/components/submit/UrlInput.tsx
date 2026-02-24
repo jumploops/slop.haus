@@ -10,6 +10,8 @@ interface UrlInputProps {
   error: string | null;
   value?: string;
   onChange?: (value: string) => void;
+  showIntro?: boolean;
+  showSupportedText?: boolean;
 }
 
 export function UrlInput({
@@ -18,6 +20,8 @@ export function UrlInput({
   error,
   value,
   onChange,
+  showIntro = true,
+  showSupportedText = true,
 }: UrlInputProps) {
   const [internalUrl, setInternalUrl] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -67,14 +71,16 @@ export function UrlInput({
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-xl text-center">
-      <div className="mb-6">
-        <h1 className="font-mono text-2xl font-black text-foreground mb-2">
-          Share your vibecoded project
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          Enter a URL and we'll extract the details for you
-        </p>
-      </div>
+      {showIntro && (
+        <div className="mb-6">
+          <h1 className="mb-2 font-mono text-2xl font-black text-foreground">
+            Share your vibecoded project
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Enter a URL and we&apos;ll extract the details for you
+          </p>
+        </div>
+      )}
 
       <div className="mb-4">
         <input
@@ -108,11 +114,13 @@ export function UrlInput({
         {isLoading ? "Analyzing..." : "Analyze Project"}
       </Button>
 
-      <div className="mt-4">
-        <p className="text-[10px] text-muted-foreground">
-          Supported: GitHub, GitLab, npm, live websites, Chrome Web Store, Steam
-        </p>
-      </div>
+      {showSupportedText && (
+        <div className="mt-4">
+          <p className="text-[10px] text-muted-foreground">
+            Supported: GitHub, GitLab, npm, live websites, Chrome Web Store, Steam
+          </p>
+        </div>
+      )}
     </form>
   );
 }
