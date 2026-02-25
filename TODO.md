@@ -58,6 +58,8 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **URL blocklist expansion** - Add more URL shorteners (bit.ly, t.co, etc.) and known spam domains to `url-validation.ts`.
 
+- [ ] **Adopt npm profanity package for tool/tag creation (deferred)** - Evaluate and integrate a maintained profanity library for server-side new-tag moderation while keeping DB `tools.status` as source of truth. Investigation: [Profanity package investigation](debug/profanity-package-investigation.md).
+
 - [ ] **Rate limit SSE connections** - No limit on concurrent SSE connections per user. Could exhaust server resources.
 
 - [ ] **Screenshot fetch timeout** - Fetching Firecrawl screenshot URLs has no timeout. Add `AbortController` with 30s timeout.
