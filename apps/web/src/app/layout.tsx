@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Alfa_Slab_One, Geist, Geist_Mono, Rubik_Wet_Paint } from "next/font/google";
+import { Suspense } from "react";
 import { Providers } from "./providers";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { Header } from "@/components/layout/Header";
 import { VisitorCounter } from "@/components/layout/VisitorCounter";
 import "./globals.css";
@@ -42,6 +44,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable} ${rubikWetPaint.variable} ${alfaSlabOne.variable} font-sans antialiased`}>
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+        </Suspense>
         <Providers>
           <div className="bg-construction-yellow overflow-hidden construction-banner-text">
             <div className="animate-[marquee_20s_linear_infinite] flex whitespace-nowrap">

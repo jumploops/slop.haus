@@ -74,6 +74,7 @@ STORAGE_PUBLIC_URL=http://localhost:3001/uploads
 # URLs
 APP_URL=http://localhost:3000
 API_URL=http://localhost:3001
+NEXT_PUBLIC_GA_MEASUREMENT_ID=   # Optional, format: G-XXXXXXXXXX
 ```
 
 ## Development
