@@ -23,7 +23,8 @@ export interface RateLimitResult {
  */
 export async function checkRateLimit(
   key: string,
-  options: RateLimitOptions
+  options: RateLimitOptions,
+  cost = 1
 ): Promise<RateLimitResult> {
   const nowMs = Date.now();
   const windowStartMs = Math.floor(nowMs / options.windowMs) * options.windowMs;
@@ -41,13 +42,13 @@ export async function checkRateLimit(
     .values({
       key,
       windowStart,
-      count: 1,
+      count: cost,
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
       target: [rateLimits.key, rateLimits.windowStart],
       set: {
-        count: sql`${rateLimits.count} + 1`,
+        count: sql`${rateLimits.count} + ${cost}`,
         updatedAt: new Date(),
       },
     })

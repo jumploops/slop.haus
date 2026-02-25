@@ -16,11 +16,17 @@ import {
   createProjectSchema,
   updateProjectSchema,
   feedQuerySchema,
+  TOOL_MAX_PER_PROJECT,
 } from "@slop/shared";
 import { slugify, generateUniqueSlug } from "@slop/shared";
 import { moderateProject } from "../lib/moderation";
 import { getStorage, generateStorageKey } from "../lib/storage";
 import { detectImageType, getImageExtension } from "../lib/uploads";
+import {
+  resolveAndUpsertTools,
+  ToolBlockedError,
+  ToolRateLimitError,
+} from "../lib/tools";
 
 const projectRoutes = new Hono();
 
@@ -76,7 +82,12 @@ async function fetchCompleteProject(projectId: string) {
     })
     .from(projectTools)
     .innerJoin(tools, eq(projectTools.toolId, tools.id))
-    .where(eq(projectTools.projectId, project.id));
+    .where(
+      and(
+        eq(projectTools.projectId, project.id),
+        eq(tools.status, "active")
+      )
+    );
 
   return {
     ...project,
@@ -251,7 +262,12 @@ projectRoutes.get("/:slug", async (c) => {
     })
     .from(projectTools)
     .innerJoin(tools, eq(projectTools.toolId, tools.id))
-    .where(eq(projectTools.projectId, project.id));
+    .where(
+      and(
+        eq(projectTools.projectId, project.id),
+        eq(tools.status, "active")
+      )
+    );
 
   return c.json({
     project: {
@@ -313,21 +329,45 @@ projectRoutes.post("/", requireAuth(), async (c) => {
     })
     .returning();
 
-  // Link tools if provided
-  if (data.tools && data.tools.length > 0) {
-    const toolRecords = await db
-      .select()
-      .from(tools)
-      .where(inArray(tools.slug, data.tools));
-
-    if (toolRecords.length > 0) {
-      await db.insert(projectTools).values(
-        toolRecords.map((t) => ({
-          projectId: project.id,
-          toolId: t.id,
-        }))
+  // Link tools if provided (existing + new)
+  let resolvedTools: Awaited<ReturnType<typeof resolveAndUpsertTools>> = [];
+  try {
+    resolvedTools = await resolveAndUpsertTools({
+      rawTools: data.tools,
+      source: "user",
+      createdByUserId: session.user.id,
+      maxNewTools: TOOL_MAX_PER_PROJECT,
+    });
+  } catch (error) {
+    if (error instanceof ToolRateLimitError) {
+      return c.json(
+        {
+          error: "Daily new tag limit reached",
+          code: "TOOL_RATE_LIMITED",
+          retryAfter: Math.ceil((error.resetAt - Date.now()) / 1000),
+        },
+        429
       );
     }
+    if (error instanceof ToolBlockedError) {
+      return c.json(
+        {
+          error: "One or more tags are blocked",
+          code: "TOOL_BLOCKED",
+          blockedTools: error.blockedTools,
+        },
+        400
+      );
+    }
+    throw error;
+  }
+  if (resolvedTools.length > 0) {
+    await db.insert(projectTools).values(
+      resolvedTools.map((tool) => ({
+        projectId: project.id,
+        toolId: tool.id,
+      }))
+    );
   }
 
   // Run synchronous moderation with confidence scoring
@@ -540,16 +580,41 @@ projectRoutes.patch("/:slug", requireAuth(), async (c) => {
     // Handle tools update
     if (data.tools !== undefined) {
       await db.delete(projectTools).where(eq(projectTools.projectId, existing.id));
-      if (data.tools.length > 0) {
-        const toolRecords = await db
-          .select()
-          .from(tools)
-          .where(inArray(tools.slug, data.tools));
-        if (toolRecords.length > 0) {
-          await db.insert(projectTools).values(
-            toolRecords.map((t) => ({ projectId: existing.id, toolId: t.id }))
+      let resolvedTools: Awaited<ReturnType<typeof resolveAndUpsertTools>> = [];
+      try {
+        resolvedTools = await resolveAndUpsertTools({
+          rawTools: data.tools,
+          source: "user",
+          createdByUserId: session.user.id,
+          maxNewTools: TOOL_MAX_PER_PROJECT,
+        });
+      } catch (error) {
+        if (error instanceof ToolRateLimitError) {
+          return c.json(
+            {
+              error: "Daily new tag limit reached",
+              code: "TOOL_RATE_LIMITED",
+              retryAfter: Math.ceil((error.resetAt - Date.now()) / 1000),
+            },
+            429
           );
         }
+        if (error instanceof ToolBlockedError) {
+          return c.json(
+            {
+              error: "One or more tags are blocked",
+              code: "TOOL_BLOCKED",
+              blockedTools: error.blockedTools,
+            },
+            400
+          );
+        }
+        throw error;
+      }
+      if (resolvedTools.length > 0) {
+        await db.insert(projectTools).values(
+          resolvedTools.map((tool) => ({ projectId: existing.id, toolId: tool.id }))
+        );
       }
     }
 

@@ -1,5 +1,11 @@
 import { db } from "@slop/db";
 import { tools } from "@slop/db/schema";
+import { eq } from "drizzle-orm";
+import {
+  TOOL_MAX_PER_PROJECT,
+  isValidToolName,
+  normalizeToolName,
+} from "@slop/shared";
 
 // Tool slug cache - avoids DB query on every analysis
 let toolSlugCache: Set<string> | null = null;
@@ -16,7 +22,10 @@ async function getToolSlugs(): Promise<Set<string>> {
   }
 
   console.log("Refreshing tool slug cache...");
-  const allTools = await db.select({ slug: tools.slug }).from(tools);
+  const allTools = await db
+    .select({ slug: tools.slug })
+    .from(tools)
+    .where(eq(tools.status, "active"));
   toolSlugCache = new Set(allTools.map((t) => t.slug));
   cacheTimestamp = now;
   console.log(`Tool cache loaded: ${toolSlugCache.size} tools`);
@@ -73,16 +82,21 @@ export async function matchToolsToDatabase(
   // Get cached tool slugs
   const allSlugs = await getToolSlugs();
 
-  // Normalize detected tools
-  const normalizedDetected = detectedTools.map((t) => t.toLowerCase().trim());
+  // Normalize detected tools (preserve display casing for unknown tags)
+  const normalizedDetected = detectedTools
+    .map((tool) => normalizeToolName(tool))
+    .filter((tool) => isValidToolName(tool))
+    .map((tool) => ({ raw: tool, lower: tool.toLowerCase() }));
+
+  if (!normalizedDetected.length) return [];
 
   // Build search terms including aliases
   const searchTerms = new Set<string>();
-  for (const detected of normalizedDetected) {
-    searchTerms.add(detected);
+  for (const { lower } of normalizedDetected) {
+    searchTerms.add(lower);
     // Check if this matches any alias
     for (const [canonical, aliases] of Object.entries(TOOL_ALIASES)) {
-      if (aliases.includes(detected)) {
+      if (aliases.includes(lower)) {
         searchTerms.add(canonical);
       }
     }
@@ -90,6 +104,7 @@ export async function matchToolsToDatabase(
 
   // Match against cached slugs (in-memory, no DB query!)
   const matched = new Set<string>();
+  const allSlugArray = [...allSlugs];
 
   for (const term of searchTerms) {
     if (term.length <= 3) {
@@ -99,7 +114,7 @@ export async function matchToolsToDatabase(
       }
     } else {
       // Longer terms: exact match or compound slug match
-      for (const slug of allSlugs) {
+      for (const slug of allSlugArray) {
         if (
           slug === term ||
           slug.startsWith(`${term}-`) ||
@@ -111,6 +126,28 @@ export async function matchToolsToDatabase(
     }
   }
 
-  // Return unique slugs, max 10
-  return [...matched].slice(0, 10);
+  const matchedArray = [...matched];
+
+  // Preserve unknown-but-valid tags for submit-time persistence.
+  const unknownTags: string[] = [];
+  for (const { raw, lower } of normalizedDetected) {
+    const knownByExactSlug = allSlugs.has(lower);
+    const knownByAlias = Object.entries(TOOL_ALIASES).some(([canonical, aliases]) =>
+      aliases.includes(lower) && allSlugs.has(canonical)
+    );
+    const knownByCompoundMatch = lower.length > 3 && allSlugArray.some((slug) =>
+      slug === lower || slug.startsWith(`${lower}-`) || slug.endsWith(`-${lower}`)
+    );
+
+    if (knownByExactSlug || knownByAlias || knownByCompoundMatch) {
+      continue;
+    }
+
+    if (!unknownTags.some((tool) => tool.toLowerCase() === raw.toLowerCase())) {
+      unknownTags.push(raw);
+    }
+  }
+
+  // Known slugs first, then unknown names. Bounded by project tool cap.
+  return [...matchedArray, ...unknownTags].slice(0, TOOL_MAX_PER_PROJECT);
 }

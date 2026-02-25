@@ -43,6 +43,15 @@ export const enrichmentStatusEnum = pgEnum("enrichment_status", [
   "failed",
 ]);
 
+export const toolStatusEnum = pgEnum("tool_status", ["active", "blocked"]);
+
+export const toolSourceEnum = pgEnum("tool_source", [
+  "seed",
+  "user",
+  "llm",
+  "admin",
+]);
+
 export const projects = pgTable(
   "projects",
   {
@@ -119,11 +128,23 @@ export const projectMedia = pgTable("project_media", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const tools = pgTable("tools", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: varchar("name", { length: 100 }).unique().notNull(),
-  slug: varchar("slug", { length: 100 }).unique().notNull(),
-});
+export const tools = pgTable(
+  "tools",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: varchar("name", { length: 100 }).unique().notNull(),
+    slug: varchar("slug", { length: 100 }).unique().notNull(),
+    status: toolStatusEnum("status").default("active").notNull(),
+    source: toolSourceEnum("source").default("seed").notNull(),
+    createdByUserId: text("created_by_user_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    usageCount: integer("usage_count").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("tools_status_idx").on(table.status)]
+);
 
 export const projectTools = pgTable(
   "project_tools",

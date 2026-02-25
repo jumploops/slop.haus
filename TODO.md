@@ -36,6 +36,8 @@ Future enhancements, fixes, and improvements.
 
 - [ ] **Discard confirmation** - "Start Over" button discards without confirmation. Add modal for confirmation.
 
+- [ ] **Admin tag alias/merge tooling (deferred)** - Add admin UI/workflow to merge duplicate technology tags and manage aliases after open tag creation ships. Context: `design/project-tags-open-taxonomy.md`.
+
 ---
 
 ## Performance
@@ -55,6 +57,8 @@ Future enhancements, fixes, and improvements.
 ## Security
 
 - [ ] **URL blocklist expansion** - Add more URL shorteners (bit.ly, t.co, etc.) and known spam domains to `url-validation.ts`.
+
+- [ ] **Adopt npm profanity package for tool/tag creation (deferred)** - Evaluate and integrate a maintained profanity library for server-side new-tag moderation while keeping DB `tools.status` as source of truth. Investigation: [Profanity package investigation](debug/profanity-package-investigation.md).
 
 - [ ] **Rate limit SSE connections** - No limit on concurrent SSE connections per user. Could exhaust server resources.
 
