@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { Header } from "@/components/layout/Header";
 import { VisitorCounter } from "@/components/layout/VisitorCounter";
+import { PrivacyChoicesButton } from "@/components/privacy/PrivacyChoicesButton";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
@@ -72,7 +73,11 @@ export default function RootLayout({
                 <VisitorCounter />
               </div>
               <div className="text-xs text-muted-foreground">
-                <span>© 2026 slop.haus</span>
+                <div className="flex items-center justify-center gap-3">
+                  <span>© 2026 slop.haus</span>
+                  <span aria-hidden>•</span>
+                  <PrivacyChoicesButton />
+                </div>
               </div>
             </div>
           </footer>

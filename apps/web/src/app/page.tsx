@@ -11,6 +11,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { fetchFeed, FeedResponse } from "@/lib/api/projects";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth-client";
+import { clearCookieConsentState } from "@/lib/privacy/consent";
 import { useSlopMode } from "@/lib/slop-mode";
 import { SlopGoo } from "@/components/slop/SlopGoo";
 import { LayoutGrid, List, ListOrdered, Loader2 } from "lucide-react";
@@ -377,6 +378,7 @@ export default function FeedPage() {
           type="button"
           onClick={() => {
             window.localStorage.removeItem("slop:feedIntroDismissed");
+            clearCookieConsentState();
             setShowIntro(true);
           }}
           className="fixed bottom-4 right-4 z-50 border-2 border-dashed border-border bg-card px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:border-primary hover:text-foreground"

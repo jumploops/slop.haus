@@ -7,6 +7,7 @@ import { LoginModalContext, useLoginModalState } from "@/hooks/useLoginModal";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { EnsureAnonymous } from "@/components/auth/EnsureAnonymous";
 import { SlopModeProvider } from "@/lib/slop-mode";
+import { ConsentManager } from "@/components/privacy/ConsentManager";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const loginModalState = useLoginModalState();
@@ -18,6 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <ToastProvider>
             <LoginModalContext.Provider value={loginModalState}>
               <EnsureAnonymous />
+              <ConsentManager />
               {children}
               <LoginModal />
             </LoginModalContext.Provider>
