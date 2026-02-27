@@ -14,6 +14,10 @@ export interface LegalDocument {
   body: string;
 }
 
+// Resolution order:
+// 1) repo-root execution (./legal),
+// 2) apps/web execution (../legal),
+// 3) deeper package/test cwd (../../legal).
 const LEGAL_DOCS_DIR_CANDIDATES = [
   path.resolve(process.cwd(), "legal"),
   path.resolve(process.cwd(), "..", "legal"),
