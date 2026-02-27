@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Alfa_Slab_One, Geist, Geist_Mono, Rubik_Wet_Paint } from "next/font/google";
 import { Suspense } from "react";
 import { Providers } from "./providers";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { Header } from "@/components/layout/Header";
 import { VisitorCounter } from "@/components/layout/VisitorCounter";
+import { PrivacyChoicesButton } from "@/components/privacy/PrivacyChoicesButton";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
@@ -72,7 +74,19 @@ export default function RootLayout({
                 <VisitorCounter />
               </div>
               <div className="text-xs text-muted-foreground">
-                <span>© 2026 slop.haus</span>
+                <div className="flex items-center justify-center gap-3">
+                  <span>© 2026 slop.haus</span>
+                  <span aria-hidden>•</span>
+                  <Link href="/privacy" className="font-mono underline underline-offset-2">
+                    Privacy
+                  </Link>
+                  <span aria-hidden>•</span>
+                  <Link href="/terms" className="font-mono underline underline-offset-2">
+                    Terms
+                  </Link>
+                  <span aria-hidden>•</span>
+                  <PrivacyChoicesButton />
+                </div>
               </div>
             </div>
           </footer>

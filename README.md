@@ -75,6 +75,11 @@ STORAGE_PUBLIC_URL=http://localhost:3001/uploads
 APP_URL=http://localhost:3000
 API_URL=http://localhost:3001
 NEXT_PUBLIC_GA_MEASUREMENT_ID=   # Optional, format: G-XXXXXXXXXX
+
+# Cookie consent banner
+NEXT_PUBLIC_COOKIE_BANNER_ENABLED=true              # Optional, default true
+NEXT_PUBLIC_COOKIE_BANNER_FORCE_GLOBAL=false        # Optional emergency kill switch
+NEXT_PUBLIC_COOKIE_BANNER_POLICY_VERSION=2026-02-27 # Optional consent/policy version
 ```
 
 ## Development
