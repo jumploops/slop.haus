@@ -1,6 +1,10 @@
 # slop.haus
 
-A showcase for vibecoded projects - apps built with AI assistance.
+A showcase for vibecoded projects — built entirely with LLMs.
+
+Live site: [https://slop.haus](https://slop.haus)
+
+![slop.haus screenshot](apps/web/public/screenshot.png)
 
 ## Tech Stack
 
