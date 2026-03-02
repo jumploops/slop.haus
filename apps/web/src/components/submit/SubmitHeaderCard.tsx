@@ -23,11 +23,7 @@ export function SubmitHeaderCard({
   const router = useRouter();
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      router.back();
-      return;
-    }
-    router.push("/submit");
+    router.push("/");
   };
 
   return (

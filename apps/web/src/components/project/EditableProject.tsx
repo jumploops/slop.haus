@@ -394,10 +394,26 @@ export function EditableProject({
                 />
               </div>
 
-              {/* Tools section */}
+              {/* URL editors */}
               <div className="border-2 border-border bg-card p-4 space-y-3">
-                <h3 className="font-mono text-sm font-bold text-foreground">Built with</h3>
-                <TagEditor selected={tools} onChange={handleToolsChange} />
+                <h3 className="font-mono text-sm font-bold text-foreground">Project links</h3>
+                <p className="text-[10px] text-muted-foreground">At least one URL is required</p>
+                <div className="space-y-3">
+                  <Input
+                    label="Live URL"
+                    type="url"
+                    value={mainUrl}
+                    onChange={(e) => setMainUrl(e.target.value)}
+                    placeholder="https://your-app.com"
+                  />
+                  <Input
+                    label="Repository URL"
+                    type="url"
+                    value={repoUrl}
+                    onChange={(e) => setRepoUrl(e.target.value)}
+                    placeholder="https://github.com/user/repo"
+                  />
+                </div>
               </div>
             </div>
 
@@ -405,16 +421,9 @@ export function EditableProject({
             <div className="space-y-4">
               <div className="border-2 border-border bg-card p-4 space-y-3">
                 <h4 className="font-mono text-xs font-bold uppercase tracking-wide text-foreground text-center">
-                  Vibe score
+                  Built with
                 </h4>
-                <VibeInput
-                  mode={vibeMode}
-                  onModeChange={handleVibeModeChange}
-                  vibePercent={vibePercent}
-                  onVibePercentChange={handleVibePercentChange}
-                  vibeDetails={vibeDetails}
-                  onVibeDetailsChange={handleVibeDetailsChange}
-                />
+                <TagEditor selected={tools} onChange={handleToolsChange} />
               </div>
 
               <div className="border-2 border-border bg-card p-4">
@@ -459,26 +468,17 @@ export function EditableProject({
         </div>
       </div>
 
-      {/* URL editors */}
+      {/* Vibe section */}
       <div className="border-2 border-border bg-card p-4 space-y-3">
-        <h3 className="font-mono text-sm font-bold text-foreground">Project links</h3>
-        <p className="text-[10px] text-muted-foreground">At least one URL is required</p>
-        <div className="space-y-3">
-          <Input
-            label="Live URL"
-            type="url"
-            value={mainUrl}
-            onChange={(e) => setMainUrl(e.target.value)}
-            placeholder="https://your-app.com"
-          />
-          <Input
-            label="Repository URL"
-            type="url"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="https://github.com/user/repo"
-          />
-        </div>
+        <h3 className="font-mono text-sm font-bold text-foreground">Vibe score</h3>
+        <VibeInput
+          mode={vibeMode}
+          onModeChange={handleVibeModeChange}
+          vibePercent={vibePercent}
+          onVibePercentChange={handleVibePercentChange}
+          vibeDetails={vibeDetails}
+          onVibeDetailsChange={handleVibeDetailsChange}
+        />
       </div>
 
       {/* URL change confirmation modal - triggered on submit when mainUrl changed */}

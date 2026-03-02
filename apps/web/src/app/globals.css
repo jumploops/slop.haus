@@ -200,8 +200,8 @@
   }
 
   .dark .brick-text {
-    -webkit-text-stroke: 1px #000000;
-    text-stroke: 1px #000000;
+    -webkit-text-stroke: 1px #ffffff;
+    text-stroke: 1px #ffffff;
     paint-order: stroke fill;
   }
 

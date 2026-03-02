@@ -38,7 +38,8 @@ interface DraftReviewProps {
   onUpdate: (field: string, value: unknown) => Promise<void>;
   onSubmit: (
     vibeMode: "overview" | "detailed",
-    vibeDetails?: Record<string, number>
+    vibeDetails?: Record<string, number>,
+    vibePercent?: number
   ) => void;
   onStartOver: () => void;
   isSubmitting: boolean;
@@ -111,7 +112,11 @@ export function DraftReview({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(vibeMode, vibeMode === "detailed" ? vibeDetails : undefined);
+    onSubmit(
+      vibeMode,
+      vibeMode === "detailed" ? vibeDetails : undefined,
+      vibeMode === "overview" ? vibePercent : undefined
+    );
   };
 
   const hasRequiredFields =

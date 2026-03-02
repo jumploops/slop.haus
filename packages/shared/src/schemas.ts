@@ -182,6 +182,7 @@ export const updateDraftSchema = z.object({
 
 export const submitDraftSchema = z.object({
   vibeMode: z.enum(["overview", "detailed"]),
+  vibePercent: z.number().min(0).max(100).optional(),
   vibeDetails: z.record(z.string(), z.number()).optional(),
 });
 

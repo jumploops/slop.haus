@@ -42,7 +42,8 @@ interface EditableProjectPreviewProps {
   onFieldChange: (field: string, value: unknown) => Promise<void>;
   onSubmit: (
     vibeMode: "overview" | "detailed",
-    vibeDetails?: Record<string, number>
+    vibeDetails?: Record<string, number>,
+    vibePercent?: number
   ) => void;
   onStartOver: () => void;
   isSubmitting: boolean;
@@ -59,7 +60,7 @@ export function EditableProjectPreview({
 }: EditableProjectPreviewProps) {
   const { data: session } = useSession();
 
-  // Local state for vibe (persisted on submit, not on change)
+  // Local vibe state is submitted in the final draft submit call.
   const [vibeMode, setVibeMode] = useState<"overview" | "detailed">("overview");
   const [vibePercent, setVibePercent] = useState(
     getValue("vibePercent") ?? 50
@@ -110,11 +111,14 @@ export function EditableProjectPreview({
 
   const handleVibePercentChange = (value: number) => {
     setVibePercent(value);
-    // Vibe is saved on submit, not on change
   };
 
   const handleSubmit = () => {
-    onSubmit(vibeMode, vibeMode === "detailed" ? vibeDetails : undefined);
+    onSubmit(
+      vibeMode,
+      vibeMode === "detailed" ? vibeDetails : undefined,
+      vibeMode === "overview" ? vibePercent : undefined
+    );
   };
 
   // Image URL with fallback
@@ -232,25 +236,38 @@ export function EditableProjectPreview({
               />
           </div>
 
-          {/* Tools section */}
+          {/* URL editors */}
           <div className="border-2 border-border bg-card p-4 space-y-3">
-              <h3 className="font-mono text-sm font-bold text-foreground">Built with</h3>
-              <TagEditor selected={tools} onChange={handleToolsChange} />
+              <h3 className="font-mono text-sm font-bold text-foreground">Project Links</h3>
+              <p className="text-[10px] text-muted-foreground">At least one URL is required</p>
+              <div className="space-y-3">
+                <Input
+                  label="Live URL"
+                  type="url"
+                  value={mainUrl}
+                  onChange={(e) => setMainUrl(e.target.value)}
+                  onBlur={() => onFieldChange("mainUrl", mainUrl || null)}
+                  placeholder="https://your-app.com"
+                />
+                <Input
+                  label="Repository URL"
+                  type="url"
+                  value={repoUrl}
+                  onChange={(e) => setRepoUrl(e.target.value)}
+                  onBlur={() => onFieldChange("repoUrl", repoUrl || null)}
+                  placeholder="https://github.com/user/repo"
+                />
+              </div>
           </div>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-4">
           <div className="border-2 border-border bg-card p-4 space-y-3">
-              <h4 className="font-mono text-xs font-bold text-foreground text-center">Vibe Score</h4>
-              <VibeInput
-                mode={vibeMode}
-                onModeChange={setVibeMode}
-                vibePercent={vibePercent}
-                onVibePercentChange={handleVibePercentChange}
-                vibeDetails={vibeDetails}
-                onVibeDetailsChange={setVibeDetails}
-              />
+              <h4 className="font-mono text-xs font-bold uppercase tracking-wide text-foreground text-center">
+                Built with
+              </h4>
+              <TagEditor selected={tools} onChange={handleToolsChange} />
           </div>
 
           <div className="border-2 border-border bg-card p-4">
@@ -286,28 +303,17 @@ export function EditableProjectPreview({
         </div>
       </div>
 
-      {/* URL editors */}
+      {/* Vibe section */}
       <div className="border-2 border-border bg-card p-4 space-y-3">
-          <h3 className="font-mono text-sm font-bold text-foreground">Project Links</h3>
-          <p className="text-[10px] text-muted-foreground">At least one URL is required</p>
-          <div className="space-y-3">
-            <Input
-              label="Live URL"
-              type="url"
-              value={mainUrl}
-              onChange={(e) => setMainUrl(e.target.value)}
-              onBlur={() => onFieldChange("mainUrl", mainUrl || null)}
-              placeholder="https://your-app.com"
-            />
-            <Input
-              label="Repository URL"
-              type="url"
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-              onBlur={() => onFieldChange("repoUrl", repoUrl || null)}
-              placeholder="https://github.com/user/repo"
-            />
-          </div>
+          <h3 className="font-mono text-sm font-bold text-foreground">Vibe Score</h3>
+          <VibeInput
+            mode={vibeMode}
+            onModeChange={setVibeMode}
+            vibePercent={vibePercent}
+            onVibePercentChange={handleVibePercentChange}
+            vibeDetails={vibeDetails}
+            onVibeDetailsChange={setVibeDetails}
+          />
       </div>
 
       {/* Error display */}

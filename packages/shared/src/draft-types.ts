@@ -89,6 +89,7 @@ export interface UpdateDraftRequest {
 
 export interface SubmitDraftRequest {
   vibeMode: "overview" | "detailed";
+  vibePercent?: number;
   vibeDetails?: Record<string, number>;
 }
 

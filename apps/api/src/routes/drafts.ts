@@ -315,8 +315,12 @@ draftRoutes.post("/:draftId/submit", requireAuth(), async (c) => {
     );
   }
 
-  // Calculate vibe percent for detailed mode
-  let finalVibePercent = vibePercent;
+  // For overview mode, trust explicit submit payload when provided.
+  // For detailed mode, derive score from detail buckets.
+  let finalVibePercent =
+    result.data.vibeMode === "overview"
+      ? result.data.vibePercent ?? vibePercent
+      : vibePercent;
   if (result.data.vibeMode === "detailed" && result.data.vibeDetails) {
     const values = Object.values(result.data.vibeDetails);
     if (values.length > 0) {

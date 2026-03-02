@@ -43,23 +43,21 @@ export function VibeInput({
 
   return (
     <div className="mb-6">
-      <div className="mb-4">
-        <label className="block text-xs font-bold font-mono uppercase tracking-wide text-foreground mb-1">
-          Vibe Score
-        </label>
-        <p className="text-xs text-muted-foreground">
+      <div className="mb-4 flex flex-wrap items-start gap-3">
+        <p className="flex-1 text-xs text-muted-foreground">
           How much of this project was "vibecoded" (AI-assisted)?
         </p>
-      </div>
 
-      <Tabs
-        tabs={[
-          { id: "overview", label: "Simple" },
-          { id: "detailed", label: "Detailed" },
-        ]}
-        activeTab={mode}
-        onTabChange={(id) => onModeChange(id as "overview" | "detailed")}
-      />
+        <Tabs
+          tabs={[
+            { id: "overview", label: "Simple" },
+            { id: "detailed", label: "Detailed" },
+          ]}
+          activeTab={mode}
+          onTabChange={(id) => onModeChange(id as "overview" | "detailed")}
+          className="mb-0 ml-auto justify-end"
+        />
+      </div>
 
       <div className="mt-4">
         {mode === "overview" ? (
@@ -69,6 +67,7 @@ export function VibeInput({
                 type="range"
                 min="0"
                 max="100"
+                step="10"
                 value={vibePercent}
                 onChange={(e) => onVibePercentChange(Number(e.target.value))}
                 className="w-full h-3 bg-muted border-2 border-border appearance-none cursor-pointer accent-primary"
@@ -96,6 +95,7 @@ export function VibeInput({
                   type="range"
                   min="0"
                   max="100"
+                  step="10"
                   value={vibeDetails[category.key] ?? 50}
                   onChange={(e) =>
                     handleDetailChange(category.key, Number(e.target.value))
@@ -125,10 +125,10 @@ function VibeScale({ percent, size = "md" }: { percent: number; size?: "sm" | "m
   };
 
   return (
-    <div className={cn("flex items-center gap-3", size === "sm" && "text-sm")}>
+    <div className={cn("flex flex-col gap-1", size === "sm" ? "w-36" : "w-full")}>
       <div
         className={cn(
-          "flex-1 bg-muted border-2 border-border overflow-hidden",
+          "w-full bg-muted border-2 border-border overflow-hidden",
           size === "sm" ? "h-2" : "h-3"
         )}
       >
@@ -137,7 +137,7 @@ function VibeScale({ percent, size = "md" }: { percent: number; size?: "sm" | "m
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="text-xs text-muted-foreground whitespace-nowrap">{getVibeLabel(percent)}</span>
+      <span className="text-xs text-muted-foreground text-center">{getVibeLabel(percent)}</span>
     </div>
   );
 }

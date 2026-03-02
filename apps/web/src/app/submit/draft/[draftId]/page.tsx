@@ -124,13 +124,18 @@ function DraftReviewContent({ draftId }: { draftId: string }) {
 
   const handleSubmit = async (
     vibeMode: "overview" | "detailed",
-    vibeDetails?: Record<string, number>
+    vibeDetails?: Record<string, number>,
+    vibePercent?: number
   ) => {
     setSubmitting(true);
     setError(null);
 
     try {
-      const { project } = await submitDraft(draftId, { vibeMode, vibeDetails });
+      const { project } = await submitDraft(draftId, {
+        vibeMode,
+        vibeDetails,
+        vibePercent,
+      });
       router.push(`/p/${project.slug}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit");
