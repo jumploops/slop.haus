@@ -10,7 +10,7 @@ import {
   jobs,
   moderationEvents,
 } from "@slop/db/schema";
-import { eq, desc, and, gte, sql, inArray, like } from "drizzle-orm";
+import { eq, desc, and, gte, sql, inArray, like, isNotNull, notInArray } from "drizzle-orm";
 import { requireAuth } from "../middleware/auth";
 import {
   createProjectSchema,
@@ -49,6 +49,8 @@ async function fetchCompleteProject(projectId: string) {
       reviewScoreTotal: projects.reviewScoreTotal,
       slopScore: sql<number>`${projects.slopScore}::float`,
       commentCount: projects.commentCount,
+      featuredAt: projects.featuredAt,
+      featuredByUserId: projects.featuredByUserId,
       status: projects.status,
       createdAt: projects.createdAt,
       updatedAt: projects.updatedAt,
@@ -118,6 +120,8 @@ projectRoutes.get("/", async (c) => {
 
   const offset = (page - 1) * limit;
   const timeFilter = getTimeWindowFilter(window);
+  const isHotSort = sort === "hot";
+  const includeFeaturedSection = isHotSort && page === 1;
 
   // Build where conditions
   const conditions = [eq(projects.status, "published")];
@@ -125,11 +129,96 @@ projectRoutes.get("/", async (c) => {
     conditions.push(gte(projects.createdAt, timeFilter));
   }
 
+  // Featured projects are shown only for hot/page-1, but excluded from the
+  // regular hot list across all pages to avoid duplicates while paginating.
+  let featuredProjects: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    tagline: string;
+    mainUrl: string | null;
+    repoUrl: string | null;
+    vibePercent: number;
+    likeCount: number;
+    reviewCount: number;
+    reviewScoreTotal: number;
+    slopScore: number;
+    commentCount: number;
+    createdAt: Date;
+    author: {
+      id: string;
+      username: string;
+      image: string | null;
+      devVerified: boolean;
+    } | null;
+    primaryMedia: (typeof projectMedia.$inferSelect) | null;
+  }> = [];
+  let featuredIds: string[] = [];
+
+  if (isHotSort) {
+    const featuredConditions = [...conditions, isNotNull(projects.featuredAt)];
+    const featuredRows = await db
+      .select({
+        id: projects.id,
+        slug: projects.slug,
+        title: projects.title,
+        tagline: projects.tagline,
+        mainUrl: projects.mainUrl,
+        repoUrl: projects.repoUrl,
+        vibePercent: projects.vibePercent,
+        likeCount: projects.likeCount,
+        reviewCount: projects.reviewCount,
+        reviewScoreTotal: projects.reviewScoreTotal,
+        slopScore: sql<number>`${projects.slopScore}::float`,
+        commentCount: projects.commentCount,
+        createdAt: projects.createdAt,
+        author: {
+          id: user.id,
+          username: user.username,
+          image: user.image,
+          devVerified: user.devVerified,
+        },
+      })
+      .from(projects)
+      .leftJoin(user, eq(projects.authorUserId, user.id))
+      .where(and(...featuredConditions))
+      .orderBy(desc(projects.featuredAt), desc(projects.createdAt))
+      .limit(3);
+
+    featuredIds = featuredRows.map((p) => p.id);
+
+    if (includeFeaturedSection && featuredRows.length > 0) {
+      const featuredMedia = await db
+        .select()
+        .from(projectMedia)
+        .where(
+          and(
+            inArray(
+              projectMedia.projectId,
+              featuredRows.map((p) => p.id)
+            ),
+            eq(projectMedia.isPrimary, true)
+          )
+        );
+
+      const featuredMediaByProject = new Map(featuredMedia.map((m) => [m.projectId, m]));
+      featuredProjects = featuredRows.map((p) => ({
+        ...p,
+        primaryMedia: featuredMediaByProject.get(p.id) || null,
+      }));
+    }
+  }
+
+  const listConditions = [...conditions];
+  if (isHotSort && featuredIds.length > 0) {
+    listConditions.push(notInArray(projects.id, featuredIds));
+  }
+
   // Get total count
   const [{ count }] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(projects)
-    .where(and(...conditions));
+    .where(and(...listConditions));
 
   // Get projects with author
   let orderBy;
@@ -166,7 +255,7 @@ projectRoutes.get("/", async (c) => {
     })
     .from(projects)
     .leftJoin(user, eq(projects.authorUserId, user.id))
-    .where(and(...conditions))
+    .where(and(...listConditions))
     .orderBy(...orderBy)
     .limit(limit)
     .offset(offset);
@@ -196,6 +285,7 @@ projectRoutes.get("/", async (c) => {
   }));
 
   return c.json({
+    featuredProjects,
     projects: projectsWithMedia,
     pagination: {
       page,
@@ -227,6 +317,8 @@ projectRoutes.get("/:slug", async (c) => {
       reviewScoreTotal: projects.reviewScoreTotal,
       slopScore: sql<number>`${projects.slopScore}::float`,
       commentCount: projects.commentCount,
+      featuredAt: projects.featuredAt,
+      featuredByUserId: projects.featuredByUserId,
       status: projects.status,
       createdAt: projects.createdAt,
       updatedAt: projects.updatedAt,

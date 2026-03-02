@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
@@ -7,8 +8,10 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { ScoreWidget } from "./ScoreWidget";
 import { useFavorite } from "@/hooks/useFavorite";
 import { useSession } from "@/lib/auth-client";
+import { featureProject, unfeatureProject } from "@/lib/api/admin";
 import { useSlopMode } from "@/lib/slop-mode";
 import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
+import { useToast } from "@/components/ui/Toast";
 import type { ProjectDetail } from "@/lib/api/projects";
 
 interface ProjectDetailsProps {
@@ -21,10 +24,39 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   const { data: session } = useSession();
   const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavorite(project.slug);
   const { enabled: slopEnabled } = useSlopMode();
+  const { showToast } = useToast();
+  const [isFeatured, setIsFeatured] = useState(Boolean(project.featuredAt));
+  const [isFeatureLoading, setIsFeatureLoading] = useState(false);
 
   const isAuthor = session?.user?.id === project.author.id;
+  const isAdmin = session?.user?.role === "admin";
   const primaryMedia = project.media.find((m) => m.isPrimary) || project.media[0];
   const imageUrl = primaryMedia?.url || getPlaceholderImage(project.title);
+
+  useEffect(() => {
+    setIsFeatured(Boolean(project.featuredAt));
+  }, [project.featuredAt]);
+
+  const handleFeatureToggle = async () => {
+    if (!isAdmin || isFeatureLoading) return;
+
+    setIsFeatureLoading(true);
+    try {
+      if (isFeatured) {
+        await unfeatureProject(project.id);
+        setIsFeatured(false);
+        showToast("Project unfeatured", "success");
+      } else {
+        await featureProject(project.id);
+        setIsFeatured(true);
+        showToast("Project featured", "success");
+      }
+    } catch {
+      showToast("Failed to update featured status", "error");
+    } finally {
+      setIsFeatureLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -80,6 +112,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                 {project.author.username}
               </span>
               {project.author.devVerified && <Badge variant="dev">Dev</Badge>}
+              {isFeatured && <Badge variant="warning">Featured</Badge>}
               <span className="font-mono">Submitted {formatRelativeTime(project.createdAt)}</span>
               {project.lastEditedAt && (
                 <span className="font-mono">Last edited {formatRelativeTime(project.lastEditedAt)}</span>
@@ -130,6 +163,17 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                 >
                   <PencilIcon /> Edit
                 </Link>
+              )}
+              {isAdmin && (
+                <Button
+                  variant={isFeatured ? "secondary" : "primary"}
+                  size="sm"
+                  onClick={handleFeatureToggle}
+                  disabled={isFeatureLoading}
+                  className="w-full sm:w-auto"
+                >
+                  {isFeatureLoading ? "Saving..." : isFeatured ? "Unfeature" : "Feature"}
+                </Button>
               )}
             </div>
           </div>

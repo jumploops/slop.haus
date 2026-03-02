@@ -74,6 +74,14 @@ export async function removeProject(id: string): Promise<void> {
   await apiPost(`/admin/projects/${id}/remove`);
 }
 
+export async function featureProject(id: string): Promise<void> {
+  await apiPost(`/admin/projects/${id}/feature`);
+}
+
+export async function unfeatureProject(id: string): Promise<void> {
+  await apiDelete(`/admin/projects/${id}/feature`);
+}
+
 export async function approveComment(id: string): Promise<void> {
   await apiPost(`/admin/comments/${id}/approve`);
 }

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Planned  
+**Status:** ✅ Completed (2026-03-02)  
 **Owner:** DB  
 **Depends On:** None
 
@@ -58,4 +58,3 @@ index("projects_featured_at_idx").on(table.featuredAt)
 
 - DB model supports feature/unfeature lifecycle and feed reads without additional tables.
 - Migration artifacts are complete and reviewable.
-

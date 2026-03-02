@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Planned  
+**Status:** ✅ Completed (2026-03-02)  
 **Owner:** API  
 **Depends On:** Phase 1
 
@@ -90,4 +90,3 @@ await db.insert(moderationEvents).values({
 ## Exit Criteria
 
 - Admin feature lifecycle is secured, auditable, and consistent with project status transitions.
-

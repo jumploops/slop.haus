@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Planned  
+**Status:** ✅ Completed (2026-03-02)  
 **Owner:** Web  
 **Depends On:** Phase 2, Phase 3
 
@@ -88,4 +88,3 @@ const nonFeaturedRank = index + 1; // independent of featured count
 ## Exit Criteria
 
 - Web UX matches all finalized featured/ranking/admin-control requirements across feed modes and viewport sizes.
-

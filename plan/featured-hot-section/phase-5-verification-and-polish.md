@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Planned  
+**Status:** 🔄 In Progress (2026-03-02)  
 **Owner:** API + Web + DB  
 **Depends On:** Phase 2, Phase 3, Phase 4
 
@@ -52,9 +52,9 @@ Run typechecks and targeted manual QA to validate featured behavior, ranking sem
 
 ## Verification Checklist
 
-- [ ] `pnpm -F @slop/db exec tsc --noEmit`
-- [ ] `pnpm -F @slop/api exec tsc --noEmit`
-- [ ] `pnpm -F @slop/web exec tsc --noEmit`
+- [ ] `pnpm -F @slop/db exec tsc --noEmit` (currently fails due pre-existing seed typing issues unrelated to this feature)
+- [x] `pnpm -F @slop/api exec tsc --noEmit`
+- [x] `pnpm -F @slop/web exec tsc --noEmit`
 - [ ] Migration files and Drizzle metadata are committed and consistent.
 - [ ] Manual QA matrix completed with no P0/P1 regressions.
 - [ ] Plan docs updated with completion statuses and date.
@@ -64,4 +64,3 @@ Run typechecks and targeted manual QA to validate featured behavior, ranking sem
 - Feature behavior is correct and stable across feed modes, roles, and pagination.
 - Auditability and permission requirements are met.
 - Implementation is ready for merge.
-

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Planned  
+**Status:** ✅ Completed (2026-03-02)  
 **Owner:** API  
 **Depends On:** Phase 1
 
@@ -71,4 +71,3 @@ const nonFeaturedCondition =
 ## Exit Criteria
 
 - Feed contract is stable and supports featured rendering requirements without regressions to existing feed modes.
-

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { MessageCircle, ExternalLink, ChevronUp } from "lucide-react";
+import { MessageCircle, ExternalLink, ChevronUp, Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
@@ -28,6 +28,7 @@ interface ProjectCardProps {
   showFavoriteButton?: boolean;
   onFavoriteChange?: () => void;
   rank?: number;
+  featured?: boolean;
   variant?: "list-sm" | "list-lg" | "grid";
   sloppy?: boolean;
 }
@@ -37,6 +38,7 @@ export function ProjectCard({
   showFavoriteButton,
   onFavoriteChange,
   rank,
+  featured = false,
   variant = "list-sm",
   sloppy = false,
 }: ProjectCardProps) {
@@ -69,6 +71,8 @@ export function ProjectCard({
   const projectHref = `/p/${project.slug}`;
   const rotation =
     rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
+  const showFeaturedBadge = featured;
+  const showRankBadge = !featured && typeof rank === "number";
   const cardTransitionClass = "transition-all duration-200";
   const cardHoverClass = "hover:border-primary hover:shadow-lg";
   const thumbnailSize = isLarge ? "sm:h-32 sm:w-48" : "sm:h-16 sm:w-24";
@@ -154,9 +158,18 @@ export function ProjectCard({
               cardHoverClass
             )}
           >
-            {rank && (
-              <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
-                {rank}
+            {(showFeaturedBadge || showRankBadge) && (
+              <div
+                className={cn(
+                  "absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center font-mono text-sm font-black",
+                  showFeaturedBadge ? "bg-warning text-fg" : "bg-foreground text-background"
+                )}
+              >
+                {showFeaturedBadge ? (
+                  <Star className="h-4 w-4 fill-current" />
+                ) : (
+                  rank
+                )}
               </div>
             )}
 
@@ -302,9 +315,18 @@ export function ProjectCard({
             cardHoverClass
           )}
         >
-          {rank && (
-            <div className="absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center bg-foreground font-mono text-sm font-black text-background">
-              {rank}
+          {(showFeaturedBadge || showRankBadge) && (
+            <div
+              className={cn(
+                "absolute -left-2 -top-2 z-25 flex h-7 w-7 -rotate-6 items-center justify-center font-mono text-sm font-black",
+                showFeaturedBadge ? "bg-warning text-fg" : "bg-foreground text-background"
+              )}
+            >
+              {showFeaturedBadge ? (
+                <Star className="h-4 w-4 fill-current" />
+              ) : (
+                rank
+              )}
             </div>
           )}
 

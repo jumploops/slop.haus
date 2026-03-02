@@ -9,7 +9,7 @@ Implement the featured-projects experience from `design/featured-hot-section.md`
 - Show featured cards with a gold square + star badge.
 - Keep normal list ranking independent of featured cards (first non-featured rank is always `1`).
 
-## Status: Planned
+## Status: In Progress
 
 **Last Updated:** 2026-03-02  
 **Owner:** API + Web + DB
@@ -32,11 +32,11 @@ Implement the featured-projects experience from `design/featured-hot-section.md`
 
 | Phase | Name | Status | Description |
 | --- | --- | --- | --- |
-| 1 | [Database Schema + Migration](./phase-1-database-schema-and-migration.md) | Planned | Add featured columns/indexes and export schema updates |
-| 2 | [Feed API Read Path](./phase-2-feed-api-read-path.md) | Planned | Return `featuredProjects` for hot/page-1 and prevent duplicates |
-| 3 | [Admin Feature/Unfeature API + Audit](./phase-3-admin-feature-write-path-and-audit.md) | Planned | Admin-only feature toggles and moderation-event audit logging |
-| 4 | [Web Feed + Project Detail UI](./phase-4-web-feed-and-admin-ui.md) | Planned | Render featured section, star badge, rank rules, and admin controls |
-| 5 | [Verification + Polish](./phase-5-verification-and-polish.md) | Planned | Typechecks, behavioral QA, and regression checks |
+| 1 | [Database Schema + Migration](./phase-1-database-schema-and-migration.md) | ✅ Completed | Add featured columns/indexes and export schema updates |
+| 2 | [Feed API Read Path](./phase-2-feed-api-read-path.md) | ✅ Completed | Return `featuredProjects` for hot/page-1 and prevent duplicates |
+| 3 | [Admin Feature/Unfeature API + Audit](./phase-3-admin-feature-write-path-and-audit.md) | ✅ Completed | Admin-only feature toggles and moderation-event audit logging |
+| 4 | [Web Feed + Project Detail UI](./phase-4-web-feed-and-admin-ui.md) | ✅ Completed | Render featured section, star badge, rank rules, and admin controls |
+| 5 | [Verification + Polish](./phase-5-verification-and-polish.md) | 🔄 In Progress | Typechecks, behavioral QA, and regression checks |
 
 ## Dependencies
 
@@ -87,4 +87,3 @@ Phase 2 + Phase 3 + Phase 4
 - All phase docs are implementation-ready and reviewed.
 - API and UI behavior matches confirmed product decisions.
 - Verification checklist is complete with no unresolved blockers.
-

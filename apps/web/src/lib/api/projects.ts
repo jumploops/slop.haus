@@ -62,6 +62,8 @@ export interface ProjectDetail {
   reviewScoreTotal: number;
   slopScore: number;
   commentCount: number;
+  featuredAt: string | null;
+  featuredByUserId: string | null;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -73,6 +75,7 @@ export interface ProjectDetail {
 }
 
 export interface FeedResponse {
+  featuredProjects: ProjectListItem[];
   projects: ProjectListItem[];
   pagination: {
     page: number;
