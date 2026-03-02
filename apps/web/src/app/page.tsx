@@ -105,10 +105,12 @@ export default function FeedPage() {
   );
 
   const pages = data ?? [];
+  const featuredProjects = sort === "hot" ? (pages[0]?.featuredProjects ?? []) : [];
   const projects = pages.flatMap((page) => page.projects);
   const pagination = pages[0]?.pagination;
   const totalPages = pagination?.totalPages ?? 0;
   const totalCount = pagination?.total ?? 0;
+  const hasAnyProjects = featuredProjects.length > 0 || projects.length > 0;
   const isLoadingMore = isValidating && size > 0;
 
   const handleSortChange = (newSort: string) => {
@@ -321,7 +323,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {pagination && projects.length === 0 && (
+      {pagination && !hasAnyProjects && (
         <div className="border-2 border-dashed border-border p-6 text-center">
           <h3 className="text-lg font-bold text-foreground mb-2">No projects yet</h3>
           <p className="text-sm text-muted-foreground">Be the first to submit a project!</p>
@@ -331,33 +333,63 @@ export default function FeedPage() {
         </div>
       )}
 
-      {pagination && projects.length > 0 && (
+      {pagination && hasAnyProjects && (
         <>
-          <div
-            className={cn(
-              displayMode === "grid"
-                ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-                : displayMode === "list-lg"
-                  ? "space-y-4"
-                  : "space-y-3",
-              slopEnabled &&
-              (displayMode === "grid"
-                ? "gap-6"
-                : displayMode === "list-lg"
-                  ? "space-y-6"
-                  : "space-y-5")
-            )}
-          >
-            {projects.map((project, index) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                rank={index + 1}
-                variant={displayMode}
-                sloppy={slopEnabled}
-              />
-            ))}
-          </div>
+          {featuredProjects.length > 0 && (
+            <div
+              className={cn(
+                displayMode === "grid"
+                  ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                  : displayMode === "list-lg"
+                    ? "space-y-4"
+                    : "space-y-3",
+                slopEnabled &&
+                (displayMode === "grid"
+                  ? "gap-6"
+                  : displayMode === "list-lg"
+                    ? "space-y-6"
+                    : "space-y-5")
+              )}
+            >
+              {featuredProjects.map((project) => (
+                <ProjectCard
+                  key={`featured-${project.id}`}
+                  project={project}
+                  featured
+                  variant={displayMode}
+                  sloppy={slopEnabled}
+                />
+              ))}
+            </div>
+          )}
+
+          {projects.length > 0 && (
+            <div
+              className={cn(
+                displayMode === "grid"
+                  ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                  : displayMode === "list-lg"
+                    ? "space-y-4"
+                    : "space-y-3",
+                slopEnabled &&
+                (displayMode === "grid"
+                  ? "gap-6"
+                  : displayMode === "list-lg"
+                    ? "space-y-6"
+                    : "space-y-5")
+              )}
+            >
+              {projects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  rank={index + 1}
+                  variant={displayMode}
+                  sloppy={slopEnabled}
+                />
+              ))}
+            </div>
+          )}
 
           {pagination && size < totalPages && (
             <div className="flex justify-center mt-4">
@@ -368,9 +400,11 @@ export default function FeedPage() {
             </div>
           )}
 
-          <div className="text-center text-muted-foreground text-xs mt-4">
-            Showing {projects.length} of {totalCount} projects
-          </div>
+          {projects.length > 0 && (
+            <div className="text-center text-muted-foreground text-xs mt-4">
+              Showing {projects.length} of {totalCount} projects
+            </div>
+          )}
         </>
       )}
       {showResetIntroButton && (

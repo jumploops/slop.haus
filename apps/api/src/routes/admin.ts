@@ -267,7 +267,12 @@ adminRoutes.post("/projects/:id/hide", requireMod(), async (c) => {
 
   await db
     .update(projects)
-    .set({ status: "hidden", updatedAt: new Date() })
+    .set({
+      status: "hidden",
+      featuredAt: null,
+      featuredByUserId: null,
+      updatedAt: new Date(),
+    })
     .where(eq(projects.id, projectId));
 
   return c.json({ success: true, message: "Project hidden" });
@@ -290,7 +295,12 @@ adminRoutes.post("/projects/:id/remove", requireAdmin(), async (c) => {
 
   await db
     .update(projects)
-    .set({ status: "removed", updatedAt: new Date() })
+    .set({
+      status: "removed",
+      featuredAt: null,
+      featuredByUserId: null,
+      updatedAt: new Date(),
+    })
     .where(eq(projects.id, projectId));
 
   // Log removal
@@ -305,6 +315,82 @@ adminRoutes.post("/projects/:id/remove", requireAdmin(), async (c) => {
   });
 
   return c.json({ success: true, message: "Project removed" });
+});
+
+// Feature project (admin only)
+adminRoutes.post("/projects/:id/feature", requireAdmin(), async (c) => {
+  const session = c.get("session");
+  const projectId = c.req.param("id");
+
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, projectId));
+
+  if (!project) {
+    return c.json({ error: "Project not found" }, 404);
+  }
+
+  if (project.status !== "published") {
+    return c.json({ error: "Only published projects can be featured" }, 400);
+  }
+
+  await db
+    .update(projects)
+    .set({
+      featuredAt: new Date(),
+      featuredByUserId: session.user.id,
+      updatedAt: new Date(),
+    })
+    .where(eq(projects.id, projectId));
+
+  await db.insert(moderationEvents).values({
+    targetType: "project",
+    targetId: projectId,
+    model: "admin_feature",
+    labels: [{ label: "feature", confidence: 1 }],
+    confidenceLevel: "absolute",
+    decision: "approved",
+    reason: `Project featured by admin ${session.user.id}`,
+  });
+
+  return c.json({ success: true, message: "Project featured" });
+});
+
+// Unfeature project (admin only)
+adminRoutes.delete("/projects/:id/feature", requireAdmin(), async (c) => {
+  const session = c.get("session");
+  const projectId = c.req.param("id");
+
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, projectId));
+
+  if (!project) {
+    return c.json({ error: "Project not found" }, 404);
+  }
+
+  await db
+    .update(projects)
+    .set({
+      featuredAt: null,
+      featuredByUserId: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(projects.id, projectId));
+
+  await db.insert(moderationEvents).values({
+    targetType: "project",
+    targetId: projectId,
+    model: "admin_feature",
+    labels: [{ label: "unfeature", confidence: 1 }],
+    confidenceLevel: "absolute",
+    decision: "approved",
+    reason: `Project unfeatured by admin ${session.user.id}`,
+  });
+
+  return c.json({ success: true, message: "Project unfeatured" });
 });
 
 // ============ COMMENT MOD ACTIONS ============

@@ -78,6 +78,8 @@ export const projects = pgTable(
       .default("0")
       .notNull(),
     commentCount: integer("comment_count").default(0).notNull(),
+    featuredAt: timestamp("featured_at"),
+    featuredByUserId: text("featured_by_user_id").references(() => user.id),
     status: projectStatusEnum("status").default("published").notNull(),
     enrichmentStatus: enrichmentStatusEnum("enrichment_status")
       .default("pending")
@@ -89,7 +91,9 @@ export const projects = pgTable(
   (table) => [
     index("projects_author_user_id_idx").on(table.authorUserId),
     index("projects_status_idx").on(table.status),
+    index("projects_status_featured_at_idx").on(table.status, table.featuredAt),
     index("projects_created_at_idx").on(table.createdAt),
+    index("projects_featured_at_idx").on(table.featuredAt),
     index("projects_hot_score_idx").on(table.hotScore),
   ]
 );

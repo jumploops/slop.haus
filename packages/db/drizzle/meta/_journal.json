@@ -57,6 +57,13 @@
       "when": 1771974542590,
       "tag": "0007_charming_gladiator",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1772443059498,
+      "tag": "0008_common_pretty_boy",
+      "breakpoints": true
     }
   ]
 }
