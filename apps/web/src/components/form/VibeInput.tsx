@@ -2,6 +2,7 @@
 
 import { Tabs } from "@/components/ui/Tabs";
 import { cn } from "@/lib/utils";
+import { getVibeLabel } from "@/lib/vibe-taxonomy";
 
 interface VibeInputProps {
   mode: "overview" | "detailed";
@@ -116,13 +117,7 @@ export function VibeInput({
 }
 
 function VibeScale({ percent, size = "md" }: { percent: number; size?: "sm" | "md" }) {
-  const getVibeLabel = (pct: number) => {
-    if (pct < 20) return "Mostly Human";
-    if (pct < 40) return "Human-Led";
-    if (pct < 60) return "Balanced";
-    if (pct < 80) return "AI-Assisted";
-    return "Fully Vibed";
-  };
+  const vibeLabel = getVibeLabel(percent);
 
   return (
     <div className={cn("flex flex-col gap-1", size === "sm" ? "w-36" : "w-full")}>
@@ -137,7 +132,7 @@ function VibeScale({ percent, size = "md" }: { percent: number; size?: "sm" | "m
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="text-xs text-muted-foreground text-center">{getVibeLabel(percent)}</span>
+      <span className="text-xs text-muted-foreground text-center">{vibeLabel}</span>
     </div>
   );
 }

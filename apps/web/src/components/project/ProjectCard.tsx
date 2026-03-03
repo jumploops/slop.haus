@@ -11,6 +11,8 @@ import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
 import { getSlopBandForAggregateScore, getSlopBandTerm } from "@slop/shared";
 import { formatSlopScore, getSlopBandBadgeClass } from "@/lib/slop-score-presentation";
+import { getVibeLabel } from "@/lib/vibe-taxonomy";
+import { VibeBadge } from "./VibeBadge";
 
 const SLOP_CARD_OFFSETS = [
   { className: "rotate-[0.6deg] translate-x-[1px] translate-y-[1px]", rotationDeg: 0.6 },
@@ -68,6 +70,7 @@ export function ProjectCard({
   const slopTerm = getSlopBandTerm(slopBand);
   const visitUrl = project.mainUrl || project.repoUrl;
   const scoreTone = getSlopBandBadgeClass(slopBand);
+  const vibeLabel = getVibeLabel(project.vibePercent);
   const projectHref = `/p/${project.slug}`;
   const rotation =
     rank && rank % 2 === 0 ? "hover:rotate-0.5" : "hover:-rotate-0.5";
@@ -189,9 +192,8 @@ export function ProjectCard({
                   className={cn(
                     "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto cursor-pointer",
                     likeButtonSize,
-                    likeState?.liked
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+                    "border-border bg-muted hover:border-primary hover:bg-primary/10",
+                    likeState?.liked ? "text-primary" : "text-muted-foreground hover:text-primary",
                     isLiking && "opacity-50 cursor-not-allowed"
                   )}
                   aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
@@ -216,6 +218,10 @@ export function ProjectCard({
                     )}
                   </h3>
                   <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{project.tagline}</p>
+                  <div className="mt-2 flex items-center gap-2.5">
+                    <VibeBadge percent={project.vibePercent} size="md" />
+                    <span className="text-xs text-muted-foreground">{vibeLabel}</span>
+                  </div>
                 </div>
 
                 <div className="flex-shrink-0 pointer-events-none">
@@ -337,9 +343,8 @@ export function ProjectCard({
             className={cn(
               "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors cursor-pointer",
               likeButtonSize,
-              likeState?.liked
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+              "border-border bg-muted hover:border-primary hover:bg-primary/10",
+              likeState?.liked ? "text-primary" : "text-muted-foreground hover:text-primary",
               isLiking && "opacity-50 cursor-not-allowed"
             )}
             aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
@@ -376,6 +381,10 @@ export function ProjectCard({
                   )}
                 </h3>
                 <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{project.tagline}</p>
+                <div className="mt-2 flex items-center gap-2.5">
+                  <VibeBadge percent={project.vibePercent} size="sm" />
+                  <span className="text-xs text-muted-foreground">{vibeLabel}</span>
+                </div>
               </div>
               <div className="flex-shrink-0">
                 <div className="flex flex-col items-center gap-1">
