@@ -192,9 +192,8 @@ export function ProjectCard({
                   className={cn(
                     "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto cursor-pointer",
                     likeButtonSize,
-                    likeState?.liked
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+                    "border-border bg-muted hover:border-primary hover:bg-primary/10",
+                    likeState?.liked ? "text-primary" : "text-muted-foreground hover:text-primary",
                     isLiking && "opacity-50 cursor-not-allowed"
                   )}
                   aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
@@ -344,9 +343,8 @@ export function ProjectCard({
             className={cn(
               "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors cursor-pointer",
               likeButtonSize,
-              likeState?.liked
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary",
+              "border-border bg-muted hover:border-primary hover:bg-primary/10",
+              likeState?.liked ? "text-primary" : "text-muted-foreground hover:text-primary",
               isLiking && "opacity-50 cursor-not-allowed"
             )}
             aria-label={likeState?.liked ? "Remove upvote" : "Upvote"}
