@@ -30,12 +30,13 @@ Implement a tooltip-enabled `VibeBadge` component and integrate it into shared `
    - taxonomy label,
    - percent detail,
    - short explanatory line.
-5. Apply neutral semantic styling (no slop-mode sticky/tilt effects).
+5. Apply literal sample palette styling on badge tones (`rose/orange/amber/sky/teal/emerald`).
 6. Integrate `VibeBadge` into `ProjectCard` in both render branches:
    - list branch (`list-sm`, `list-lg`)
    - grid branch
-7. Ensure placement does not conflict with slop-score block, rank badge, featured badge, or title wrapping.
-8. Ensure badge trigger participates safely in card interaction model:
+7. Render vibe label text next to each badge in shared card layouts.
+8. Ensure placement does not conflict with slop-score block, rank badge, featured badge, or title wrapping.
+9. Ensure badge trigger participates safely in card interaction model:
    - no accidental card-navigation breakage,
    - no blocked hover/focus tooltip due to `pointer-events` containers.
 
@@ -64,13 +65,14 @@ Implement a tooltip-enabled `VibeBadge` component and integrate it into shared `
 
 ## Verification Checklist
 
-- [ ] Badge renders on all shared card variants.
-- [ ] Tooltip works on hover and keyboard focus.
-- [ ] Clicking regular card areas still navigates to project page.
-- [ ] Like/favorite/link controls still work exactly as before.
-- [ ] No layout overlap with rank/featured/slop-score badges in mobile and desktop.
-- [ ] No badge rendered on My Projects cards.
+- [x] Badge renders on all shared card variants.
+- [x] Tooltip works on hover and keyboard focus.
+- [x] Clicking regular card areas still navigates to project page.
+- [x] Like/favorite/link controls still work exactly as before.
+- [x] No layout overlap with rank/featured/slop-score badges in mobile and desktop.
+- [x] No badge rendered on My Projects cards.
+- [x] Vibe label text renders next to badge on shared cards.
 
 ## Exit Criteria
 
-- Shared project cards display a stable, accessible, tooltip-enabled vibe badge using approved terminology and neutral styling.
+- Shared project cards display a stable, accessible, tooltip-enabled vibe badge using approved terminology and literal sample palette styling.

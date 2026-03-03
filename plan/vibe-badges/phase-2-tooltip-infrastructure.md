@@ -57,10 +57,10 @@ export function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimiti
 
 ## Verification Checklist
 
-- [ ] Dependency is present in `apps/web/package.json` and lockfile is updated.
-- [ ] `Tooltip` wrapper builds and can be imported from web components.
-- [ ] Tooltip is accessible via keyboard focus and hover.
-- [ ] Tooltip styles are readable in light and dark modes.
+- [x] Dependency is present in `apps/web/package.json` and lockfile is updated.
+- [x] `Tooltip` wrapper builds and can be imported from web components.
+- [x] Tooltip is accessible via keyboard focus and hover.
+- [x] Tooltip styles are readable in light and dark modes.
 
 ## Exit Criteria
 

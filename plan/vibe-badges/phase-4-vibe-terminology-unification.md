@@ -8,7 +8,7 @@
 
 ## Goal
 
-Adopt the sample taxonomy terms for vibe score labels across project, submit, and edit flows so all vibe surfaces resolve labels consistently.
+Adopt shared taxonomy terms for vibe score labels across project, submit, and edit flows so all vibe surfaces resolve labels consistently.
 
 ## Files To Change
 
@@ -22,6 +22,22 @@ Adopt the sample taxonomy terms for vibe score labels across project, submit, an
 3. Remove duplicated, hardcoded threshold logic currently local to components.
 4. Keep existing percent display behavior while changing label terms only.
 5. Preserve existing submit/edit interaction behavior and slider value semantics.
+
+## Final Label Mapping
+
+| Bucket | Label |
+| --- | --- |
+| 0 | Handcrafted |
+| 10 | Mostly Human |
+| 20 | Mostly Human |
+| 30 | Mostly Human |
+| 40 | AI-Assisted |
+| 50 | AI-Assisted |
+| 60 | AI-Assisted |
+| 70 | Mostly AI |
+| 80 | Mostly AI |
+| 90 | Vibecoded |
+| 100 | Pure Vibe |
 
 ## Implementation Notes
 
@@ -43,10 +59,10 @@ const label = getVibeLabel(percent);
 
 ## Verification Checklist
 
-- [ ] Project page vibe score term matches badge term for the same percent.
-- [ ] Submit flow shows sample taxonomy terms while adjusting sliders.
-- [ ] Edit flow shows sample taxonomy terms while adjusting sliders.
-- [ ] No behavior change in percent persistence or form submission.
+- [x] Project page vibe score term matches badge term for the same percent.
+- [x] Submit flow shows taxonomy terms from shared utility while adjusting sliders.
+- [x] Edit flow shows taxonomy terms from shared utility while adjusting sliders.
+- [x] No behavior change in percent persistence or form submission.
 
 ## Exit Criteria
 

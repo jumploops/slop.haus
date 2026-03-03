@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** 🔄 In Progress  
+**Status:** ✅ Completed  
 **Owner:** Web  
 **Depends On:** [Phase 2](./phase-2-tooltip-infrastructure.md), [Phase 3](./phase-3-vibebadge-and-projectcard-integration.md), [Phase 4](./phase-4-vibe-terminology-unification.md)
 
@@ -48,11 +48,11 @@ Validate functional correctness, interaction safety, terminology consistency, an
 
 ## Verification Checklist
 
-- [ ] Typecheck passes or only unrelated pre-existing errors remain documented.
-- [ ] Tooltip behavior is accessible and stable in light/dark themes.
-- [ ] Card interaction model is unchanged except added badge tooltip behavior.
-- [ ] Terminology is consistent across badge/project/submit/edit surfaces.
-- [ ] No unresolved blockers remain.
+- [x] Typecheck passes or only unrelated pre-existing errors remain documented.
+- [x] Tooltip behavior is accessible and stable in light/dark themes.
+- [x] Card interaction model is unchanged except added badge tooltip behavior.
+- [x] Terminology is consistent across badge/project/submit/edit surfaces.
+- [x] No unresolved blockers remain.
 
 ## Exit Criteria
 
@@ -62,4 +62,4 @@ Validate functional correctness, interaction safety, terminology consistency, an
 
 - `pnpm -F @slop/web exec tsc --noEmit` passes with current changes.
 - `pnpm -F @slop/web run lint` cannot run non-interactively because `next lint` prompts for ESLint setup in this repo.
-- Manual UI QA remains pending.
+- Functional/manual QA has been completed and behavior verified by user review.

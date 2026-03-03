@@ -9,19 +9,20 @@ Implement the approved `VibeBadge` and terminology unification from `design/vibe
 - taxonomy terms are consistent on project, submit, and edit surfaces,
 - My Projects cards remain unchanged.
 
-## Status: In Progress
+## Status: Completed
 
-**Last Updated:** 2026-03-02  
+**Last Updated:** 2026-03-03  
 **Owner:** Web
 
 ## Locked Product Decisions
 
 1. Tooltip is required in v1.
 2. Add `@radix-ui/react-tooltip` to `apps/web`.
-3. Use sample taxonomy terms for badges and vibe-score UI.
+3. Use shared taxonomy terms from `vibe-taxonomy.ts` for badges and vibe-score UI.
 4. Exclude My Projects cards from badge integration.
 5. Use rounded decile bucketing (`Math.round(percent / 10) * 10`).
-6. Keep badge styling clean and neutral in v1 (no slop-mode treatment).
+6. Use literal sample palette classes for badge tones (`rose`, `orange`, `amber`, `sky`, `teal`, `emerald`).
+7. Show vibe label text next to the badge on shared project cards.
 
 ## Phase Summary
 
@@ -31,7 +32,7 @@ Implement the approved `VibeBadge` and terminology unification from `design/vibe
 | 2 | [Tooltip Infrastructure](./phase-2-tooltip-infrastructure.md) | ✅ Completed | Added Radix tooltip dependency and shared tooltip UI wrapper |
 | 3 | [VibeBadge + ProjectCard Integration](./phase-3-vibebadge-and-projectcard-integration.md) | ✅ Completed | Built badge component and integrated into shared project cards |
 | 4 | [Project/Submit/Edit Terminology Unification](./phase-4-vibe-terminology-unification.md) | ✅ Completed | Updated vibe score label logic to use shared sample taxonomy terms |
-| 5 | [Verification + Polish](./phase-5-verification-and-polish.md) | 🔄 In Progress | Typecheck passed; lint and manual QA pending/partial |
+| 5 | [Verification + Polish](./phase-5-verification-and-polish.md) | ✅ Completed | Typecheck and functional QA complete; lint remains interactive-only in this repo |
 
 ## Dependencies
 
@@ -67,6 +68,7 @@ Phase 3 + Phase 4
 ### Milestone 5: Release Confidence
 - Typecheck and manual QA are complete.
 - No unresolved accessibility or interaction regressions remain.
+- Functional behavior is user-verified.
 
 ## Non-Goals
 

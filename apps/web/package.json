@@ -6,11 +6,11 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@slop/shared": "workspace:*",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@slop/shared": "workspace:*",
     "@tailwindcss/postcss": "^4.1.18",
     "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",
@@ -29,6 +29,8 @@
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
     "typescript": "^5.7.2"
   }
 }

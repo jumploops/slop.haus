@@ -33,13 +33,13 @@ Create a single frontend utility that normalizes vibe percentage values and reso
 | Bucket | Label |
 | --- | --- |
 | 0 | Handcrafted |
-| 10 | Human-led |
-| 20 | Human-led |
+| 10 | Mostly Human |
+| 20 | Mostly Human |
 | 30 | Mostly Human |
-| 40 | Human + AI |
-| 50 | Hybrid |
+| 40 | AI-Assisted |
+| 50 | AI-Assisted |
 | 60 | AI-Assisted |
-| 70 | AI-Assisted |
+| 70 | Mostly AI |
 | 80 | Mostly AI |
 | 90 | Vibecoded |
 | 100 | Pure Vibe |
@@ -70,9 +70,9 @@ export function getVibeLabel(percent: number): string {
 
 ## Verification Checklist
 
-- [ ] Utility compiles with strict TypeScript settings in `apps/web`.
-- [ ] Edge cases resolve correctly (`-1`, `0`, `4`, `5`, `94`, `95`, `100`, `101`).
-- [ ] Exported API is sufficient for badge and meter/input consumers.
+- [x] Utility compiles with strict TypeScript settings in `apps/web`.
+- [x] Edge cases resolve correctly (`-1`, `0`, `4`, `5`, `94`, `95`, `100`, `101`).
+- [x] Exported API is sufficient for badge and meter/input consumers.
 
 ## Exit Criteria
 
