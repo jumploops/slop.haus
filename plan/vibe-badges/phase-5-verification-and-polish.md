@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** ⏳ Not Started  
+**Status:** 🔄 In Progress  
 **Owner:** Web  
 **Depends On:** [Phase 2](./phase-2-tooltip-infrastructure.md), [Phase 3](./phase-3-vibebadge-and-projectcard-integration.md), [Phase 4](./phase-4-vibe-terminology-unification.md)
 
@@ -57,3 +57,9 @@ Validate functional correctness, interaction safety, terminology consistency, an
 ## Exit Criteria
 
 - VibeBadge feature is implementation-complete, verified, and ready for merge/review.
+
+## Progress Notes
+
+- `pnpm -F @slop/web exec tsc --noEmit` passes with current changes.
+- `pnpm -F @slop/web run lint` cannot run non-interactively because `next lint` prompts for ESLint setup in this repo.
+- Manual UI QA remains pending.

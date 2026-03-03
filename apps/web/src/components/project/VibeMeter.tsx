@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { clampVibePercent, getVibeLabel } from "@/lib/vibe-taxonomy";
 
 interface VibeMeterProps {
   percent: number;
@@ -13,7 +14,8 @@ export function VibeMeter({
   size = "md",
   className,
 }: VibeMeterProps) {
-  const clampedPercent = Math.max(0, Math.min(100, percent));
+  const clampedPercent = clampVibePercent(percent);
+  const vibeLabel = getVibeLabel(clampedPercent);
 
   return (
     <div className={className}>
@@ -30,7 +32,7 @@ export function VibeMeter({
       </div>
       {showLabel && (
         <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-          <span className="font-mono font-bold uppercase tracking-wide text-foreground">Vibe</span>
+          <span className="font-mono font-bold text-foreground">{vibeLabel}</span>
           <span>{clampedPercent}%</span>
         </div>
       )}

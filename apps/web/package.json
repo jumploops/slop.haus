@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@slop/shared": "workspace:*",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/postcss": "^4.1.18",
     "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",

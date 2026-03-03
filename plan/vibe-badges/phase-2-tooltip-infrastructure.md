@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** ⏳ Not Started  
+**Status:** ✅ Completed  
 **Owner:** Web  
 **Depends On:** None
 
@@ -65,3 +65,9 @@ export function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimiti
 ## Exit Criteria
 
 - `apps/web` has stable, reusable tooltip infrastructure required for v1 badge behavior.
+
+## Progress Notes
+
+- Implemented `apps/web/src/components/ui/Tooltip.tsx` with Radix primitives.
+- Added `@radix-ui/react-tooltip` to `apps/web/package.json`.
+- Lockfile now includes tooltip dependency updates.

@@ -9,7 +9,7 @@ Implement the approved `VibeBadge` and terminology unification from `design/vibe
 - taxonomy terms are consistent on project, submit, and edit surfaces,
 - My Projects cards remain unchanged.
 
-## Status: Draft
+## Status: In Progress
 
 **Last Updated:** 2026-03-02  
 **Owner:** Web
@@ -27,11 +27,11 @@ Implement the approved `VibeBadge` and terminology unification from `design/vibe
 
 | Phase | Name | Status | Description |
 | --- | --- | --- | --- |
-| 1 | [Shared Vibe Taxonomy Utility](./phase-1-shared-vibe-taxonomy-utility.md) | ⏳ Not Started | Add canonical clamp/bucket/label helpers and mapping constants |
-| 2 | [Tooltip Infrastructure](./phase-2-tooltip-infrastructure.md) | ⏳ Not Started | Add Radix tooltip dependency and shared tooltip UI wrapper |
-| 3 | [VibeBadge + ProjectCard Integration](./phase-3-vibebadge-and-projectcard-integration.md) | ⏳ Not Started | Build badge component and integrate into shared project cards |
-| 4 | [Project/Submit/Edit Terminology Unification](./phase-4-vibe-terminology-unification.md) | ⏳ Not Started | Update vibe score label logic to use shared sample taxonomy terms |
-| 5 | [Verification + Polish](./phase-5-verification-and-polish.md) | ⏳ Not Started | Typechecks, interaction QA, and visual regression checks |
+| 1 | [Shared Vibe Taxonomy Utility](./phase-1-shared-vibe-taxonomy-utility.md) | ✅ Completed | Added canonical clamp/bucket/label helpers and mapping constants |
+| 2 | [Tooltip Infrastructure](./phase-2-tooltip-infrastructure.md) | ✅ Completed | Added Radix tooltip dependency and shared tooltip UI wrapper |
+| 3 | [VibeBadge + ProjectCard Integration](./phase-3-vibebadge-and-projectcard-integration.md) | ✅ Completed | Built badge component and integrated into shared project cards |
+| 4 | [Project/Submit/Edit Terminology Unification](./phase-4-vibe-terminology-unification.md) | ✅ Completed | Updated vibe score label logic to use shared sample taxonomy terms |
+| 5 | [Verification + Polish](./phase-5-verification-and-polish.md) | 🔄 In Progress | Typecheck passed; lint and manual QA pending/partial |
 
 ## Dependencies
 
