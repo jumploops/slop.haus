@@ -52,6 +52,10 @@ export function formatVotes(up: number, down: number): string {
   return `+${up} / -${down}`;
 }
 
+export function isRecentDate(date: Date | string, durationMs: number): boolean {
+  return Date.now() - new Date(date).getTime() < durationMs;
+}
+
 export function getPlaceholderImage(title: string): string {
   const placeholders = [
     "/colorful-email-app-interface-with-mood-indicators.jpg",

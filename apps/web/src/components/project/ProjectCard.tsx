@@ -5,8 +5,8 @@ import { MessageCircle, ExternalLink, ChevronUp, Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
-import { cn, formatRelativeTime, getPlaceholderImage } from "@/lib/utils";
+import { useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { cn, formatRelativeTime, getPlaceholderImage, isRecentDate } from "@/lib/utils";
 import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
 import { getSlopBandForAggregateScore, getSlopBandTerm } from "@slop/shared";
@@ -47,15 +47,12 @@ export function ProjectCard({
   const router = useRouter();
   const isGrid = variant === "grid";
   const isLarge = variant === "list-lg";
-  const [localLikeCount, setLocalLikeCount] = useState(project.likeCount);
+  const [localLikeCountOverride, setLocalLikeCountOverride] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const localLikeCount = localLikeCountOverride ?? project.likeCount;
   const { likeState, submitLike, isLiking } = useLike(project.slug, {
-    onLikeSuccess: (result) => setLocalLikeCount(result.likeCount),
+    onLikeSuccess: (result) => setLocalLikeCountOverride(result.likeCount),
   });
-
-  useEffect(() => {
-    setLocalLikeCount(project.likeCount);
-  }, [project.likeCount]);
   const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavorite(
     project.slug,
     { onSuccess: onFavoriteChange }
@@ -64,7 +61,7 @@ export function ProjectCard({
   const cardRef = useRef<HTMLElement | null>(null);
 
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
-  const isNew = Date.now() - new Date(project.createdAt).getTime() < 2 * 24 * 60 * 60 * 1000;
+  const isNew = isRecentDate(project.createdAt, 2 * 24 * 60 * 60 * 1000);
   const slopBand = getSlopBandForAggregateScore(project.slopScore, project.reviewCount);
   const slopScore = project.reviewCount === 0 ? "—" : formatSlopScore(project.slopScore);
   const slopTerm = getSlopBandTerm(slopBand);

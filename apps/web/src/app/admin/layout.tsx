@@ -43,7 +43,7 @@ export default function AdminLayout({
         <div className="border-2 border-destructive bg-card p-6 text-center">
           <h1 className="text-xl font-bold text-destructive mb-2">Unauthorized</h1>
           <p className="text-xs text-muted-foreground mb-4">
-            You don't have permission to access this page.
+            You don&apos;t have permission to access this page.
           </p>
           <Link href="/">
             <Button variant="primary">Go Home</Button>

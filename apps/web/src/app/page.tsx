@@ -34,6 +34,13 @@ const windowOptions: { value: WindowOption; label: string }[] = [
   { value: "all", label: "All time" },
 ];
 
+function getStoredDisplayMode(stored: string | null): DisplayMode | null {
+  if (stored !== "list-sm" && stored !== "list-lg" && stored !== "grid") {
+    return null;
+  }
+  return stored;
+}
+
 export default function FeedPage() {
   const { data: session } = useSession();
   const { enabled: slopEnabled } = useSlopMode();
@@ -64,20 +71,28 @@ export default function FeedPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const dismissed = window.localStorage.getItem("slop:feedIntroDismissed");
-    setShowIntro(dismissed !== "true");
-  }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem("slop:feedDisplayMode");
-    if (stored === "list-sm" || stored === "list-lg" || stored === "grid") {
-      if (stored === "list-lg" && !window.matchMedia("(min-width: 640px)").matches) {
+    const isDismissed = window.localStorage.getItem("slop:feedIntroDismissed") === "true";
+    const storedDisplayMode = getStoredDisplayMode(
+      window.localStorage.getItem("slop:feedDisplayMode")
+    );
+
+    queueMicrotask(() => {
+      setShowIntro(!isDismissed);
+
+      if (!storedDisplayMode) {
+        return;
+      }
+
+      if (
+        storedDisplayMode === "list-lg" &&
+        !window.matchMedia("(min-width: 640px)").matches
+      ) {
         setDisplayMode("list-sm");
       } else {
-        setDisplayMode(stored);
+        setDisplayMode(storedDisplayMode);
       }
-    }
+    });
   }, []);
 
   useEffect(() => {

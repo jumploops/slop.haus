@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 
@@ -17,16 +17,21 @@ export function CookiePreferencesDialog({
   onClose,
   onSave,
 }: CookiePreferencesDialogProps) {
-  const [analyticsValue, setAnalyticsValue] = useState(analyticsEnabled);
+  const [analyticsDraft, setAnalyticsDraft] = useState<boolean | null>(null);
+  const analyticsValue = analyticsDraft ?? analyticsEnabled;
 
-  useEffect(() => {
-    if (open) {
-      setAnalyticsValue(analyticsEnabled);
-    }
-  }, [open, analyticsEnabled]);
+  const handleClose = () => {
+    setAnalyticsDraft(null);
+    onClose();
+  };
+
+  const handleSave = () => {
+    onSave(analyticsValue);
+    setAnalyticsDraft(null);
+  };
 
   return (
-    <Modal isOpen={open} onClose={onClose} title="Privacy choices">
+    <Modal isOpen={open} onClose={handleClose} title="Privacy choices">
       <div className="space-y-4">
         <p className="text-xs text-muted-foreground">
           Necessary cookies stay on. You can choose whether analytics cookies
@@ -64,7 +69,7 @@ export function CookiePreferencesDialog({
                 type="checkbox"
                 className="h-4 w-4 accent-primary"
                 checked={analyticsValue}
-                onChange={(event) => setAnalyticsValue(event.target.checked)}
+                onChange={(event) => setAnalyticsDraft(event.target.checked)}
               />
               Enable
             </label>
@@ -75,11 +80,11 @@ export function CookiePreferencesDialog({
           <Button
             size="sm"
             variant="primary"
-            onClick={() => onSave(analyticsValue)}
+            onClick={handleSave}
           >
             Save choices
           </Button>
-          <Button size="sm" variant="secondary" onClick={onClose}>
+          <Button size="sm" variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
         </div>
@@ -87,4 +92,3 @@ export function CookiePreferencesDialog({
     </Modal>
   );
 }
-

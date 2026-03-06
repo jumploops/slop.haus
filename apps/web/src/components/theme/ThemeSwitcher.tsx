@@ -1,18 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useIsClient } from "@/hooks/useIsClient";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
+  if (!isClient) {
     return (
       <div className="flex h-8 w-8 items-center justify-center border-2 border-dashed border-border">
         <span className="sr-only">Loading theme toggle</span>

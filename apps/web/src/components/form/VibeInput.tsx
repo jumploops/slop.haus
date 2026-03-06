@@ -46,7 +46,7 @@ export function VibeInput({
     <div className="mb-6">
       <div className="mb-4 flex flex-wrap items-start gap-3">
         <p className="flex-1 text-xs text-muted-foreground">
-          How much of this project was "vibecoded" (AI-assisted)?
+          How much of this project was vibecoded (AI-assisted)?
         </p>
 
         <Tabs

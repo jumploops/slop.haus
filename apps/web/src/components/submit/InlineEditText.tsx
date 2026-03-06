@@ -26,13 +26,6 @@ export function InlineEditText({
   const [editValue, setEditValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Sync editValue when value prop changes
-  useEffect(() => {
-    if (!isEditing) {
-      setEditValue(value);
-    }
-  }, [value, isEditing]);
-
   const handleClick = useCallback(() => {
     setIsEditing(true);
     setEditValue(value);

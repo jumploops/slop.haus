@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 import { fetchGitHubRepos } from "@/lib/api/auth";
 import { Button } from "@/components/ui/Button";
@@ -26,7 +26,7 @@ export function GitHubRepoPicker({
     fetchGitHubRepos
   );
 
-  const repos = useMemo(() => {
+  const repos = (() => {
     if (!data?.repos) return [];
     const query = search.trim().toLowerCase();
     if (!query) return data.repos;
@@ -35,7 +35,7 @@ export function GitHubRepoPicker({
       const haystacks = [repo.name, repo.fullName, repo.description || ""];
       return haystacks.some((value) => value.toLowerCase().includes(query));
     });
-  }, [data?.repos, search]);
+  })();
 
   if (isRepoListLoading) {
     return (

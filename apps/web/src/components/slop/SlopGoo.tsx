@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useLayoutEffect, useMemo, useState, type CSSProperties, type RefObject } from "react";
 import { createPortal } from "react-dom";
+import { useIsClient } from "@/hooks/useIsClient";
 import { getElementQuad, pickDownmostEdge } from "@/lib/slop/geometry";
 import { mulberry32, randomSeed } from "@/lib/slop/random";
 import type { Attach, Point } from "@/lib/slop/types";
@@ -88,8 +89,9 @@ export function SlopGoo({
   zIndex = 5000,
   enabled = true,
 }: SlopGooProps) {
-  const [seed, setSeed] = useState<number | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
+  const [generatedSeed] = useState(() => seedOverride ?? randomSeed());
+  const seed = seedOverride ?? generatedSeed;
   const [geom, setGeom] = useState<null | {
     left: number;
     top: number;
@@ -107,22 +109,8 @@ export function SlopGoo({
   const prefersReducedMotion = usePrefersReducedMotion();
   const showDrips = !prefersReducedMotion && dripCount > 0;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!enabled) return;
-    if (seedOverride !== undefined && seedOverride !== null) {
-      setSeed(seedOverride);
-      return;
-    }
-    setSeed((prev) => prev ?? randomSeed());
-  }, [enabled, seedOverride]);
-
   useLayoutEffect(() => {
     if (!enabled) {
-      setGeom(null);
       return;
     }
     const el = targetRef.current;
@@ -258,7 +246,7 @@ export function SlopGoo({
   }, [attach, blur, borderOffset, edgeInset, edgeInsetLowEnd, edgeOffset, enabled, maxDrop, renderMode, targetRef, thickness, useBorderOffset]);
 
   const shapes = useMemo(() => {
-    if (!geom || seed === null) return null;
+    if (!geom) return null;
 
     const rand = mulberry32(seed);
     const spacing = Math.max(6, beadSpacing);
@@ -310,9 +298,9 @@ export function SlopGoo({
     return { beads, poolBlobs, drips };
   }, [beadSpacing, dripCount, geom, maxDrop, poolBias, seed, showDrips, thickness, viscositySeconds]);
 
-  if (!enabled || !mounted || !geom || !shapes) return null;
+  if (!enabled || !isClient || !geom || !shapes) return null;
 
-  const seedValue = seed ?? 1;
+  const seedValue = seed;
   const { left, top, width, height, b0, b1, mode } = geom;
   const dx = b1.x - b0.x;
   const dy = b1.y - b0.y;
