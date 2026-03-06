@@ -38,10 +38,10 @@ The target is a simple, robust architecture, not a broad feed rewrite.
 - It also does not forward request cookies explicitly on the server side.
 - Feed is public today, so cookie forwarding is not required for correctness, but the coupling is still weak.
 
-### Existing envs already support a server-only API base
-- The repo already defines `API_URL` in [`.env`](/Users/adam/code/slop.haus/.env), [`.env.prod`](/Users/adam/code/slop.haus/.env.prod), and [`.env.example`](/Users/adam/code/slop.haus/.env.example).
-- [`apps/web/src/lib/api.ts`](/Users/adam/code/slop.haus/apps/web/src/lib/api.ts) currently uses `NEXT_PUBLIC_API_URL` because it runs in the browser.
-- For server-side feed bootstrap, `apps/web` can read `process.env.API_URL` directly without exposing it to the client.
+### Existing envs already support a shared API base
+- The repo already defines `API_URL` and `NEXT_PUBLIC_API_URL` in [`.env`](/Users/adam/code/slop.haus/.env), [`.env.prod`](/Users/adam/code/slop.haus/.env.prod), and [`.env.example`](/Users/adam/code/slop.haus/.env.example).
+- [`apps/web/src/lib/api.ts`](/Users/adam/code/slop.haus/apps/web/src/lib/api.ts) already uses `NEXT_PUBLIC_API_URL` for browser fetches.
+- In practice, `web` and `api` run as separate services and use the same deployed API base, so the SSR helper can safely reuse `process.env.NEXT_PUBLIC_API_URL`.
 
 ## Decisions
 
@@ -129,7 +129,7 @@ Responsibilities:
 
 - build the feed query string
 - fetch `GET /api/v1/projects?...`
-- use `process.env.API_URL` as the base URL
+- use `process.env.NEXT_PUBLIC_API_URL` as the base URL
 - set explicit caching semantics for the feed SSR request
 - return `FeedResponse`
 
@@ -140,7 +140,7 @@ Caching for v1:
 Reasoning:
 - Feed freshness matters.
 - `hot` ordering and new submissions should not be silently cached by Next server fetch.
-- Reusing `API_URL` keeps the env story simple and avoids adding another nearly-identical variable.
+- Reusing `NEXT_PUBLIC_API_URL` matches the existing browser data path and the current separate-service deployment model.
 
 ### 6) Preserve client-only UI concerns as client-only
 Do not move these into SSR logic:
@@ -172,7 +172,7 @@ Reasoning:
 
 1. Request hits `/` or `/?sort=...&window=...`.
 2. Server page parses and validates `sort` and `window`.
-3. Server page fetches page 1 of that feed view using `API_URL` and `cache: "no-store"`.
+3. Server page fetches page 1 of that feed view using `NEXT_PUBLIC_API_URL` and `cache: "no-store"`.
 4. Server renders HTML with real project cards when fetch succeeds.
 5. Client shell hydrates with `initialFeed`, `initialSort`, and `initialWindow`.
 6. `useSWRInfinite(...)` uses the SSR data as page 1 and does not immediately revalidate it.
@@ -185,7 +185,7 @@ Reasoning:
 - new: `apps/web/src/components/feed/FeedPageClient.tsx`
 - new: `apps/web/src/lib/server/feed.ts`
 - update: [`apps/web/src/lib/api/projects.ts`](/Users/adam/code/slop.haus/apps/web/src/lib/api/projects.ts) for shared feed query helpers/types if needed
-- possible env documentation update in [`.env.example`](/Users/adam/code/slop.haus/.env.example) if `apps/web` has not previously documented `API_URL` usage
+- possible env documentation update in [`.env.example`](/Users/adam/code/slop.haus/.env.example) if `apps/web` needs clearer notes around `NEXT_PUBLIC_API_URL` reuse in SSR
 
 ## Edge Cases
 
@@ -236,7 +236,7 @@ The feed response is public today, so server fetch does not need forwarded cooki
 If later requirements add user-specific fields to the feed payload:
 - the server fetch helper will need explicit cookie/header forwarding
 - caching strategy will need to be revisited
-- the `API_URL`-based helper will need an auth-aware branch
+- the `NEXT_PUBLIC_API_URL`-based helper will need an auth-aware branch
 
 ### 8) Freshness vs. performance
 `cache: "no-store"` gives the most predictable results, but it also means every request hits the API directly.
@@ -264,14 +264,14 @@ Follow-up implementation choices can still be made during planning, but the main
 - URL-backed `sort` and `window`
 - `cache: "no-store"`
 - no immediate first-page background revalidation
-- server-side feed fetch via `API_URL`
+- server-side feed fetch via `NEXT_PUBLIC_API_URL`
 
 ## Recommendation
 Implement the smallest robust version:
 
 - server wrapper page for `/`
 - URL-backed `sort` and `window`
-- dedicated server feed helper using `API_URL` with `cache: "no-store"`
+- dedicated server feed helper using `NEXT_PUBLIC_API_URL` with `cache: "no-store"`
 - new client shell seeded with `initialFeed`
 - graceful fallback to client fetch when server bootstrap fails
 

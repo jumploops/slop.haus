@@ -1,5 +1,40 @@
 # Progress Log
 
+## Feed First-Page SSR + Client Filter Transitions
+
+**Status:** Complete  
+**Last Updated:** 2026-03-06  
+**Plan Docs:** `plan/feed-first-page-ssr/`, `plan/feed-client-filter-transitions/`
+
+### Overview
+
+Improved the root feed so project cards render in the initial SSR payload, while keeping filter interactions fast and client-side after hydration.
+
+### Delivered
+
+- Added SSR bootstrap for feed page 1 on `/`
+- Added deep-link support for non-default feed views
+- Added shared feed route/query normalization helpers
+- Seeded `useSWRInfinite(...)` from SSR data to avoid duplicate first-page fetches
+- Moved live filter transitions back to client-owned state after hydration
+- Kept the URL in sync with `history.replaceState(...)` instead of App Router navigation
+- Preserved load-more pagination as client-side behavior
+- Reduced filter-transition main-thread cost by:
+  - preserving previous feed data during filter swaps
+  - memoizing `ProjectCard`
+  - marking filter swaps as React transitions
+
+### Verification
+
+- Hard-refresh SSR behavior verified for default and deep-link views
+- Filter changes verified to avoid server route rerenders
+- No hydration mismatch after the SSR/client split
+- URL stays in sync during client-side filter changes
+- `pnpm -F @slop/web run lint`
+- `pnpm -F @slop/web exec tsc --noEmit`
+
+---
+
 ## URL-First Onboarding Feature
 
 **Status:** Complete (All 8 Phases)

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Draft  
+**Status:** ✅ Implemented (2026-03-06)  
 **Owner:** Web  
 **Depends On:** None
 
@@ -14,7 +14,7 @@ This phase should produce a thin server wrapper page for `/` that:
 
 - parses `searchParams`
 - normalizes `sort` and `window`
-- fetches page 1 from the API using `API_URL`
+- fetches page 1 from the API using `NEXT_PUBLIC_API_URL`
 - passes bootstrap data into a client feed shell
 
 ## Files To Change
@@ -34,7 +34,7 @@ This phase should produce a thin server wrapper page for `/` that:
 2. Add a server-only feed bootstrap helper in `apps/web/src/lib/server/feed.ts`:
    - builds the query string
    - fetches `/api/v1/projects`
-   - uses `process.env.API_URL`
+   - uses `process.env.NEXT_PUBLIC_API_URL`
    - uses `cache: "no-store"`
    - throws on non-OK responses
 3. Convert `apps/web/src/app/page.tsx` into an async server page:
@@ -49,7 +49,7 @@ This phase should produce a thin server wrapper page for `/` that:
 
 - Keep parsing and URL generation in one helper module to avoid server/client drift.
 - Use the existing `FeedResponse` type instead of inventing a duplicate server-side shape.
-- Prefer requiring `API_URL` for the server helper rather than silently reaching for browser envs.
+- Reusing `NEXT_PUBLIC_API_URL` is acceptable here because the deployed browser and SSR paths target the same API service.
 - If Next does not clearly infer the page as dynamic from the `no-store` fetch, add route-level dynamic config only if needed.
 
 ## Conceptual Shape
@@ -80,12 +80,12 @@ return (
 - [ ] `/?sort=new`, `/?sort=top&window=30d`, and `/?window=7d` resolve to the expected normalized values.
 - [ ] Invalid params fall back to `hot` / `all`.
 - [ ] When the API request fails, the page still renders and passes `initialFeed = null`.
-- [ ] `API_URL` is the only base used by the server helper.
+- [ ] `NEXT_PUBLIC_API_URL` is the base used by the server helper, with localhost fallback in local dev.
 - [ ] `pnpm -F @slop/web exec tsc --noEmit`
 
 ## Risks / Watchpoints
 
-1. Missing `API_URL` in the web runtime will break SSR bootstrap unless the failure path is intentionally handled.
+1. Missing `NEXT_PUBLIC_API_URL` in the web runtime will force the localhost fallback; that is acceptable in local dev but should be explicit in deployed environments.
 2. Inbound invalid query params can still leave a non-canonical URL in the address bar unless we explicitly redirect, which is out of scope for this phase.
 3. Server bootstrap introduces a new dependency from web runtime to API runtime availability.
 

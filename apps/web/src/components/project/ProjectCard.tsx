@@ -5,7 +5,7 @@ import { MessageCircle, ExternalLink, ChevronUp, Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
-import { useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { memo, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { cn, formatRelativeTime, getPlaceholderImage, isRecentDate } from "@/lib/utils";
 import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
@@ -35,7 +35,7 @@ interface ProjectCardProps {
   sloppy?: boolean;
 }
 
-export function ProjectCard({
+function ProjectCardComponent({
   project,
   showFavoriteButton,
   onFavoriteChange,
@@ -486,3 +486,6 @@ function getSlopIndex(seed: string) {
   }
   return Math.abs(hash);
 }
+
+export const ProjectCard = memo(ProjectCardComponent);
+ProjectCard.displayName = "ProjectCard";

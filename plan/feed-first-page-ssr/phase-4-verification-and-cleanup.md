@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Draft  
+**Status:** ✅ Completed (2026-03-06)  
 **Owner:** Web  
 **Depends On:** Phase 3
 
@@ -32,7 +32,7 @@ Verify that SSR feed bootstrap is actually happening, that the client does not i
 3. Verify failure behavior:
    - API unavailable during SSR bootstrap
    - invalid `sort` and `window` params
-   - missing or misconfigured `API_URL`
+   - missing or misconfigured `NEXT_PUBLIC_API_URL`
 4. Verify interactive behavior:
    - intro dismissal/reset
    - display mode persistence
@@ -54,15 +54,15 @@ Verify that SSR feed bootstrap is actually happening, that the client does not i
 
 ## Verification Checklist
 
-- [ ] Initial HTML contains actual project content for the active feed view.
-- [ ] Skeletons are not the only initial payload when SSR bootstrap succeeds.
-- [ ] No hydration mismatch is introduced by the server/client split.
-- [ ] No immediate duplicate page-1 request occurs after hydration.
-- [ ] Page-2+ requests still happen through the client load-more path.
-- [ ] Invalid query params normalize safely.
-- [ ] Missing `API_URL` fails in a diagnosable way and does not white-screen the route.
-- [ ] `pnpm -F @slop/web run lint`
-- [ ] `pnpm -F @slop/web exec tsc --noEmit`
+- [x] Initial HTML contains actual project content for the active feed view.
+- [x] Skeletons are not the only initial payload when SSR bootstrap succeeds.
+- [x] No hydration mismatch is introduced by the server/client split.
+- [x] No immediate duplicate page-1 request occurs after hydration.
+- [x] Page-2+ requests still happen through the client load-more path.
+- [x] Invalid query params normalize safely.
+- [x] Missing `NEXT_PUBLIC_API_URL` falls back predictably in local dev and is configured explicitly in deployed environments.
+- [x] `pnpm -F @slop/web run lint`
+- [x] `pnpm -F @slop/web exec tsc --noEmit`
 
 ## Risks / Watchpoints
 

@@ -12,7 +12,9 @@ The implementation should keep the current interactive feed behavior intact whil
 - intro dismissal, display mode, and slop mode remain client-only
 - failed SSR bootstrap degrades gracefully to the current client-fetch path
 
-## Status: Draft
+Interactive filter transitions were later refined in the follow-up plan at [plan/feed-client-filter-transitions/README.md](/Users/adam/code/slop.haus/plan/feed-client-filter-transitions/README.md), so this document tracks the SSR bootstrap foundation rather than the final transition model.
+
+## Status: Complete
 
 **Last Updated:** 2026-03-06  
 **Owner:** Web
@@ -23,21 +25,21 @@ The implementation should keep the current interactive feed behavior intact whil
 2. Use `cache: "no-store"` for the server feed fetch.
 3. Do not immediately background-revalidate page 1 on hydration.
 4. Make `sort` and `window` URL-backed in v1.
-5. Use `process.env.API_URL` for the server-side feed fetch helper.
+5. Use `process.env.NEXT_PUBLIC_API_URL` for the server-side feed fetch helper.
 6. Keep load-more pagination client-only in v1.
 7. Keep intro dismissal, display mode, and slop mode client-only.
 8. Gracefully fall back to client fetch if server bootstrap fails.
 9. Omit default query params from canonical feed URLs when possible.
-10. Prefer `router.replace(...)` for feed-control navigation to avoid noisy history.
+10. Keep feed URLs synchronized in v1; the shipped implementation uses client-side history updates for live filter changes.
 
 ## Phase Summary
 
 | Phase | Name | Status | Description |
 | --- | --- | --- | --- |
-| 1 | [Route Contract + Server Bootstrap](./phase-1-route-contract-and-server-bootstrap.md) | Draft | Add feed query normalization, server fetch helper, and server wrapper page |
-| 2 | [Client Shell + SWR Bootstrap](./phase-2-client-shell-and-swr-bootstrap.md) | Draft | Extract the current feed UI into a client component seeded from SSR data |
-| 3 | [URL-Backed Controls + Navigation](./phase-3-url-backed-controls-and-navigation.md) | Draft | Make sort/window controls drive search params and reset pagination cleanly |
-| 4 | [Verification + Cleanup](./phase-4-verification-and-cleanup.md) | Draft | Validate SSR behavior, fallback paths, and env/runtime correctness |
+| 1 | [Route Contract + Server Bootstrap](./phase-1-route-contract-and-server-bootstrap.md) | ✅ Implemented | Added feed query normalization, server fetch helper, and server wrapper page |
+| 2 | [Client Shell + SWR Bootstrap](./phase-2-client-shell-and-swr-bootstrap.md) | ✅ Implemented | Extracted the feed UI into a client component seeded from SSR data |
+| 3 | [URL-Backed Controls + Navigation](./phase-3-url-backed-controls-and-navigation.md) | ✅ Implemented | URL-backed feed state shipped; live filter transitions were later refined in the follow-up client-transition plan |
+| 4 | [Verification + Cleanup](./phase-4-verification-and-cleanup.md) | ✅ Completed | Browser QA confirmed SSR bootstrap, deep-link behavior, and client recovery behavior |
 
 ## Dependencies
 
@@ -53,7 +55,7 @@ Phase 1 (server route contract + bootstrap helper)
 ### Milestone 1: Server Bootstrap Ready
 - `/` is a server page again.
 - Route search params are parsed and normalized consistently.
-- Page 1 of the feed can be fetched on the server via `API_URL`.
+- Page 1 of the feed can be fetched on the server via `NEXT_PUBLIC_API_URL`.
 
 ### Milestone 2: Interactive Feed Preserved
 - Existing feed UI lives in a dedicated client shell.
@@ -79,7 +81,7 @@ Phase 1 (server route contract + bootstrap helper)
 
 ## Cross-Cutting Risks
 
-1. `API_URL` may be present in API runtime but not web runtime in some environments.
+1. `NEXT_PUBLIC_API_URL` must be present or fall back cleanly in the web runtime for both browser and SSR fetch paths.
 2. URL state can become split-brain if search-param parsing and client URL generation do not share one normalization contract.
 3. `useSWRInfinite(...)` can issue an unnecessary first-page refetch if seeded/configured incorrectly.
 4. Route changes can leave stale paginated pages visible if the client shell is not reset cleanly per feed view.
