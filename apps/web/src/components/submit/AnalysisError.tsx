@@ -25,7 +25,10 @@ export function AnalysisError({
   // Handle countdown for rate limit wait
   useEffect(() => {
     if (recovery.action === "wait" && recovery.waitSeconds) {
-      setWaitRemaining(recovery.waitSeconds);
+      const waitSeconds = recovery.waitSeconds;
+      queueMicrotask(() => {
+        setWaitRemaining(waitSeconds);
+      });
 
       const interval = setInterval(() => {
         setWaitRemaining((prev) => {

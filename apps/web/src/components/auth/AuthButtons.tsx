@@ -8,13 +8,14 @@ import { signOut, useSession } from "@/lib/auth-client";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { useLoginModal } from "@/hooks/useLoginModal";
+import { useIsClient } from "@/hooks/useIsClient";
 import { useSlopMode } from "@/lib/slop-mode";
 
 export function AuthButtons() {
   const { data: session, isPending } = useSession();
   const { theme, setTheme } = useTheme();
+  const isClient = useIsClient();
   const { enabled: slopEnabled, toggle: toggleSlop } = useSlopMode();
-  const [mounted, setMounted] = useState(false);
   const { openLoginModal } = useLoginModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -30,10 +31,6 @@ export function AuthButtons() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const cycleTheme = () => {
     if (theme === "system") {
       setTheme("light");
@@ -44,7 +41,7 @@ export function AuthButtons() {
     }
   };
 
-  const themeLabel = mounted ? getThemeLabel(theme) : "System";
+  const themeLabel = isClient ? getThemeLabel(theme) : "System";
   const slopLabel = slopEnabled ? "On" : "Off";
   const isRegisteredUser = Boolean(session?.user && !session.user.isAnonymous);
 

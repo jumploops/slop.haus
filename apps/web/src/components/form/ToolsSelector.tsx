@@ -163,7 +163,7 @@ export function ToolsSelector({
           )}
           {!isLoading && availableTools?.length === 0 && search && (
             <div className="px-4 py-3 text-xs text-muted-foreground space-y-1">
-              <div>No tools found for "{search}"</div>
+              <div>No tools found for &quot;{search}&quot;</div>
               <div>Press Enter to add it as a new tag.</div>
             </div>
           )}

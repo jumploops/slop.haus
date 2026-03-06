@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "slop:mode";
+const SLOP_MODE_CHANGE_EVENT = "slop:mode-change";
 
 interface SlopModeContextValue {
   enabled: boolean;
@@ -12,32 +13,53 @@ interface SlopModeContextValue {
 
 const SlopModeContext = createContext<SlopModeContextValue | null>(null);
 
-export function SlopModeProvider({ children }: { children: React.ReactNode }) {
-  const [enabled, setEnabled] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
+function getServerSnapshot() {
+  return true;
+}
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "off") {
-      setEnabled(false);
-    } else if (stored === "on") {
-      setEnabled(true);
+function getClientSnapshot() {
+  return window.localStorage.getItem(STORAGE_KEY) !== "off";
+}
+
+function subscribe(onStoreChange: () => void) {
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY) {
+      onStoreChange();
     }
-    setIsInitialized(true);
+  };
+  const handleLocalChange = () => onStoreChange();
+
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(SLOP_MODE_CHANGE_EVENT, handleLocalChange);
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(SLOP_MODE_CHANGE_EVENT, handleLocalChange);
+  };
+}
+
+function writeSlopMode(enabled: boolean) {
+  window.localStorage.setItem(STORAGE_KEY, enabled ? "on" : "off");
+  window.dispatchEvent(new Event(SLOP_MODE_CHANGE_EVENT));
+}
+
+export function SlopModeProvider({ children }: { children: React.ReactNode }) {
+  const enabled = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+
+  const setEnabled = useCallback((value: boolean) => {
+    writeSlopMode(value);
   }, []);
 
-  useEffect(() => {
-    if (!isInitialized) return;
-    window.localStorage.setItem(STORAGE_KEY, enabled ? "on" : "off");
-  }, [enabled, isInitialized]);
+  const toggle = useCallback(() => {
+    writeSlopMode(!enabled);
+  }, [enabled]);
 
   const value = useMemo(
     () => ({
       enabled,
       setEnabled,
-      toggle: () => setEnabled((prev) => !prev),
+      toggle,
     }),
-    [enabled]
+    [enabled, setEnabled, toggle]
   );
 
   return <SlopModeContext.Provider value={value}>{children}</SlopModeContext.Provider>;

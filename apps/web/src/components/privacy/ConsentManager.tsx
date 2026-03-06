@@ -37,7 +37,9 @@ export function ConsentManager() {
 
   useEffect(() => {
     if (!isCookieBannerEnabled()) {
-      setIsReady(true);
+      queueMicrotask(() => {
+        setIsReady(true);
+      });
       return;
     }
 
@@ -47,10 +49,12 @@ export function ConsentManager() {
       ? parsedConsent
       : null;
 
-    setContext(nextContext);
-    setConsentState(nextConsent);
-    setBannerOpen(nextContext.required && !nextConsent);
-    setIsReady(true);
+    queueMicrotask(() => {
+      setContext(nextContext);
+      setConsentState(nextConsent);
+      setBannerOpen(nextContext.required && !nextConsent);
+      setIsReady(true);
+    });
   }, []);
 
   useEffect(() => {

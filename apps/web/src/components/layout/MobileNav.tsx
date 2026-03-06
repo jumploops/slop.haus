@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { signIn, signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { useIsClient } from "@/hooks/useIsClient";
 import { useSlopMode } from "@/lib/slop-mode";
 
 interface MobileNavProps {
@@ -18,8 +19,8 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
   const { theme, setTheme } = useTheme();
+  const isClient = useIsClient();
   const { enabled: slopEnabled, toggle: toggleSlop } = useSlopMode();
-  const [mounted, setMounted] = useState(false);
 
   // Close on route change
   useEffect(() => {
@@ -38,10 +39,6 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const cycleTheme = () => {
     if (theme === "system") {
       setTheme("light");
@@ -56,7 +53,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const isAdmin = isRegisteredUser && session?.user?.role === "admin";
   const isMod = isRegisteredUser && session?.user?.role === "mod";
   const showAdminLink = isAdmin || isMod;
-  const themeLabel = mounted ? getThemeLabel(theme) : "System";
+  const themeLabel = isClient ? getThemeLabel(theme) : "System";
   const slopLabel = slopEnabled ? "On" : "Off";
 
   return (

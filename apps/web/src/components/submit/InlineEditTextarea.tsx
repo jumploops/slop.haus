@@ -24,13 +24,6 @@ export function InlineEditTextarea({
   const [editValue, setEditValue] = useState(value);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Sync editValue when value prop changes
-  useEffect(() => {
-    if (!isEditing) {
-      setEditValue(value);
-    }
-  }, [value, isEditing]);
-
   // Auto-resize textarea
   const adjustHeight = useCallback(() => {
     const textarea = textareaRef.current;

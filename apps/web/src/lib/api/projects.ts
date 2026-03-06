@@ -1,5 +1,6 @@
 import { apiGet, apiPost, apiPatch, apiDelete, apiPostFormData } from "../api";
 import type { FeedQuery, CreateProjectInput, UpdateProjectInput } from "@slop/shared";
+import { buildFeedApiQueryString } from "@/lib/feed-query";
 
 export interface ProjectMedia {
   id: string;
@@ -106,13 +107,7 @@ export interface ProjectRevision {
 }
 
 export async function fetchFeed(query: Partial<FeedQuery> = {}): Promise<FeedResponse> {
-  const params = new URLSearchParams();
-  if (query.sort) params.set("sort", query.sort);
-  if (query.window) params.set("window", query.window);
-  if (query.page) params.set("page", String(query.page));
-  if (query.limit) params.set("limit", String(query.limit));
-
-  const qs = params.toString();
+  const qs = buildFeedApiQueryString(query);
   return apiGet<FeedResponse>(`/projects${qs ? `?${qs}` : ""}`);
 }
 
