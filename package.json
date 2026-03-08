@@ -6,6 +6,7 @@
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
+    "chrome:project": "node scripts/open-project-chrome.mjs",
     "db:generate": "pnpm --filter @slop/db run generate",
     "db:migrate": "pnpm --filter @slop/db run migrate",
     "db:migrate:prod": "pnpm --filter @slop/db run migrate:prod",

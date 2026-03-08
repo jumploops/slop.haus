@@ -33,3 +33,6 @@ coverage/
 
 # Local file store
 uploads/
+
+# Local browser profiles / perf tooling
+.chrome/
