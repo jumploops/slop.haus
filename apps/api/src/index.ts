@@ -50,6 +50,11 @@ app.get("/health", (c) => {
 // Static file serving for uploads (local storage only)
 const storageType = process.env.STORAGE_TYPE || "local";
 if (storageType === "local") {
+  app.use("/uploads/*", async (c, next) => {
+    await next();
+    c.header("Cache-Control", "public, max-age=31536000, immutable");
+  });
+
   app.use(
     "/uploads/*",
     serveStatic({

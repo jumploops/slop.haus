@@ -22,9 +22,9 @@ The current working theory is:
 
 1. The Phase 2 first pass appears to have fixed the dominant late client-only LCP path in local runs by moving intro and consent state into the initial render.
 2. `SlopGoo` is still a confirmed forced-layout contributor above the fold and should stay under verification until a post-change trace confirms the reduced cost.
-3. Feed screenshots are still downloading on mobile even when hidden by CSS, including the featured S3 screenshot path.
-4. Screenshot delivery and cache headers are still contributing to the `Use efficient cache lifetimes` warning.
-5. Per-card `like-state` fan-out and other non-critical client boot work remain likely next-order contributors now that the worst above-the-fold delay has been removed locally.
+3. The Phase 3 first pass appears to have removed hidden mobile screenshot requests in local runs by preventing mobile list thumbnails from mounting and moving visible feed images onto a responsive path.
+4. New uploads and local `/uploads/*` responses now have immutable cache headers in code, but older S3 screenshot objects still need metadata refresh or replacement before live-header verification is complete.
+5. The Phase 4 first pass materially reduced the measured `like-state` and visitor-count request fan-out, but shared auth/session boot is still present and is now the clearest remaining client-boot target.
 
 This plan keeps scope centered on the root feed and shared feed-card surfaces first. It does not treat broad bundle modernization or whole-site redesign as part of this effort.
 
@@ -45,9 +45,13 @@ This plan keeps scope centered on the root feed and shared feed-card surfaces fi
 | --- | --- | --- | --- |
 | 1 | [Baseline + Decision Gates](./phase-1-baseline-and-decision-gates.md) | Completed | Confirmed the late mobile LCP candidates, hidden image requests, cache/header behavior, and that the server path is not the first fix target |
 | 2 | [Above-the-Fold LCP + Reflow Reduction](./phase-2-above-the-fold-lcp-and-reflow.md) | In Progress | Eliminate late client-only intro/consent LCP candidates and reduce or defer expensive above-the-fold measurement/effects |
-| 3 | [Image Delivery + Cache Policy](./phase-3-image-delivery-and-cache-policy.md) | Planned | Stop hidden mobile image requests, optimize feed thumbnails, and harden real screenshot caching on the live delivery path |
-| 4 | [Non-Critical Boot + Server Path](./phase-4-non-critical-boot-and-server-path.md) | Planned | Defer startup work that is not needed for first paint, cut `like-state` fan-out, and only revisit feed SSR fetch strategy if later measurements justify it |
-| 5 | [Verification + Regression Guardrails](./phase-5-verification-and-regression-guardrails.md) | Planned | Re-run PSI/trace/network checks, complete QA matrix, and document final outcomes |
+| 3 | [Image Delivery + Cache Policy](./phase-3-image-delivery-and-cache-policy.md) | In Progress | Stop hidden mobile image requests, optimize feed thumbnails, and harden real screenshot caching on the live delivery path |
+| 4 | [Non-Critical Boot + Server Path](./phase-4-non-critical-boot-and-server-path.md) | In Progress | Defer startup work that is not needed for first paint, cut `like-state` fan-out, and only revisit feed SSR fetch strategy if later measurements justify it |
+| 5 | [Verification + Regression Guardrails](./phase-5-verification-and-regression-guardrails.md) | In Progress | Re-run PSI/trace/network checks, complete QA matrix, and document final outcomes |
+
+## Supporting Docs
+
+- [Deferred Work](./deferred-work.md)
 
 ## Dependency Graph
 

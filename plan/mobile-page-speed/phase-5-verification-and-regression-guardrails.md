@@ -1,6 +1,6 @@
 # Phase 5: Verification + Regression Guardrails
 
-**Status:** Planned  
+**Status:** In Progress  
 **Owner:** Web + API  
 **Depends On:** Phase 4
 
@@ -12,6 +12,7 @@ Verify that the implemented changes actually improved mobile performance, did no
 
 - [/Users/adam/code/slop.haus/debug/feed-mobile-pagespeed-discrepancy.md](/Users/adam/code/slop.haus/debug/feed-mobile-pagespeed-discrepancy.md)
 - [/Users/adam/code/slop.haus/plan/mobile-page-speed/README.md](/Users/adam/code/slop.haus/plan/mobile-page-speed/README.md)
+- [/Users/adam/code/slop.haus/plan/mobile-page-speed/deferred-work.md](/Users/adam/code/slop.haus/plan/mobile-page-speed/deferred-work.md)
 - possible summary doc touch:
   - [/Users/adam/code/slop.haus/PR_SUMMARY.md](/Users/adam/code/slop.haus/PR_SUMMARY.md)
 - any small cleanup in implementation files touched by earlier phases
@@ -26,7 +27,8 @@ Verify that the implemented changes actually improved mobile performance, did no
    - no late fallback from intro to consent banner when intro is dismissed
 3. Re-run Network validation and confirm:
    - hidden mobile thumbnails are not requested
-   - screenshot/upload cache headers are present and correct
+   - screenshot/upload cache headers are present and correct for the asset generation path being validated
+   - any historical S3 screenshot still used for verification has been refreshed or explicitly called out as pre-fix metadata
 4. Compare before/after metrics against the baseline recorded in Phase 1.
 5. Run manual QA for:
    - intro visible
@@ -39,6 +41,31 @@ Verify that the implemented changes actually improved mobile performance, did no
    - `pnpm -F @slop/web exec tsc --noEmit`
    - `pnpm -F @slop/api exec tsc --noEmit`
 7. Update docs with final confirmed outcomes, remaining limitations, and any follow-up work intentionally deferred.
+
+## Progress Notes
+
+- 2026-03-09: Local mobile before/after comparison is now strong enough to start Phase 5 documentation:
+  - baseline default artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-2026-03-08T01-18-04-638Z.json`
+  - baseline intro-dismissed artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T08-47-54-360Z.json`
+  - current default artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-default-2026-03-09T22-32-17-627Z.json`
+  - current intro-dismissed artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T22-32-15-440Z.json`
+- 2026-03-09: Current local mobile comparison:
+  - default-path LCP improved from `20292 ms` to `1652 ms`
+  - default-path FCP is now `1652 ms`, with the above-the-fold LCP candidate present in the initial render window instead of appearing as a very-late client-only reveal
+  - intro-dismissed-path LCP improved from `21544 ms` to `1272 ms`
+  - hidden mobile image requests remain at `0`
+  - first-load `like-state` fan-out fell from `21 GET + 21 OPTIONS` to `4 GET + 0 OPTIONS` on the default path and `5 GET + 0 OPTIONS` on the intro-dismissed path
+- 2026-03-09: Static verification status:
+  - `pnpm -F @slop/web run lint` passes with `0` errors and warnings only
+  - `pnpm -F @slop/web exec tsc --noEmit` passes
+  - `pnpm -F @slop/api exec tsc --noEmit` passes
+  - `pnpm -F @slop/worker exec tsc --noEmit` passes
+- 2026-03-09: Remaining gaps before Phase 5 can be considered complete:
+  - no fresh Lighthouse or PSI rerun is recorded yet
+  - no desktop verification pass is recorded yet
+  - no fresh forced-reflow trace is recorded yet
+  - no live S3 metadata refresh has been performed for older screenshot objects
+  - manual QA matrix is still pending
 
 ## Manual QA Matrix
 
@@ -81,10 +108,10 @@ These are guidance targets, not hard release gates:
 
 - [ ] Before/after PSI or Lighthouse results are recorded with dates.
 - [ ] Trace confirms the intended LCP/reflow improvements actually occurred.
-- [ ] Trace confirms intro-visible and intro-dismissed flows both avoid the late client-only LCP path seen in Phase 1.
+- [x] Trace confirms intro-visible and intro-dismissed flows both avoid the late client-only LCP path seen in Phase 1.
 - [ ] Network validation confirms image-request and cache-header fixes.
 - [ ] Desktop behavior remains acceptable.
-- [ ] Lint and typecheck pass.
+- [x] Lint and typecheck pass.
 - [ ] Plan and debug docs are updated with final outcomes and remaining risks.
 
 ## Exit Criteria

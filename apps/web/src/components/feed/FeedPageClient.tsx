@@ -74,6 +74,7 @@ export function FeedPageClient({
     session?.user?.role === "admin" || process.env.NODE_ENV === "development";
   const [showIntro, setShowIntro] = useState(initialShowIntro);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
+  const [canLoadDesktopListThumbnails, setCanLoadDesktopListThumbnails] = useState(false);
   const [showIntroGoo, setShowIntroGoo] = useState(false);
   const introRef = useRef<HTMLDivElement | null>(null);
   const slopIntroClass = slopEnabled ? "" : "shadow-[2px_2px_0_var(--border)]";
@@ -107,19 +108,44 @@ export function FeedPageClient({
       return;
     }
 
-    if (
+    const nextDisplayMode =
       storedDisplayMode === "list-lg" &&
       !window.matchMedia("(min-width: 640px)").matches
-    ) {
-      setDisplayMode("list-sm");
-    } else {
-      setDisplayMode(storedDisplayMode);
+        ? "list-sm"
+        : storedDisplayMode;
+
+    const rafId = window.requestAnimationFrame(() => {
+      setDisplayMode(nextDisplayMode);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
     }
+
+    const media = window.matchMedia("(min-width: 640px)");
+    const rafId = window.requestAnimationFrame(() => {
+      setCanLoadDesktopListThumbnails(media.matches);
+    });
+    const update = () => {
+      setCanLoadDesktopListThumbnails(media.matches);
+    };
+
+    media.addEventListener("change", update);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      media.removeEventListener("change", update);
+    };
   }, []);
 
   useEffect(() => {
     if (!showIntro || !slopEnabled || typeof window === "undefined") {
-      setShowIntroGoo(false);
       return;
     }
 
@@ -300,6 +326,7 @@ export function FeedPageClient({
               type="button"
               onClick={() => {
                 persistFeedIntroDismissed();
+                setShowIntroGoo(false);
                 setShowIntro(false);
               }}
               aria-label="Dismiss intro"
@@ -479,6 +506,7 @@ export function FeedPageClient({
                   project={project}
                   featured
                   variant={displayMode}
+                  canLoadListThumbnail={canLoadDesktopListThumbnails}
                   sloppy={slopEnabled}
                 />
               ))}
@@ -493,6 +521,7 @@ export function FeedPageClient({
                   project={project}
                   rank={index + 1}
                   variant={displayMode}
+                  canLoadListThumbnail={canLoadDesktopListThumbnails}
                   sloppy={slopEnabled}
                 />
               ))}
@@ -522,6 +551,7 @@ export function FeedPageClient({
           onClick={() => {
             clearFeedIntroDismissed();
             clearCookieConsentState();
+            setShowIntroGoo(false);
             setShowIntro(true);
           }}
           className="fixed bottom-4 right-4 z-50 border-2 border-dashed border-border bg-card px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:border-primary hover:text-foreground"

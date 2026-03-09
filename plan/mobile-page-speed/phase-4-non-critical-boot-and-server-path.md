@@ -1,6 +1,6 @@
 # Phase 4: Non-Critical Boot + Server Path
 
-**Status:** Planned  
+**Status:** In Progress  
 **Owner:** Web + API  
 **Depends On:** Phase 3
 
@@ -12,6 +12,9 @@ This phase is deliberately second-order. Phase 1 did not support the server/boot
 
 ## Files To Change
 
+- [/Users/adam/code/slop.haus/apps/web/src/lib/api.ts](/Users/adam/code/slop.haus/apps/web/src/lib/api.ts)
+- [/Users/adam/code/slop.haus/apps/web/src/hooks/useLike.ts](/Users/adam/code/slop.haus/apps/web/src/hooks/useLike.ts)
+- [/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx)
 - [/Users/adam/code/slop.haus/apps/web/src/app/providers.tsx](/Users/adam/code/slop.haus/apps/web/src/app/providers.tsx)
 - [/Users/adam/code/slop.haus/apps/web/src/components/auth/EnsureAnonymous.tsx](/Users/adam/code/slop.haus/apps/web/src/components/auth/EnsureAnonymous.tsx)
 - [/Users/adam/code/slop.haus/apps/web/src/components/layout/VisitorCounter.tsx](/Users/adam/code/slop.haus/apps/web/src/components/layout/VisitorCounter.tsx)
@@ -83,10 +86,32 @@ const shouldFetchLikeState = hasInteracted || isInViewport;
 fetch(url, { next: { revalidate: 30 } });
 ```
 
+## Progress Notes
+
+- 2026-03-09: Implemented a first Phase 4 pass that:
+  - removes the unnecessary `Content-Type` header from client `GET` requests so simple cross-origin fetches no longer preflight
+  - defers per-card `like-state` fetching until cards are featured, near the viewport, or interacted with
+  - defers anonymous sign-in behind an idle window
+  - defers visitor-count fetching until the footer approaches the viewport
+  - avoids initializing favorite-button session logic on feed cards that do not render a favorite button
+- 2026-03-09: Local mobile validation after that pass showed:
+  - warm default artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-default-2026-03-09T22-32-17-627Z.json`
+  - warm intro-dismissed artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T22-32-15-440Z.json`
+  - default-path total requests dropped from `69` to `26`
+  - intro-dismissed total requests dropped from `69` to `27`
+  - default-path `like-state` requests dropped from `21 GET + 21 OPTIONS` to `4 GET + 0 OPTIONS`
+  - intro-dismissed `like-state` requests dropped from `21 GET + 21 OPTIONS` to `5 GET + 0 OPTIONS`
+  - `visitor-count` requests dropped from `2` to `0` in both warm mobile paths
+  - warm default-path LCP measured `1652 ms`
+  - warm intro-dismissed-path LCP measured `1272 ms`
+- 2026-03-09: Remaining Phase 4 signal after the first pass:
+  - shared auth/session boot is still present at `3` `GET /api/auth/get-session` requests plus one anonymous sign-in `OPTIONS` and `POST`
+  - the current local evidence still does not justify changing SSR feed caching semantics ahead of the remaining client-boot work
+
 ## Verification Checklist
 
 - [ ] Above-the-fold paint no longer depends on non-critical auth or footer work.
-- [ ] First-load `like-state` fan-out is materially reduced or removed from the default feed path.
+- [x] First-load `like-state` fan-out is materially reduced or removed from the default feed path.
 - [ ] Anonymous-session behavior still works correctly after deferral.
 - [ ] Visitor counter and analytics still function, but no longer sit on the critical path.
 - [ ] Any server caching change is backed by measured TTFB improvement and documented freshness tradeoffs.
@@ -98,6 +123,7 @@ fetch(url, { next: { revalidate: 30 } });
 2. Deferring session reads in header/nav can create UX flicker if placeholders are not handled carefully.
 3. Server-side feed caching can stale the `hot` feed if the revalidate window is too long.
 4. Deferring `like-state` too aggressively can make vote affordances feel inconsistent if the loading state is not deliberate.
+5. Removing unnecessary `GET` headers reduces preflights in the split-origin local setup, but deployed request behavior should still be rechecked in the real production host arrangement.
 
 ## Exit Criteria
 

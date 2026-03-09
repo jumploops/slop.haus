@@ -44,9 +44,6 @@ export async function apiGet<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE}/api/v1${path}`, {
     method: "GET",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
   });
   return handleResponse<T>(response);
 }

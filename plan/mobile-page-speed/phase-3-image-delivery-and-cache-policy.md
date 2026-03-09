@@ -1,6 +1,6 @@
 # Phase 3: Image Delivery + Cache Policy
 
-**Status:** Planned  
+**Status:** In Progress  
 **Owner:** Web + API  
 **Depends On:** Phase 2
 
@@ -15,6 +15,7 @@ This phase addresses two related problems:
 
 ## Files To Change
 
+- [/Users/adam/code/slop.haus/apps/web/src/components/feed/FeedPageClient.tsx](/Users/adam/code/slop.haus/apps/web/src/components/feed/FeedPageClient.tsx)
 - [/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx)
 - possible shared image consumers if the same pattern is reused:
   - [/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectDetails.tsx](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectDetails.tsx)
@@ -23,7 +24,7 @@ This phase addresses two related problems:
 - [/Users/adam/code/slop.haus/apps/api/src/index.ts](/Users/adam/code/slop.haus/apps/api/src/index.ts)
 - possible supporting touch:
   - [/Users/adam/code/slop.haus/apps/api/src/lib/storage.ts](/Users/adam/code/slop.haus/apps/api/src/lib/storage.ts)
-  - [/Users/adam/code/slop.haus/apps/web/src/lib/utils.ts](/Users/adam/code/slop.haus/apps/web/src/lib/utils.ts)
+  - [/Users/adam/code/slop.haus/apps/worker/src/lib/storage.ts](/Users/adam/code/slop.haus/apps/worker/src/lib/storage.ts)
 
 ## Recommended Strategy
 
@@ -51,6 +52,24 @@ This phase addresses two related problems:
    - the S3-backed public screenshot path now matters more because it is confirmed in the default `/` flow
 7. Confirm `next.config.ts` covers the real production media host, not just localhost.
 8. Re-run Lighthouse/Network checks to confirm the transfer-size and cache-lifetime audits improve materially.
+
+## Progress Notes
+
+- 2026-03-09: Implemented a first Phase 3 pass that:
+  - moves feed-card screenshots onto `next/image`
+  - stops mounting list-mode thumbnails until a desktop viewport is confirmed, eliminating the mobile hidden-image path
+  - expands `next.config.ts` image host handling to cover both local uploads and `S3_PUBLIC_URL`
+  - applies `Cache-Control: public, max-age=31536000, immutable` to new screenshot uploads in both API and worker S3 paths, plus local `/uploads/*` responses
+- 2026-03-09: Local mobile validation after that pass showed:
+  - warm default artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-default-2026-03-09T09-42-03-271Z.json`
+  - warm intro-dismissed artifact `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T09-43-27-575Z.json`
+  - default-path hidden image requests dropped from `21` to `0`
+  - intro-dismissed hidden image requests dropped from `21` to `0`
+  - warm default-path LCP measured `972 ms`
+  - warm intro-dismissed-path LCP measured `996 ms`
+- 2026-03-09: Remaining limitation after the first pass:
+  - existing S3 screenshot objects uploaded before this change do not automatically inherit the new cache metadata
+  - live cache-header verification for the previously measured featured S3 asset still requires a metadata refresh or a new upload
 
 ## Design Notes
 
@@ -80,20 +99,20 @@ Cache-Control: public, max-age=31536000, immutable
 
 ## Verification Checklist
 
-- [ ] Mobile no longer requests thumbnails that are visually hidden in list mode.
-- [ ] Visible feed thumbnails use responsive sizing instead of raw unbounded `<img>` tags.
+- [x] Mobile no longer requests thumbnails that are visually hidden in list mode.
+- [x] Visible feed thumbnails use responsive sizing instead of raw unbounded `<img>` tags.
 - [ ] Cache headers for the live screenshot delivery path are explicit and match the selected mutability strategy.
-- [ ] Placeholder-image caching is also no longer stuck at `public, max-age=0` if those assets remain in the feed path.
-- [ ] Production media-host configuration is valid for the chosen image-loading path.
+- [x] Placeholder-image caching is no longer part of the measured mobile feed path once hidden list thumbnails are removed.
+- [x] Production media-host configuration is valid for the chosen image-loading path.
 - [ ] Lighthouse cache-lifetime and transfer-size findings improve materially.
 - [ ] No new card-layout or CLS regressions are introduced on desktop or mobile.
 
 ## Risks / Watchpoints
 
-1. `next/image` adoption can fail if remote host configuration is incomplete.
+1. `next/image` adoption can fail if remote host configuration is incomplete or diverges from the deployed public media URL.
 2. Incorrect `sizes` values can still lead to larger-than-needed downloads.
 3. Immutable caching is unsafe if screenshot URLs can be overwritten in place.
-4. Fixing only local `/uploads` headers will miss the confirmed S3-backed screenshot path.
+4. Existing S3 objects keep their old metadata until they are re-uploaded or explicitly updated.
 
 ## Exit Criteria
 

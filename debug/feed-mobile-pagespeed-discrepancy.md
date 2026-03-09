@@ -6,7 +6,7 @@
 - Opened: 2026-03-06
 - Updated: 2026-03-09
 - Assumption: the PageSpeed run is targeting the root feed page at `/`
-- Code changes: Phase 1 measurement tooling is in place; Phase 2 intro/consent/SlopGoo first-pass changes landed; hidden-image and cache-policy fixes are still pending
+- Code changes: Phase 1 measurement tooling is in place; Phase 2 intro/consent/SlopGoo first-pass changes landed; Phase 3 feed-image and upload-cache first-pass changes landed; Phase 4 non-critical boot first-pass changes landed
 
 ## Problem Statement
 
@@ -346,7 +346,146 @@ Interpretation:
 - The consent banner can still be the final LCP element in the intro-dismissed case, but it now appears in the initial render window instead of becoming a very-late fallback.
 - Hidden mobile image requests, weak screenshot caching, and `like-state` fan-out remain unchanged and now stand out more clearly as the next work items.
 
-## Current Implementation Notes
+## Phase 3 First-Pass Result
+
+### Implemented changes on 2026-03-09
+
+The first Phase 3 implementation pass changed four things:
+
+- feed card screenshots now use `next/image` instead of raw `<img>` tags
+- list-mode thumbnails are no longer rendered until a desktop viewport is confirmed, so the mobile path does not download hidden screenshots
+- `next.config.ts` now allows both local upload URLs and the configured S3 public URL for optimized loading
+- new screenshot uploads now receive `Cache-Control: public, max-age=31536000, immutable` in both API and worker S3 upload paths, and local `/uploads/*` responses now set the same header
+
+Relevant files:
+
+- [`apps/web/src/components/feed/FeedPageClient.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/feed/FeedPageClient.tsx)
+- [`apps/web/src/components/project/ProjectCard.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx)
+- [`apps/web/next.config.ts`](/Users/adam/code/slop.haus/apps/web/next.config.ts)
+- [`apps/api/src/index.ts`](/Users/adam/code/slop.haus/apps/api/src/index.ts)
+- [`apps/api/src/lib/storage.ts`](/Users/adam/code/slop.haus/apps/api/src/lib/storage.ts)
+- [`apps/worker/src/lib/storage.ts`](/Users/adam/code/slop.haus/apps/worker/src/lib/storage.ts)
+
+### Local validation after the first Phase 3 pass
+
+Warm default path:
+
+- Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-default-2026-03-09T09-42-03-271Z.json`
+- LCP: `972 ms`
+- FCP: `972 ms`
+- Document TTFB: `254.4 ms`
+- Image requests: `2`
+- Hidden image nodes requested: `0`
+- Unique hidden image assets requested: `0`
+
+Warm intro-dismissed path:
+
+- Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T09-43-27-575Z.json`
+- LCP: `996 ms`
+- FCP: `996 ms`
+- Document TTFB: `280.5 ms`
+- Image requests: `2`
+- Hidden image nodes requested: `0`
+- Unique hidden image assets requested: `0`
+
+Interpretation:
+
+- The mobile feed no longer requests hidden screenshots in either measured mobile path.
+- The previously confirmed hidden featured S3 screenshot request is gone from the warm mobile route.
+- The remaining image requests in these runs are inline SVG data URLs, not feed screenshot network requests.
+
+### Cache-policy status after the first Phase 3 pass
+
+What is now true in code:
+
+- new S3 screenshot uploads receive `Cache-Control: public, max-age=31536000, immutable`
+- local `/uploads/*` responses receive `Cache-Control: public, max-age=31536000, immutable`
+
+Important limitation:
+
+- existing S3 screenshot objects that were uploaded before this change do not automatically gain new metadata
+- the previously measured featured S3 screenshot URL was not re-uploaded during this pass, so its historical missing `Cache-Control` header should be assumed unchanged until metadata is refreshed or the asset is replaced
+
+## Phase 4 First-Pass Result
+
+### Implemented changes on 2026-03-09
+
+The first Phase 4 implementation pass changed four things:
+
+- client `GET` requests no longer send `Content-Type: application/json`, eliminating avoidable CORS preflights on simple fetches
+- per-card `like-state` requests now wait until a card is featured, near the viewport, or interacted with instead of firing for every card on first load
+- anonymous sign-in is deferred behind an idle window instead of running immediately on mount
+- the footer visitor counter no longer fetches until it approaches the viewport, and favorite-button session work no longer initializes on feed cards that do not render a favorite control
+
+Relevant files:
+
+- [`apps/web/src/lib/api.ts`](/Users/adam/code/slop.haus/apps/web/src/lib/api.ts)
+- [`apps/web/src/hooks/useLike.ts`](/Users/adam/code/slop.haus/apps/web/src/hooks/useLike.ts)
+- [`apps/web/src/components/project/ProjectCard.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx)
+- [`apps/web/src/components/auth/EnsureAnonymous.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/auth/EnsureAnonymous.tsx)
+- [`apps/web/src/components/layout/VisitorCounter.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/layout/VisitorCounter.tsx)
+
+### Local validation after the first Phase 4 pass
+
+Warm default path:
+
+- Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-default-2026-03-09T22-32-17-627Z.json`
+- LCP: `1652 ms`
+- FCP: `1652 ms`
+- Document TTFB: `223.4 ms`
+- Total requests: `26`
+- `like-state` `GET` requests: `4`
+- `like-state` `OPTIONS` requests: `0`
+- `visitor-count` `GET` requests: `0`
+
+Warm intro-dismissed path:
+
+- Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T22-32-15-440Z.json`
+- LCP: `1272 ms`
+- FCP: `1272 ms`
+- Document TTFB: `494.4 ms`
+- Total requests: `27`
+- `like-state` `GET` requests: `5`
+- `like-state` `OPTIONS` requests: `0`
+- `visitor-count` `GET` requests: `0`
+
+For comparison, the Phase 3 warm mobile artifacts were still showing:
+
+- `69` total requests
+- `21` `like-state` `GET` requests
+- `21` `like-state` `OPTIONS` requests
+- `2` `visitor-count` `GET` requests
+
+Interpretation:
+
+- The measured first-load network tax is materially lower after the first Phase 4 pass.
+- The biggest win is the complete removal of the old per-card `like-state` preflight storm.
+- Viewport-gated `like-state` loading reduced the default-path first-load `like-state` fetches from `21` to `4`, and the intro-dismissed path from `21` to `5`.
+- Footer-only visitor-count work is now off the critical path in the measured mobile runs.
+- Shared auth/session boot is still present, with `3` `GET /api/auth/get-session` requests and one anonymous sign-in `OPTIONS` plus `POST` in both warm runs, so that remains the clearest unresolved Phase 4 target if we continue pushing this phase.
+
+## Phase 5 Verification Snapshot
+
+### Local comparison status on 2026-03-09
+
+Current local evidence is strong enough to say the major mobile regression path is fixed:
+
+- default-path LCP improved from `20292 ms` in the 2026-03-07 baseline artifact to `1652 ms` in `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-default-2026-03-09T22-32-17-627Z.json`
+- intro-dismissed-path LCP improved from `21544 ms` in the 2026-03-09 baseline artifact to `1272 ms` in `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T22-32-15-440Z.json`
+- hidden mobile image requests remain at `0`
+- first-load `like-state` fan-out is down to `4` or `5` `GET`s with `0` preflights instead of `21` `GET`s plus `21` `OPTIONS`
+
+### What is still not verified
+
+- no fresh Lighthouse or PageSpeed run is recorded yet for mobile or desktop
+- no fresh desktop verification run is recorded yet
+- no fresh forced-reflow trace is recorded yet after the intro/consent/boot changes
+- no live S3 metadata refresh has been performed for older screenshot objects
+- the manual QA matrix is still pending
+
+## Historical Baseline Notes
+
+The notes below describe the pre-fix implementation that informed the original hypotheses. They are no longer the current code path after the Phase 2, Phase 3, and Phase 4 changes above.
 
 ### 1. The feed itself is server-bootstrapped
 

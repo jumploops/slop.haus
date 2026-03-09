@@ -7,16 +7,18 @@ import { ApiResponseError } from "@/lib/api";
 import { useToast } from "@/components/ui/Toast";
 
 interface UseLikeOptions {
+  enabled?: boolean;
   onLikeSuccess?: (result: LikeResult) => void;
 }
 
 export function useLike(projectSlug: string, options: UseLikeOptions = {}) {
+  const { enabled = true } = options;
   const { showToast } = useToast();
   const [isLiking, setIsLiking] = useState(false);
   const [rateLimitedUntil, setRateLimitedUntil] = useState<number | null>(null);
 
   const { data: likeState, mutate } = useSWR<LikeState>(
-    `/projects/${projectSlug}/like-state`,
+    enabled ? `/projects/${projectSlug}/like-state` : null,
     () => getLikeState(projectSlug),
     {
       revalidateOnFocus: false,
