@@ -1,6 +1,6 @@
 # Phase 1: Baseline + Decision Gates
 
-**Status:** In Progress  
+**Status:** Completed  
 **Owner:** Web  
 **Depends On:** None
 
@@ -22,11 +22,16 @@ Turn the current hypotheses into confirmed constraints before changing runtime b
 - [/Users/adam/code/slop.haus/README.md](/Users/adam/code/slop.haus/README.md)
 - [/Users/adam/code/slop.haus/package.json](/Users/adam/code/slop.haus/package.json)
 - `/Users/adam/code/slop.haus/scripts/open-project-chrome.mjs` (new)
+- `/Users/adam/code/slop.haus/scripts/lib/chrome-env.mjs` (new)
+- `/Users/adam/code/slop.haus/scripts/measure-mobile-feed.mjs` (new)
 - possible temporary investigation-only touches in:
   - [/Users/adam/code/slop.haus/apps/web/src/app/page.tsx](/Users/adam/code/slop.haus/apps/web/src/app/page.tsx)
   - [/Users/adam/code/slop.haus/apps/web/src/components/feed/FeedPageClient.tsx](/Users/adam/code/slop.haus/apps/web/src/components/feed/FeedPageClient.tsx)
+  - [/Users/adam/code/slop.haus/apps/web/src/components/slop/SlopGoo.tsx](/Users/adam/code/slop.haus/apps/web/src/components/slop/SlopGoo.tsx)
+  - [/Users/adam/code/slop.haus/apps/web/src/lib/slop/geometry.ts](/Users/adam/code/slop.haus/apps/web/src/lib/slop/geometry.ts)
   - [/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx)
   - [/Users/adam/code/slop.haus/apps/api/src/index.ts](/Users/adam/code/slop.haus/apps/api/src/index.ts)
+  - [/Users/adam/code/slop.haus/apps/web/src/hooks/useLike.ts](/Users/adam/code/slop.haus/apps/web/src/hooks/useLike.ts)
 
 ## Tasks
 
@@ -85,13 +90,13 @@ performance.mark("intro-mounted");
 
 ## Verification Checklist
 
-- [ ] Mobile baseline is recorded with date, URL, and intro/slop state.
-- [ ] LCP element identity is confirmed from a real trace.
-- [ ] Hidden-thumbnail request behavior is confirmed from Network.
-- [ ] Screenshot/upload cache headers are recorded from a real response.
-- [ ] SSR bootstrap timing is measured well enough to decide whether Phase 4 should include caching changes.
+- [x] Mobile baseline is recorded with date, URL, and intro/slop state.
+- [x] LCP element identity is confirmed from a real trace.
+- [x] Hidden-thumbnail request behavior is confirmed from Network.
+- [x] Screenshot/upload cache headers are recorded from a real response.
+- [x] SSR bootstrap timing is measured well enough to decide whether Phase 4 should include caching changes.
 - [x] Repo-local Chrome launcher is available and uses env-backed binary/profile configuration.
-- [ ] Debug doc is updated from hypothesis-only to confirmed/ruled-out findings.
+- [x] Debug doc is updated from hypothesis-only to confirmed/ruled-out findings.
 
 ## Exit Criteria
 
@@ -104,3 +109,26 @@ performance.mark("intro-mounted");
 
 - 2026-03-07: Began Phase 1 by standardizing Chrome launch configuration around env-backed binary resolution and a project-local user-data directory.
 - 2026-03-07: Added `pnpm chrome:project`, `scripts/open-project-chrome.mjs`, `.env` / `.env.example` Chrome vars, and `.chrome/` gitignore coverage. Smoke-tested the launcher path with a non-GUI stub binary to verify env/profile resolution.
+- 2026-03-07: Added `pnpm chrome:measure:mobile` and a headless Chrome CDP measurement script. First local mobile baseline confirmed:
+  - LCP candidate is the intro paragraph, not an image.
+  - LCP in the automated mobile run landed at ~20.3s.
+  - hidden mobile list thumbnails are still requested.
+  - placeholder image cache headers are currently `public, max-age=0`.
+  - card-level `like-state` fetches and preflights create a large initial API fan-out.
+- 2026-03-09: Reran the mobile measurement after featuring a real S3-backed project on `/`. The new artifact confirmed:
+  - the featured S3 screenshot is also requested while hidden on mobile.
+  - the featured S3 screenshot response is missing `Cache-Control`.
+  - the final LCP element is still the intro paragraph at ~21.2s.
+  - `like-state` fan-out increased to `21` preflights plus `21` GET requests.
+  - local document/API timings (`~205 ms` for `/`, `~19 ms` for the feed API) do not support prioritizing SSR/feed caching as the first fix.
+- 2026-03-09: Added temporary intro and `SlopGoo` instrumentation to tighten forced-reflow attribution. The instrumented rerun confirmed:
+  - intro reconciliation did not start until ~`21.1s`.
+  - intro layout mount happened ~`133.5 ms` before the final LCP.
+  - `SlopGoo` measurement started immediately after intro visibility.
+  - `SlopGoo` consumed ~`55.2 ms` total measured time in the run, with a hottest sample of `37.5 ms`.
+  - the hottest `SlopGoo` sample was dominated by synchronous `getComputedStyle(...)` and `getElementQuad(...)` work, making it a confirmed forced-layout contributor.
+- 2026-03-09: Added an `intro-dismissed` measurement scenario and compared it against the default path. That comparison confirmed:
+  - dismissing the intro does not fix the late mobile LCP.
+  - the final LCP shifts to the cookie consent banner paragraph at ~`21.5s`.
+  - `SlopGoo` drops out of the scenario, but very-late client reconciliation of above-the-fold UI remains.
+  - screenshot keys are generated as versioned `screenshots/<timestamp>-<random>.<ext>` paths, so immutable caching is compatible with the current URL shape.

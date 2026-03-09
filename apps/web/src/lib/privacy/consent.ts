@@ -1,10 +1,12 @@
 export const CONSENT_CONTEXT_COOKIE_NAME = "slop_consent_context";
+export const COOKIE_CONSENT_STATE_COOKIE_NAME = "slop_consent_state";
 export const CONSENT_STATE_STORAGE_KEY = "slop:cookieConsent";
 export const OPEN_PRIVACY_CHOICES_EVENT = "slop:open-privacy-choices";
 export const COOKIE_CONSENT_UPDATED_EVENT = "slop:cookie-consent-updated";
 export const COOKIE_CONSENT_RESET_EVENT = "slop:cookie-consent-reset";
 export const CONSENT_POLICY_VERSION =
   process.env.NEXT_PUBLIC_COOKIE_BANNER_POLICY_VERSION || "2026-02-27";
+const COOKIE_CONSENT_STATE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 180;
 
 export type AnalyticsConsentValue = "granted" | "denied";
 export type ConsentDecisionSource =
@@ -63,6 +65,18 @@ function getCookieValueFromCookieString(
   }
 
   return null;
+}
+
+function decodeCookieValue(raw: string | null | undefined): string | null {
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
 }
 
 function parseBooleanEnv(raw: string | undefined, fallback: boolean): boolean {
@@ -223,6 +237,13 @@ export function readConsentContextFromDocument(): ConsentContext | null {
 }
 
 export function loadCookieConsentState(): CookieConsentState | null {
+  if (typeof document !== "undefined") {
+    const fromCookie = readConsentStateFromDocument();
+    if (fromCookie) {
+      return fromCookie;
+    }
+  }
+
   if (typeof window === "undefined") {
     return null;
   }
@@ -232,7 +253,7 @@ export function loadCookieConsentState(): CookieConsentState | null {
 }
 
 export function persistCookieConsentState(state: CookieConsentState): void {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
 
@@ -240,15 +261,35 @@ export function persistCookieConsentState(state: CookieConsentState): void {
     CONSENT_STATE_STORAGE_KEY,
     serializeCookieConsentState(state)
   );
+  document.cookie = buildConsentStateCookieString(serializeCookieConsentState(state));
 }
 
 export function clearCookieConsentState(): void {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
 
   window.localStorage.removeItem(CONSENT_STATE_STORAGE_KEY);
+  document.cookie = buildConsentStateCookieString("", 0);
   window.dispatchEvent(new Event(COOKIE_CONSENT_RESET_EVENT));
+}
+
+export function readConsentStateFromDocument(): CookieConsentState | null {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const raw = getCookieValueFromCookieString(
+    document.cookie,
+    COOKIE_CONSENT_STATE_COOKIE_NAME
+  );
+  return parseCookieConsentState(raw);
+}
+
+export function readConsentStateFromCookieValue(
+  raw: string | null | undefined
+): CookieConsentState | null {
+  return parseCookieConsentState(decodeCookieValue(raw));
 }
 
 export function resolveAnalyticsEnabled(
@@ -283,4 +324,22 @@ export function emitCookieConsentUpdated(
       detail,
     })
   );
+}
+
+function buildConsentStateCookieString(
+  value: string,
+  maxAgeSeconds = COOKIE_CONSENT_STATE_COOKIE_MAX_AGE_SECONDS
+): string {
+  const secure =
+    typeof window !== "undefined" && window.location.protocol === "https:";
+
+  return [
+    `${COOKIE_CONSENT_STATE_COOKIE_NAME}=${encodeURIComponent(value)}`,
+    "Path=/",
+    "SameSite=Lax",
+    `Max-Age=${maxAgeSeconds}`,
+    secure ? "Secure" : null,
+  ]
+    .filter(Boolean)
+    .join("; ");
 }

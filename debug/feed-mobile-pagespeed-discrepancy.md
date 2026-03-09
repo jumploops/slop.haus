@@ -2,10 +2,11 @@
 
 ## Status
 
-- Type: investigation only
-- Date: 2026-03-06
+- Type: investigation in progress
+- Opened: 2026-03-06
+- Updated: 2026-03-09
 - Assumption: the PageSpeed run is targeting the root feed page at `/`
-- Code changes: none in this step
+- Code changes: Phase 1 measurement tooling is in place; Phase 2 intro/consent/SlopGoo first-pass changes landed; hidden-image and cache-policy fixes are still pending
 
 ## Problem Statement
 
@@ -47,6 +48,303 @@ The main question for this pass is not "what should we change yet," but "what ar
    - [`apps/web/src/components/project/ProjectCard.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx)
    - [`apps/api/src/index.ts`](/Users/adam/code/slop.haus/apps/api/src/index.ts)
 6. Attempted a production build for additional asset/bundle signals, but local build verification was blocked because `next/font` could not reach `fonts.googleapis.com` in the restricted environment.
+7. Added repo-local Chrome measurement tooling:
+   - [`scripts/open-project-chrome.mjs`](/Users/adam/code/slop.haus/scripts/open-project-chrome.mjs)
+   - [`scripts/measure-mobile-feed.mjs`](/Users/adam/code/slop.haus/scripts/measure-mobile-feed.mjs)
+
+## Confirmed Phase 1 Findings
+
+### Local automated mobile baseline
+
+Date: 2026-03-07  
+Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-2026-03-08T01-18-04-638Z.json`
+
+Environment:
+
+- Dedicated repo-local Chrome profile
+- Headless Chrome via local binary
+- Mobile emulation: `390x844`, DPR `2`
+- CPU throttling: `4x`
+- Network emulation: slow-ish 4G profile
+- URL: `http://localhost:3000/`
+
+Measured results from this run:
+
+- Document TTFB (`navigation.responseStart`): `304.3 ms`
+- First Contentful Paint: `1040 ms`
+- Largest Contentful Paint: `20292 ms`
+- Cumulative Layout Shift: `0`
+
+Interpretation:
+
+- The document itself is not slow enough to explain the LCP problem.
+- The LCP delay is overwhelmingly a post-response/render-path problem in this run.
+
+### Local rerun with a real featured S3 screenshot
+
+Date: 2026-03-09  
+Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-2026-03-09T08-25-30-666Z.json`
+
+Measured results from this run:
+
+- Document TTFB (`navigation.responseStart`): `205.8 ms`
+- First Contentful Paint: `1016 ms`
+- Largest Contentful Paint: `21168 ms`
+- Cumulative Layout Shift: `0`
+
+Interpretation:
+
+- The featured S3-backed screenshot did not change the identity of the mobile LCP candidate.
+- The local mobile bottleneck is still overwhelmingly after the initial document response.
+
+### Confirmed LCP element in this baseline
+
+The final LCP element in this run was the intro paragraph:
+
+- `p.relative.z-10.max-w-md | Not all slop is equal - share your best/funny/useful/useless vibecoded machinati`
+
+This confirms that the current mobile LCP candidate is above the feed cards in the intro path, not a screenshot image.
+
+### Hidden mobile images are definitely being requested
+
+The automated run found:
+
+- `20` hidden image nodes in the DOM
+- `6` unique hidden placeholder image assets actually requested
+- `8` total image requests during initial load
+
+That confirms the current `hidden sm:block` list-thumbnail path is still costing mobile image bytes even when those screenshots are not visible.
+
+The 2026-03-09 rerun raised that to:
+
+- `21` hidden image nodes in the DOM
+- `7` unique hidden image assets actually requested
+
+That rerun included one live S3 screenshot URL:
+
+- `https://s3.us-west-2.amazonaws.com/slop.haus-public/screenshots/1771926128984-aee914770f494692.png`
+
+Interpretation:
+
+- The featured S3 image is also being fetched while hidden in the mobile layout.
+- This is no longer just a placeholder-only behavior.
+
+### The first-page local baseline is using placeholders, not uploaded screenshots
+
+The local `GET /api/v1/projects?page=1&limit=20` response returned `primaryMedia: null` for all 20 first-page projects in this baseline.
+
+Interpretation:
+
+- The measured image/cache behavior in this run is dominated by placeholder assets from [`apps/web/public`](/Users/adam/code/slop.haus/apps/web/public), not uploaded screenshots.
+- Upload-cache validation is still incomplete for this specific baseline.
+
+### Placeholder image cache headers are weak
+
+The requested placeholder images returned:
+
+- `Cache-Control: public, max-age=0`
+
+Examples:
+
+- `http://localhost:3000/chaotic-colorful-css-code-editor.jpg`
+- `http://localhost:3000/pitch-deck-generator-with-money-and-rocket-emojis.jpg`
+
+This confirms at least one real contributor to the cache-lifetime audit.
+
+### Feed API caching is also weak in the current local path
+
+Observed headers:
+
+- `GET /` document: `Cache-Control: no-store, must-revalidate`
+- `GET /api/v1/projects?...`: no explicit `Cache-Control` header observed in the local API response
+
+Interpretation:
+
+- The document cache policy is intentionally strict.
+- The feed API response currently provides no cache guidance in this local path.
+- This does not, by itself, justify treating server-side caching as the first performance fix.
+
+### A new bottleneck surfaced: per-card like-state fan-out
+
+The automated run observed:
+
+- `1` feed fetch to `/api/v1/projects?...`
+- `20` `OPTIONS` preflight requests for `like-state`
+- `20` `GET` requests for per-project `like-state`
+
+Relevant code:
+
+- [`apps/web/src/components/project/ProjectCard.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx)
+- [`apps/web/src/hooks/useLike.ts`](/Users/adam/code/slop.haus/apps/web/src/hooks/useLike.ts)
+
+Interpretation:
+
+- This was not called out strongly enough in the original hypothesis list.
+- Even if it is not the single LCP root cause, it is a meaningful first-load network tax on mobile and should now be considered a leading suspect.
+
+The 2026-03-09 rerun increased this to:
+
+- `21` `OPTIONS` preflight requests for `like-state`
+- `21` `GET` requests for per-project `like-state`
+
+That aligns with one featured card plus twenty feed cards participating in the same first-load fan-out.
+
+### Live screenshot cache validation is now confirmed
+
+The 2026-03-09 rerun captured a real featured S3 screenshot response:
+
+- URL: `https://s3.us-west-2.amazonaws.com/slop.haus-public/screenshots/1771926128984-aee914770f494692.png`
+- Status: `200`
+- Content-Type: `image/png`
+- Content-Length: `141862`
+- Date: `Mon, 09 Mar 2026 08:25:33 GMT`
+- Last-Modified: `Tue, 24 Feb 2026 09:42:10 GMT`
+- `Cache-Control`: missing
+
+Interpretation:
+
+- A live screenshot used by the default `/` experience currently ships without any explicit `Cache-Control` header.
+- The cache-lifetime concern is now confirmed from a real media response, not just inferred from local placeholder assets or `/uploads/*` code paths.
+
+### Screenshot URLs appear immutable enough for long-lived caching
+
+The storage key generator currently produces screenshot paths in this shape:
+
+- `screenshots/<timestamp>-<random>.<extension>`
+
+Relevant code:
+
+- [`apps/api/src/lib/storage.ts#L100`](/Users/adam/code/slop.haus/apps/api/src/lib/storage.ts#L100)
+
+Interpretation:
+
+- The generated screenshot URLs are effectively versioned by key.
+- Unless a caller intentionally overwrites the same object key, the current path shape is compatible with a long-lived `immutable` cache policy.
+
+### Server/bootstrap latency is not the dominant problem in the local path
+
+Direct local timing checks on 2026-03-09:
+
+- `GET /`: `starttransfer=0.204527`, `total=0.212783`
+- `GET /api/v1/projects?sort=hot&window=all&page=1&limit=20`: `starttransfer=0.019303`, `total=0.019368`
+
+Interpretation:
+
+- The local feed API is fast enough that it does not explain a `~21s` LCP outcome.
+- The strict `no-store` SSR path may still be worth revisiting later for freshness or resilience reasons, but it should not be treated as a first-order mobile bottleneck in the current local evidence set.
+
+### Intro hydration timing is now directly confirmed
+
+Date: 2026-03-09  
+Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-2026-03-09T08-43-50-850Z.json`
+
+The instrumented rerun recorded these intro marks:
+
+- `feed:intro:reconcile-start` at `21082.0 ms`
+- `feed:intro:queue-apply-visible` at `21576.3 ms`
+- `feed:intro:layout-mounted` at `21674.5 ms`
+- `feed:intro:raf-visible` at `21733.7 ms`
+- final LCP at `21808.0 ms`
+
+Interpretation:
+
+- The intro does not even begin reconciliation until very late in the page lifecycle in this local mobile run.
+- The intro becomes layout-mounted only about `133.5 ms` before the final LCP.
+- This is the strongest evidence so far that the hydration-gated intro path is the primary reason the mobile LCP candidate lands so late when the intro is visible.
+
+### Intro-dismissed mobile still lands on a very late client-only LCP
+
+Date: 2026-03-09  
+Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T08-47-54-360Z.json`
+
+Measured results from this scenario:
+
+- Scenario: `intro-dismissed`
+- Document TTFB (`navigation.responseStart`): `389.7 ms`
+- First Contentful Paint: `1180 ms`
+- Largest Contentful Paint: `21544 ms`
+- Final LCP element:
+  - `p.text-sm.text-foreground | We use necessary cookies for core site functionality and optional analytics cook`
+- Intro marks:
+  - `feed:intro:reconcile-start` at `20794.5 ms`
+  - `feed:intro:queue-apply-dismissed` at `21337.6 ms`
+- `SlopGoo` measures: `0`
+
+Interpretation:
+
+- Removing the intro does not solve the late mobile LCP in the current local path.
+- The final LCP shifts to the cookie consent banner paragraph, which is another client-only, above-the-fold surface mounted after startup work.
+- This means the broader Phase 2 target should be "late client reconciliation of above-the-fold UI," not only the intro card.
+
+### `SlopGoo` is a direct forced-layout contributor right before LCP
+
+The same instrumented rerun recorded:
+
+- `10` `SlopGoo` measure calls
+- `55.2 ms` total measured `SlopGoo` measurement time
+- `37.5 ms` max single measurement
+- first `SlopGoo` measure start at `21734.5 ms`
+- last `SlopGoo` measure end at `24122.8 ms`
+- trigger mix: `{"initial": 6, "resize-observer": 4}`
+
+The hottest sample spent most of its time in synchronous layout/style reads:
+
+- `positionReadMs`: `27.4 ms`
+- `quadReadMs`: `8.9 ms`
+- `borderStyleReadMs`: `0.1 ms`
+
+Interpretation:
+
+- `SlopGoo` begins its measurement work immediately after the intro becomes visible.
+- The hottest `SlopGoo` sample lines up with exactly the style/geometry access pattern we suspected from the forced-reflow audit.
+- This does not prove `SlopGoo` is the entire reflow problem, but it does move it from "strong suspect" to "confirmed contributor."
+
+## Phase 2 First-Pass Result
+
+### Implemented changes on 2026-03-09
+
+The first Phase 2 implementation pass changed three things:
+
+- intro visibility is now seeded from a server-readable dismissal cookie
+- consent state is now seeded from cookies in the root layout/provider path so the banner does not appear only after client reconciliation
+- intro `SlopGoo` no longer renders immediately on first paint and is deferred behind the critical window
+
+Relevant files:
+
+- [`apps/web/src/app/page.tsx`](/Users/adam/code/slop.haus/apps/web/src/app/page.tsx)
+- [`apps/web/src/app/layout.tsx`](/Users/adam/code/slop.haus/apps/web/src/app/layout.tsx)
+- [`apps/web/src/app/providers.tsx`](/Users/adam/code/slop.haus/apps/web/src/app/providers.tsx)
+- [`apps/web/src/components/feed/FeedPageClient.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/feed/FeedPageClient.tsx)
+- [`apps/web/src/components/privacy/ConsentManager.tsx`](/Users/adam/code/slop.haus/apps/web/src/components/privacy/ConsentManager.tsx)
+- [`apps/web/src/lib/feed-intro.ts`](/Users/adam/code/slop.haus/apps/web/src/lib/feed-intro.ts)
+- [`apps/web/src/lib/privacy/consent.ts`](/Users/adam/code/slop.haus/apps/web/src/lib/privacy/consent.ts)
+
+### Local validation after the first Phase 2 pass
+
+Default path:
+
+- Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-default-2026-03-09T09-10-52-966Z.json`
+- LCP: `1220 ms`
+- FCP: `1220 ms`
+- Document TTFB: `453.7 ms`
+- Final LCP element:
+  - `p.relative.z-10.max-w-md | Not all slop is equal - share your best/funny/useful/useless vibecoded machinati`
+
+Intro-dismissed path:
+
+- Artifact: `/Users/adam/code/slop.haus/.chrome/measurements/mobile-feed-intro-dismissed-2026-03-09T09-14-33-579Z.json`
+- LCP: `1024 ms`
+- FCP: `1024 ms`
+- Document TTFB: `251.4 ms`
+- Final LCP element:
+  - `p.text-sm.text-foreground | We use necessary cookies for core site functionality and optional analytics cook`
+
+Interpretation:
+
+- The late `~21s` client-only LCP behavior is gone in both measured local paths.
+- The intro path is now present early enough that it no longer waits for post-hydration reconciliation.
+- The consent banner can still be the final LCP element in the intro-dismissed case, but it now appears in the initial render window instead of becoming a very-late fallback.
+- Hidden mobile image requests, weak screenshot caching, and `like-state` fan-out remain unchanged and now stand out more clearly as the next work items.
 
 ## Current Implementation Notes
 
@@ -94,6 +392,10 @@ First-load anonymous auth can trigger sign-in, session refetch, and visitor-coun
 
 - [`apps/web/src/components/auth/EnsureAnonymous.tsx#L11`](/Users/adam/code/slop.haus/apps/web/src/components/auth/EnsureAnonymous.tsx#L11)
 
+Consent UI is also client-reconciled after mount and only opens the banner from an effect:
+
+- [`apps/web/src/components/privacy/ConsentManager.tsx#L31`](/Users/adam/code/slop.haus/apps/web/src/components/privacy/ConsentManager.tsx#L31)
+
 There is also a footer visitor-count fetch and optional analytics boot:
 
 - [`apps/web/src/components/layout/VisitorCounter.tsx#L12`](/Users/adam/code/slop.haus/apps/web/src/components/layout/VisitorCounter.tsx#L12)
@@ -121,6 +423,20 @@ The API server serves `/uploads/*` via `serveStatic(...)`, but unlike `visitor-c
 
 That is a plausible contributor to the "efficient cache lifetimes" warning if the audited page pulls uploaded screenshots.
 
+### 7. Each feed card fetches like state on mount
+
+Every rendered `ProjectCard` calls `useLike(project.slug)`, which triggers a per-card SWR fetch for `/projects/{slug}/like-state`:
+
+- [`apps/web/src/components/project/ProjectCard.tsx#L53`](/Users/adam/code/slop.haus/apps/web/src/components/project/ProjectCard.tsx#L53)
+- [`apps/web/src/hooks/useLike.ts`](/Users/adam/code/slop.haus/apps/web/src/hooks/useLike.ts)
+
+In the current local baseline, that produced a large first-load API fan-out on mobile:
+
+- `20` preflights
+- `20` fetches
+
+This is now a concrete suspect, not just a generic "client boot might be heavy" guess.
+
 ## Hypotheses
 
 ### 1. Post-hydration intro rendering is delaying mobile LCP
@@ -144,7 +460,7 @@ Why it fits the reported metrics:
 - It explains a much worse mobile LCP than desktop without requiring a huge TBT spike.
 - It aligns with prior local debug work that already identified intro hydration as a source of slower first stable paint.
 
-### 2. `SlopGoo` is likely responsible for the forced reflow signal
+### 2. `SlopGoo` is a confirmed contributor to the forced reflow signal
 
 Confidence: high
 
@@ -166,6 +482,7 @@ Why it fits the reported metrics:
 
 - It is a direct code match for "forced reflow."
 - It sits above the fold on the intro, so mobile pays its cost early.
+- Instrumented measurement now shows `SlopGoo` doing synchronous style/geometry work immediately before final LCP.
 
 ### 3. Mobile is probably downloading screenshots that are hidden by CSS
 
@@ -221,22 +538,27 @@ Relevant code:
 
 - [`apps/web/src/app/providers.tsx#L16`](/Users/adam/code/slop.haus/apps/web/src/app/providers.tsx#L16)
 - [`apps/web/src/components/auth/EnsureAnonymous.tsx#L11`](/Users/adam/code/slop.haus/apps/web/src/components/auth/EnsureAnonymous.tsx#L11)
+- [`apps/web/src/components/privacy/ConsentManager.tsx#L31`](/Users/adam/code/slop.haus/apps/web/src/components/privacy/ConsentManager.tsx#L31)
 - [`apps/web/src/components/layout/VisitorCounter.tsx#L12`](/Users/adam/code/slop.haus/apps/web/src/components/layout/VisitorCounter.tsx#L12)
 - [`apps/web/src/components/analytics/GoogleAnalytics.tsx#L52`](/Users/adam/code/slop.haus/apps/web/src/components/analytics/GoogleAnalytics.tsx#L52)
 
 Why it fits the reported metrics:
 
 - On slower CPUs and throttled networks, these extra tasks can push out first stable rendering without creating a catastrophic TBT number.
+- The intro-dismissed scenario confirms that another client-only above-the-fold surface, the cookie banner, can become the late final LCP instead.
 
-### 6. The feed SSR path may still have a real network latency problem because page 1 is always `no-store`
+### 6. The feed SSR path is probably not the primary mobile bottleneck in the current local path
 
-Confidence: medium
+Confidence: low-medium
 
 Why:
 
 - The root page performs a server fetch for the feed on every request.
 - That fetch is explicitly `cache: "no-store"`.
 - Web and API are separate services, so the HTML path depends on an extra network hop.
+- Local timing checks on 2026-03-09 measured:
+  - `GET /`: about `205 ms` to first byte
+  - direct feed API request: about `19 ms` to first byte
 
 Relevant code:
 
@@ -245,16 +567,17 @@ Relevant code:
 
 Why it fits the reported metrics:
 
-- If API latency, cold starts, or DB work are slower under PageSpeed’s mobile throttling assumptions, that would inflate both FCP and LCP.
-- This is not yet proven because we have not measured TTFB/server timing separately.
+- It is still a possible secondary concern in production or on cold paths.
+- In the local measurements so far, it is nowhere near large enough to explain the observed mobile LCP.
 
 ### 7. Screenshot/upload responses may have weak cache headers, matching the `758 KiB` cache-lifetime warning
 
-Confidence: medium
+Confidence: high
 
 Why:
 
 - `/uploads/*` static serving does not currently show an explicit long-term cache policy.
+- A live featured S3 screenshot was captured without any `Cache-Control` header.
 - That is the kind of issue Lighthouse typically flags in "Use efficient cache lifetimes."
 
 Relevant code:
@@ -300,42 +623,33 @@ Interpretation:
 
 ## Leading Suspects
 
-If we need to rank where to look first before changing code:
+After the first Phase 2 pass, the remaining highest-value suspects are:
 
-1. Post-hydration intro rendering delaying the LCP candidate.
-2. Above-the-fold `SlopGoo` measurement work causing forced reflow.
-3. Hidden mobile screenshots still downloading because of raw `<img>` usage.
-4. Extra first-load client work from anonymous auth/session/consent/visitor count.
-5. Weak caching on screenshot assets.
+1. Per-card `like-state` request + preflight fan-out on first render.
+2. Hidden mobile screenshots still downloading because of raw `<img>` usage.
+3. Weak caching on placeholder and live screenshot assets.
+4. Any residual above-the-fold `SlopGoo` cost that remains after the first-paint deferral.
 
 ## Root Cause Status
 
-Unconfirmed.
+Primary late-LCP cause fixed in the current local validation pass.
 
 Current best working theory:
 
-- Mobile LCP is being delayed by a combination of post-hydration intro rendering and above-the-fold layout measurement work.
-- In parallel, feed screenshots may be wasting bandwidth on mobile even when hidden, which would amplify the gap and help explain the cache-lifetime audit.
+- Very-late client reconciliation of above-the-fold UI was the dominant local Phase 1 cause, and the first Phase 2 pass appears to have removed that delay.
+- Hidden mobile images, weak cache headers, and card-level API fan-out now stand out as the next concrete bottlenecks.
+- The local SSR/bootstrap path is still not supported as the primary cause.
 
-## Suggested Validation Checks Before Code Changes
+## Remaining Validation Checks
 
-1. In Chrome Performance, capture a fresh mobile-throttled load and confirm the LCP element identity:
-   - intro heading/card vs feed card vs image
-2. Check whether offscreen/hidden feed thumbnails are requested on mobile:
-   - Network panel
-   - compare visible layout vs requested image URLs
-3. Inspect response headers for one real screenshot URL:
-   - confirm whether `Cache-Control` is missing or too short
-4. Compare TTFB/server timing for `/` vs the API feed request:
-   - determine whether `cache: "no-store"` is materially hurting first paint
-5. Record a trace around the intro mount:
-   - verify whether `SlopGoo` or related geometry calls account for the unattributed forced reflow
+1. Capture a post-Phase-2 trace and confirm the residual forced-reflow cost after intro `SlopGoo` deferral.
+2. Move to Phase 3 and verify that hidden mobile image requests and cache-lifetime findings fall materially once image delivery is corrected.
+3. Move to Phase 4 and verify that reducing `like-state` fan-out materially reduces early network and main-thread churn.
 
-## Solution Direction (Not Implemented Yet)
+## Solution Direction (Updated)
 
-If the validation above confirms the current theory, the likely solution areas are:
+The next implementation areas are now:
 
-- Make the LCP candidate available in initial HTML instead of post-hydration only.
-- Reduce or defer above-the-fold layout-measurement effects.
 - Stop requesting hidden/offscreen screenshots on mobile and adopt real image optimization/lazy loading.
 - Add explicit cache headers for static uploaded media.
+- Reduce early card-level `like-state` network fan-out after first paint.

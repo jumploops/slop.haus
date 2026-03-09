@@ -8,8 +8,19 @@ import { LoginModal } from "@/components/auth/LoginModal";
 import { EnsureAnonymous } from "@/components/auth/EnsureAnonymous";
 import { SlopModeProvider } from "@/lib/slop-mode";
 import { ConsentManager } from "@/components/privacy/ConsentManager";
+import type { ConsentContext, CookieConsentState } from "@/lib/privacy/consent";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+interface ProvidersProps {
+  children: React.ReactNode;
+  initialConsentContext: ConsentContext;
+  initialConsentState: CookieConsentState | null;
+}
+
+export function Providers({
+  children,
+  initialConsentContext,
+  initialConsentState,
+}: ProvidersProps) {
   const loginModalState = useLoginModalState();
 
   return (
@@ -19,7 +30,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <ToastProvider>
             <LoginModalContext.Provider value={loginModalState}>
               <EnsureAnonymous />
-              <ConsentManager />
+              <ConsentManager
+                initialContext={initialConsentContext}
+                initialConsentState={initialConsentState}
+              />
               {children}
               <LoginModal />
             </LoginModalContext.Provider>

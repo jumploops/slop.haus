@@ -112,6 +112,8 @@ For local performance work, use the repo-managed Chrome launcher instead of a pe
 
 ```bash
 pnpm chrome:project
+pnpm chrome:measure:mobile
+pnpm chrome:measure:mobile -- --dismiss-intro
 ```
 
 This uses the env vars in `.env` / `.env.example`:
@@ -124,6 +126,8 @@ CHROME_START_URL=http://localhost:3000/
 ```
 
 `CHROME_USER_DATA_DIR` is intentionally project-local and should stay separate from any existing Chrome profile.
+
+`pnpm chrome:measure:mobile` writes artifacts to `.chrome/measurements/`. Use `-- --dismiss-intro` to compare the default feed against a fresh-profile run with `slop:feedIntroDismissed=true`.
 
 ## Ports
 

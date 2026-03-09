@@ -23,6 +23,7 @@ Verify that the implemented changes actually improved mobile performance, did no
    - actual LCP element and timestamp
    - reduced forced reflow
    - reduced first-load main-thread churn
+   - no late fallback from intro to consent banner when intro is dismissed
 3. Re-run Network validation and confirm:
    - hidden mobile thumbnails are not requested
    - screenshot/upload cache headers are present and correct
@@ -43,6 +44,7 @@ Verify that the implemented changes actually improved mobile performance, did no
 
 - `/` on mobile viewport, intro visible
 - `/` on mobile viewport, intro dismissed
+- `/` on mobile viewport, intro dismissed and consent required
 - `/` on mobile viewport, slop mode on
 - `/` on mobile viewport, slop mode off
 - `/` on desktop viewport
@@ -58,7 +60,8 @@ These are guidance targets, not hard release gates:
 2. Mobile FCP should improve materially from the 2.2 s baseline.
 3. Forced-reflow cost should be clearly reduced or eliminated as a top insight.
 4. Cache-lifetime audit should be resolved or substantially reduced.
-5. Desktop should not regress meaningfully while mobile improves.
+5. The final mobile LCP should no longer be an above-the-fold client-only paragraph that appears after startup reconciliation.
+6. Desktop should not regress meaningfully while mobile improves.
 
 ## Design Notes
 
@@ -78,6 +81,7 @@ These are guidance targets, not hard release gates:
 
 - [ ] Before/after PSI or Lighthouse results are recorded with dates.
 - [ ] Trace confirms the intended LCP/reflow improvements actually occurred.
+- [ ] Trace confirms intro-visible and intro-dismissed flows both avoid the late client-only LCP path seen in Phase 1.
 - [ ] Network validation confirms image-request and cache-header fixes.
 - [ ] Desktop behavior remains acceptable.
 - [ ] Lint and typecheck pass.
@@ -88,4 +92,3 @@ These are guidance targets, not hard release gates:
 - The mobile performance work is validated end to end.
 - Remaining issues, if any, are documented as explicit follow-ups rather than hidden unknowns.
 - The repo has a durable paper trail for why the chosen changes were made and what they improved.
-

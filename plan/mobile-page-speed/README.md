@@ -1,7 +1,7 @@
 # Mobile Page Speed Implementation Plan
 
-**Status:** Planned  
-**Last Updated:** 2026-03-07  
+**Status:** In Progress  
+**Last Updated:** 2026-03-09  
 **Owner:** Web + API
 
 ## Overview
@@ -20,11 +20,11 @@ Current PageSpeed gap called out in the investigation:
 
 The current working theory is:
 
-1. The dominant mobile LCP candidate is likely gated by post-hydration intro rendering.
-2. `SlopGoo` is the strongest forced-reflow suspect above the fold.
-3. Feed screenshots may be downloading on mobile even when hidden by CSS.
-4. Screenshot delivery and cache headers likely contribute to the `Use efficient cache lifetimes` warning.
-5. Non-critical client boot work may be competing with initial paint on slower mobile devices.
+1. The Phase 2 first pass appears to have fixed the dominant late client-only LCP path in local runs by moving intro and consent state into the initial render.
+2. `SlopGoo` is still a confirmed forced-layout contributor above the fold and should stay under verification until a post-change trace confirms the reduced cost.
+3. Feed screenshots are still downloading on mobile even when hidden by CSS, including the featured S3 screenshot path.
+4. Screenshot delivery and cache headers are still contributing to the `Use efficient cache lifetimes` warning.
+5. Per-card `like-state` fan-out and other non-critical client boot work remain likely next-order contributors now that the worst above-the-fold delay has been removed locally.
 
 This plan keeps scope centered on the root feed and shared feed-card surfaces first. It does not treat broad bundle modernization or whole-site redesign as part of this effort.
 
@@ -36,17 +36,17 @@ This plan keeps scope centered on the root feed and shared feed-card surfaces fi
 4. Treat non-visible mobile image requests as bugs, not acceptable tradeoffs.
 5. Decorative effects may be deferred, simplified, or disabled on initial mobile paint if they materially harm performance.
 6. Add explicit cache policy for uploaded/static media if current headers are weak.
-7. Defer non-critical auth, analytics, and visitor-counter work until after first paint whenever correctness allows it.
-8. Only change server-side feed caching semantics if traces show the `web -> api` path is a meaningful contributor to first paint and the freshness tradeoff is acceptable.
+7. Defer non-critical auth, analytics, visitor-counter work, and per-card `like-state` fetching until after first paint whenever correctness allows it.
+8. Only change server-side feed caching semantics if traces outside the current local baseline show the `web -> api` path is a meaningful contributor to first paint and the freshness tradeoff is acceptable.
 
 ## Phase Summary
 
 | Phase | Name | Status | Description |
 | --- | --- | --- | --- |
-| 1 | [Baseline + Decision Gates](./phase-1-baseline-and-decision-gates.md) | In Progress | Confirm LCP element, reflow source, image requests, cache headers, and server timing before implementation |
-| 2 | [Above-the-Fold LCP + Reflow Reduction](./phase-2-above-the-fold-lcp-and-reflow.md) | Planned | Remove hydration-gated LCP behavior and reduce or defer expensive above-the-fold measurement/effects |
-| 3 | [Image Delivery + Cache Policy](./phase-3-image-delivery-and-cache-policy.md) | Planned | Stop hidden mobile image requests, optimize feed thumbnails, and harden screenshot caching |
-| 4 | [Non-Critical Boot + Server Path](./phase-4-non-critical-boot-and-server-path.md) | Planned | Defer startup work that is not needed for first paint and revisit feed SSR fetch strategy if measured server latency warrants it |
+| 1 | [Baseline + Decision Gates](./phase-1-baseline-and-decision-gates.md) | Completed | Confirmed the late mobile LCP candidates, hidden image requests, cache/header behavior, and that the server path is not the first fix target |
+| 2 | [Above-the-Fold LCP + Reflow Reduction](./phase-2-above-the-fold-lcp-and-reflow.md) | In Progress | Eliminate late client-only intro/consent LCP candidates and reduce or defer expensive above-the-fold measurement/effects |
+| 3 | [Image Delivery + Cache Policy](./phase-3-image-delivery-and-cache-policy.md) | Planned | Stop hidden mobile image requests, optimize feed thumbnails, and harden real screenshot caching on the live delivery path |
+| 4 | [Non-Critical Boot + Server Path](./phase-4-non-critical-boot-and-server-path.md) | Planned | Defer startup work that is not needed for first paint, cut `like-state` fan-out, and only revisit feed SSR fetch strategy if later measurements justify it |
 | 5 | [Verification + Regression Guardrails](./phase-5-verification-and-regression-guardrails.md) | Planned | Re-run PSI/trace/network checks, complete QA matrix, and document final outcomes |
 
 ## Dependency Graph
