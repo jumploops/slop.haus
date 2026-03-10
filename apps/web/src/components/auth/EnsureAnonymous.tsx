@@ -18,22 +18,40 @@ export function EnsureAnonymous() {
       return;
     }
 
-    hasAttempted.current = true;
+    const runAnonymousSignIn = () => {
+      hasAttempted.current = true;
 
-    void signIn
-      .anonymous()
-      .then(async (result) => {
-        if (result?.error) {
-          console.warn("[auth] anonymous sign-in failed", result.error);
-          return;
-        }
+      void signIn
+        .anonymous()
+        .then(async (result) => {
+          if (result?.error) {
+            console.warn("[auth] anonymous sign-in failed", result.error);
+            return;
+          }
 
-        await refetch();
-        void mutate("visitor-count");
-      })
-      .catch((error) => {
-        console.warn("[auth] anonymous sign-in failed", error);
+          await refetch();
+          void mutate("visitor-count");
+        })
+        .catch((error) => {
+          console.warn("[auth] anonymous sign-in failed", error);
+        });
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(runAnonymousSignIn, {
+        timeout: 2_000,
       });
+
+      return () => {
+        window.cancelIdleCallback(idleId);
+      };
+    }
+
+    const timeoutId = window.setTimeout(runAnonymousSignIn, 1_200);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [session, isPending, refetch]);
 
   return null;

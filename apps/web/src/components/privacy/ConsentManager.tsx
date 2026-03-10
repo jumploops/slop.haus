@@ -6,7 +6,6 @@ import {
   COOKIE_CONSENT_RESET_EVENT,
   OPEN_PRIVACY_CHOICES_EVENT,
   emitCookieConsentUpdated,
-  getDefaultConsentContext,
   isConsentStateCurrent,
   isCookieBannerEnabled,
   loadCookieConsentState,
@@ -20,6 +19,11 @@ import {
 import { CookieConsentBanner } from "./CookieConsentBanner";
 import { CookiePreferencesDialog } from "./CookiePreferencesDialog";
 
+interface ConsentManagerProps {
+  initialContext: ConsentContext;
+  initialConsentState: CookieConsentState | null;
+}
+
 function resolveDecisionSource(context: ConsentContext): ConsentDecisionSource {
   if (context.source === "global_override") {
     return "global_override";
@@ -28,44 +32,60 @@ function resolveDecisionSource(context: ConsentContext): ConsentDecisionSource {
   return context.required ? "geo_required" : "geo_not_required";
 }
 
-export function ConsentManager() {
-  const [isReady, setIsReady] = useState(false);
-  const [bannerOpen, setBannerOpen] = useState(false);
+export function ConsentManager({
+  initialContext,
+  initialConsentState,
+}: ConsentManagerProps) {
+  const bannerEnabled = isCookieBannerEnabled();
+  const [bannerOpen, setBannerOpen] = useState(
+    bannerEnabled && initialContext.required && !initialConsentState
+  );
   const [preferencesOpen, setPreferencesOpen] = useState(false);
-  const [context, setContext] = useState<ConsentContext>(getDefaultConsentContext);
-  const [consentState, setConsentState] = useState<CookieConsentState | null>(null);
+  const [context, setContext] = useState<ConsentContext>(initialContext);
+  const [consentState, setConsentState] = useState<CookieConsentState | null>(
+    initialConsentState
+  );
 
   useEffect(() => {
-    if (!isCookieBannerEnabled()) {
-      queueMicrotask(() => {
-        setIsReady(true);
-      });
+    if (!bannerEnabled) {
       return;
     }
 
-    const nextContext = readConsentContextFromDocument() || getDefaultConsentContext();
+    if (initialConsentState) {
+      return;
+    }
+
+    const nextContext = readConsentContextFromDocument() || initialContext;
     const parsedConsent = loadCookieConsentState();
     const nextConsent = isConsentStateCurrent(parsedConsent, CONSENT_POLICY_VERSION)
       ? parsedConsent
       : null;
 
-    queueMicrotask(() => {
-      setContext(nextContext);
-      setConsentState(nextConsent);
-      setBannerOpen(nextContext.required && !nextConsent);
-      setIsReady(true);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!isCookieBannerEnabled()) {
+    if (!nextConsent) {
       return;
     }
 
-    const openPreferences = () => setPreferencesOpen(true);
+    const timeoutId = window.setTimeout(() => {
+      setContext(nextContext);
+      setConsentState(nextConsent);
+      setBannerOpen(nextContext.required && !nextConsent);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [bannerEnabled, initialContext, initialConsentState]);
+
+  useEffect(() => {
+    if (!bannerEnabled) {
+      return;
+    }
+
+    const openPreferences = () => {
+      setPreferencesOpen(true);
+    };
     const resetConsent = () => {
-      const nextContext =
-        readConsentContextFromDocument() || getDefaultConsentContext();
+      const nextContext = readConsentContextFromDocument() || initialContext;
       setContext(nextContext);
       setConsentState(null);
       setBannerOpen(nextContext.required);
@@ -79,7 +99,7 @@ export function ConsentManager() {
       window.removeEventListener(OPEN_PRIVACY_CHOICES_EVENT, openPreferences);
       window.removeEventListener(COOKIE_CONSENT_RESET_EVENT, resetConsent);
     };
-  }, []);
+  }, [bannerEnabled, initialContext]);
 
   const analyticsEnabled = useMemo(() => {
     return resolveAnalyticsEnabled(context, consentState);
@@ -106,7 +126,7 @@ export function ConsentManager() {
     });
   }
 
-  if (!isReady || !isCookieBannerEnabled()) {
+  if (!bannerEnabled) {
     return null;
   }
 

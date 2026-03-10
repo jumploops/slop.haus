@@ -1,11 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MessageCircle, ExternalLink, ChevronUp, Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useLike } from "@/hooks/useLike";
 import { useFavorite } from "@/hooks/useFavorite";
-import { memo, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import {
+  memo,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
 import { cn, formatRelativeTime, getPlaceholderImage, isRecentDate } from "@/lib/utils";
 import { SlopGoo } from "@/components/slop/SlopGoo";
 import type { ProjectListItem } from "@/lib/api/projects";
@@ -32,6 +40,7 @@ interface ProjectCardProps {
   rank?: number;
   featured?: boolean;
   variant?: "list-sm" | "list-lg" | "grid";
+  canLoadListThumbnail?: boolean;
   sloppy?: boolean;
 }
 
@@ -42,23 +51,21 @@ function ProjectCardComponent({
   rank,
   featured = false,
   variant = "list-sm",
+  canLoadListThumbnail = false,
   sloppy = false,
 }: ProjectCardProps) {
   const router = useRouter();
+  const cardRef = useRef<HTMLElement | null>(null);
   const isGrid = variant === "grid";
   const isLarge = variant === "list-lg";
   const [localLikeCountOverride, setLocalLikeCountOverride] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [shouldLoadLikeState, setShouldLoadLikeState] = useState(featured);
   const localLikeCount = localLikeCountOverride ?? project.likeCount;
   const { likeState, submitLike, isLiking } = useLike(project.slug, {
+    enabled: shouldLoadLikeState,
     onLikeSuccess: (result) => setLocalLikeCountOverride(result.likeCount),
   });
-  const { isFavorited, toggleFavorite, isLoading: favoriteLoading } = useFavorite(
-    project.slug,
-    { onSuccess: onFavoriteChange }
-  );
-
-  const cardRef = useRef<HTMLElement | null>(null);
 
   const thumbnailUrl = project.primaryMedia?.url || getPlaceholderImage(project.title);
   const isNew = isRecentDate(project.createdAt, 2 * 24 * 60 * 60 * 1000);
@@ -76,6 +83,9 @@ function ProjectCardComponent({
   const cardTransitionClass = "transition-all duration-200";
   const cardHoverClass = "hover:border-primary hover:shadow-lg";
   const thumbnailSize = isLarge ? "sm:h-32 sm:w-48" : "sm:h-16 sm:w-24";
+  const listThumbnailSizes = isLarge ? "(max-width: 639px) 0px, 192px" : "(max-width: 639px) 0px, 96px";
+  const gridThumbnailSizes =
+    "(max-width: 639px) calc(100vw - 2rem), (max-width: 1023px) calc(50vw - 2rem), 320px";
   const likeButtonSize = isGrid ? "h-12 w-12" : "h-16 w-14";
   const scoreSizeClass = isGrid ? "h-10 w-10 text-base" : "h-12 w-12 text-lg";
   const slopSeed = project.id || project.slug || project.title;
@@ -90,6 +100,57 @@ function ProjectCardComponent({
       )
     : "";
   const showGoo = sloppy && isHovered;
+  const showListThumbnail = !isGrid && canLoadListThumbnail;
+
+  useEffect(() => {
+    if (shouldLoadLikeState || typeof window === "undefined") {
+      return;
+    }
+
+    const element = cardRef.current;
+    if (!element || typeof window.IntersectionObserver !== "function") {
+      const timeoutId = window.setTimeout(() => {
+        setShouldLoadLikeState(true);
+      }, 0);
+
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    }
+
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) {
+          return;
+        }
+
+        setShouldLoadLikeState(true);
+        observer.disconnect();
+      },
+      { rootMargin: "300px 0px" }
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [shouldLoadLikeState]);
+
+  const primeLikeState = () => {
+    setShouldLoadLikeState(true);
+  };
+
+  const handleMouseEnter = () => {
+    primeLikeState();
+    setIsHovered(true);
+  };
+
+  const handleFocusCapture = () => {
+    primeLikeState();
+    setIsHovered(true);
+  };
+
   const goo = showGoo ? (
     <SlopGoo
       targetRef={cardRef}
@@ -140,9 +201,10 @@ function ProjectCardComponent({
           tabIndex={0}
           onClick={handleCardClick}
           onKeyDown={handleCardKeyDown}
-          onMouseEnter={() => setIsHovered(true)}
+          onMouseEnter={handleMouseEnter}
           onMouseLeave={() => setIsHovered(false)}
-          onFocusCapture={() => setIsHovered(true)}
+          onFocusCapture={handleFocusCapture}
+          onTouchStartCapture={primeLikeState}
           onBlurCapture={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget as Node)) {
               setIsHovered(false);
@@ -176,7 +238,13 @@ function ProjectCardComponent({
             <div
               className="relative z-10 aspect-[5/3] overflow-hidden border-b-2 border-border"
             >
-              <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              <Image
+                src={thumbnailUrl}
+                alt={project.title}
+                fill
+                sizes={gridThumbnailSizes}
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
             </div>
 
@@ -184,7 +252,10 @@ function ProjectCardComponent({
               <div className="flex items-start gap-3">
                 <button
                   type="button"
-                  onClick={() => submitLike(likeState?.liked ? 0 : 1)}
+                  onClick={() => {
+                    primeLikeState();
+                    void submitLike(likeState?.liked ? 0 : 1);
+                  }}
                   disabled={isLiking}
                   className={cn(
                     "relative z-10 flex flex-col items-center justify-center gap-0.5 border-2 transition-colors pointer-events-auto cursor-pointer",
@@ -269,20 +340,12 @@ function ProjectCardComponent({
                 )}
               </div>
 
-              {showFavoriteButton && (
-                <div className="flex items-center gap-2 pointer-events-auto">
-                  <Button
-                    variant={isFavorited ? "secondary" : "ghost"}
-                    size="sm"
-                    onClick={toggleFavorite}
-                    disabled={favoriteLoading}
-                    aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-                  >
-                    <HeartIcon filled={isFavorited} />
-                    <span className="sr-only">Favorite</span>
-                  </Button>
-                </div>
-              )}
+              {showFavoriteButton ? (
+                <ProjectFavoriteButton
+                  projectSlug={project.slug}
+                  onFavoriteChange={onFavoriteChange}
+                />
+              ) : null}
             </div>
           </div>
         </article>
@@ -300,9 +363,10 @@ function ProjectCardComponent({
         tabIndex={0}
         onClick={handleCardClick}
         onKeyDown={handleCardKeyDown}
-        onMouseEnter={() => setIsHovered(true)}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={() => setIsHovered(false)}
-        onFocusCapture={() => setIsHovered(true)}
+        onFocusCapture={handleFocusCapture}
+        onTouchStartCapture={primeLikeState}
         onBlurCapture={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget as Node)) {
             setIsHovered(false);
@@ -335,7 +399,10 @@ function ProjectCardComponent({
 
           <button
             type="button"
-            onClick={() => submitLike(likeState?.liked ? 0 : 1)}
+            onClick={() => {
+              primeLikeState();
+              void submitLike(likeState?.liked ? 0 : 1);
+            }}
             disabled={isLiking}
             className={cn(
               "relative z-10 flex flex-shrink-0 flex-col items-center justify-center gap-0.5 border-2 transition-colors cursor-pointer",
@@ -356,8 +423,20 @@ function ProjectCardComponent({
               thumbnailSize
             )}
           >
-            <img src={thumbnailUrl} alt={project.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+            {showListThumbnail ? (
+              <>
+                <Image
+                  src={thumbnailUrl}
+                  alt={project.title}
+                  fill
+                  sizes={listThumbnailSizes}
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-foreground/5 mix-blend-multiply" />
+              </>
+            ) : (
+              <div className="h-full w-full bg-muted/30" aria-hidden="true" />
+            )}
           </div>
 
           <div className="relative z-10 flex min-w-0 flex-1 flex-col gap-2 pointer-events-none">
@@ -430,20 +509,12 @@ function ProjectCardComponent({
               )}
             </div>
 
-            {showFavoriteButton && (
-              <div className="flex items-center gap-2 pointer-events-auto">
-                <Button
-                  variant={isFavorited ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={toggleFavorite}
-                  disabled={favoriteLoading}
-                  aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-                >
-                  <HeartIcon filled={isFavorited} />
-                  <span className="sr-only">Favorite</span>
-                </Button>
-              </div>
-            )}
+            {showFavoriteButton ? (
+              <ProjectFavoriteButton
+                projectSlug={project.slug}
+                onFavoriteChange={onFavoriteChange}
+              />
+            ) : null}
           </div>
         </div>
       </article>
@@ -460,6 +531,33 @@ function isInteractiveTarget(target: EventTarget | null) {
     target.closest(
       'a,button,input,select,textarea,label,[role="button"],[data-card-interactive="true"]'
     )
+  );
+}
+
+function ProjectFavoriteButton({
+  projectSlug,
+  onFavoriteChange,
+}: {
+  projectSlug: string;
+  onFavoriteChange?: () => void;
+}) {
+  const { isFavorited, toggleFavorite, isLoading } = useFavorite(projectSlug, {
+    onSuccess: onFavoriteChange,
+  });
+
+  return (
+    <div className="flex items-center gap-2 pointer-events-auto">
+      <Button
+        variant={isFavorited ? "secondary" : "ghost"}
+        size="sm"
+        onClick={toggleFavorite}
+        disabled={isLoading}
+        aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+      >
+        <HeartIcon filled={isFavorited} />
+        <span className="sr-only">Favorite</span>
+      </Button>
+    </div>
   );
 }
 

@@ -19,6 +19,10 @@ import {
   type FeedSort,
   type FeedWindow,
 } from "@/lib/feed-query";
+import {
+  clearFeedIntroDismissed,
+  persistFeedIntroDismissed,
+} from "@/lib/feed-intro";
 import { clearCookieConsentState } from "@/lib/privacy/consent";
 import { useSlopMode } from "@/lib/slop-mode";
 import { cn } from "@/lib/utils";
@@ -27,6 +31,7 @@ interface FeedPageClientProps {
   initialFeed: FeedResponse | null;
   initialSort: FeedSort;
   initialWindow: FeedWindow;
+  initialShowIntro: boolean;
 }
 
 type DisplayMode = "list-sm" | "list-lg" | "grid";
@@ -57,6 +62,7 @@ export function FeedPageClient({
   initialFeed,
   initialSort,
   initialWindow,
+  initialShowIntro,
 }: FeedPageClientProps) {
   const router = useRouter();
   const { data: session } = useSession();
@@ -66,8 +72,10 @@ export function FeedPageClient({
   const [, startTransition] = useTransition();
   const showResetIntroButton =
     session?.user?.role === "admin" || process.env.NODE_ENV === "development";
-  const [showIntro, setShowIntro] = useState(false);
+  const [showIntro, setShowIntro] = useState(initialShowIntro);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("list-lg");
+  const [canLoadDesktopListThumbnails, setCanLoadDesktopListThumbnails] = useState(false);
+  const [showIntroGoo, setShowIntroGoo] = useState(false);
   const introRef = useRef<HTMLDivElement | null>(null);
   const slopIntroClass = slopEnabled ? "" : "shadow-[2px_2px_0_var(--border)]";
   const slopDismissClass = slopEnabled
@@ -92,28 +100,91 @@ export function FeedPageClient({
       return;
     }
 
-    const isDismissed = window.localStorage.getItem("slop:feedIntroDismissed") === "true";
     const storedDisplayMode = getStoredDisplayMode(
       window.localStorage.getItem("slop:feedDisplayMode")
     );
 
-    queueMicrotask(() => {
-      setShowIntro(!isDismissed);
+    if (!storedDisplayMode) {
+      return;
+    }
 
-      if (!storedDisplayMode) {
-        return;
-      }
+    const nextDisplayMode =
+      storedDisplayMode === "list-lg" &&
+      !window.matchMedia("(min-width: 640px)").matches
+        ? "list-sm"
+        : storedDisplayMode;
 
-      if (
-        storedDisplayMode === "list-lg" &&
-        !window.matchMedia("(min-width: 640px)").matches
-      ) {
-        setDisplayMode("list-sm");
-      } else {
-        setDisplayMode(storedDisplayMode);
-      }
+    const rafId = window.requestAnimationFrame(() => {
+      setDisplayMode(nextDisplayMode);
     });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const media = window.matchMedia("(min-width: 640px)");
+    const rafId = window.requestAnimationFrame(() => {
+      setCanLoadDesktopListThumbnails(media.matches);
+    });
+    const update = () => {
+      setCanLoadDesktopListThumbnails(media.matches);
+    };
+
+    media.addEventListener("change", update);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      media.removeEventListener("change", update);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!showIntro || !slopEnabled || typeof window === "undefined") {
+      return;
+    }
+
+    const isMobile = !window.matchMedia("(min-width: 640px)").matches;
+
+    if (isMobile) {
+      if (typeof window.requestIdleCallback === "function") {
+        const idleId = window.requestIdleCallback(
+          () => {
+            setShowIntroGoo(true);
+          },
+          { timeout: 1500 }
+        );
+
+        return () => {
+          window.cancelIdleCallback(idleId);
+          setShowIntroGoo(false);
+        };
+      }
+
+      const timeoutId = window.setTimeout(() => {
+        setShowIntroGoo(true);
+      }, 1200);
+
+      return () => {
+        window.clearTimeout(timeoutId);
+        setShowIntroGoo(false);
+      };
+    }
+
+    const rafId = window.requestAnimationFrame(() => {
+      setShowIntroGoo(true);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      setShowIntroGoo(false);
+    };
+  }, [showIntro, slopEnabled]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -254,7 +325,8 @@ export function FeedPageClient({
             <button
               type="button"
               onClick={() => {
-                window.localStorage.setItem("slop:feedIntroDismissed", "true");
+                persistFeedIntroDismissed();
+                setShowIntroGoo(false);
                 setShowIntro(false);
               }}
               aria-label="Dismiss intro"
@@ -266,7 +338,7 @@ export function FeedPageClient({
               ×
             </button>
           </div>
-          {slopEnabled && (
+          {slopEnabled && showIntroGoo && (
             <SlopGoo
               targetRef={introRef}
               renderMode="inline"
@@ -434,6 +506,7 @@ export function FeedPageClient({
                   project={project}
                   featured
                   variant={displayMode}
+                  canLoadListThumbnail={canLoadDesktopListThumbnails}
                   sloppy={slopEnabled}
                 />
               ))}
@@ -448,6 +521,7 @@ export function FeedPageClient({
                   project={project}
                   rank={index + 1}
                   variant={displayMode}
+                  canLoadListThumbnail={canLoadDesktopListThumbnails}
                   sloppy={slopEnabled}
                 />
               ))}
@@ -475,8 +549,9 @@ export function FeedPageClient({
         <button
           type="button"
           onClick={() => {
-            window.localStorage.removeItem("slop:feedIntroDismissed");
+            clearFeedIntroDismissed();
             clearCookieConsentState();
+            setShowIntroGoo(false);
             setShowIntro(true);
           }}
           className="fixed bottom-4 right-4 z-50 border-2 border-dashed border-border bg-card px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:border-primary hover:text-foreground"

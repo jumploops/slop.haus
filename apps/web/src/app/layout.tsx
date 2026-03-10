@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { Alfa_Slab_One, Geist, Geist_Mono, Rubik_Wet_Paint } from "next/font/google";
 import { Suspense } from "react";
 import { Providers } from "./providers";
@@ -7,6 +8,15 @@ import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { Header } from "@/components/layout/Header";
 import { VisitorCounter } from "@/components/layout/VisitorCounter";
 import { PrivacyChoicesButton } from "@/components/privacy/PrivacyChoicesButton";
+import {
+  CONSENT_CONTEXT_COOKIE_NAME,
+  COOKIE_CONSENT_STATE_COOKIE_NAME,
+  CONSENT_POLICY_VERSION,
+  getDefaultConsentContext,
+  isConsentStateCurrent,
+  parseConsentContext,
+  readConsentStateFromCookieValue,
+} from "@/lib/privacy/consent";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
@@ -38,18 +48,35 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const initialConsentContext =
+    parseConsentContext(cookieStore.get(CONSENT_CONTEXT_COOKIE_NAME)?.value) ||
+    getDefaultConsentContext();
+  const parsedConsentState = readConsentStateFromCookieValue(
+    cookieStore.get(COOKIE_CONSENT_STATE_COOKIE_NAME)?.value
+  );
+  const initialConsentState = isConsentStateCurrent(
+    parsedConsentState,
+    CONSENT_POLICY_VERSION
+  )
+    ? parsedConsentState
+    : null;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable} ${rubikWetPaint.variable} ${alfaSlabOne.variable} font-sans antialiased`}>
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
-        <Providers>
+        <Providers
+          initialConsentContext={initialConsentContext}
+          initialConsentState={initialConsentState}
+        >
           <div className="bg-construction-yellow overflow-hidden construction-banner-text">
             <div className="animate-[marquee_20s_linear_infinite] flex whitespace-nowrap">
               {Array.from({ length: 10 }).map((_, i) => (

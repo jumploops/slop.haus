@@ -3,6 +3,8 @@ import * as path from "path";
 import * as crypto from "crypto";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
+const IMMUTABLE_MEDIA_CACHE_CONTROL = "public, max-age=31536000, immutable";
+
 export interface StorageProvider {
   upload(key: string, data: Buffer, contentType: string): Promise<string>;
   delete(key: string): Promise<void>;
@@ -79,6 +81,7 @@ class S3Storage implements StorageProvider {
         Key: key,
         Body: data,
         ContentType: contentType,
+        CacheControl: IMMUTABLE_MEDIA_CACHE_CONTROL,
       })
     );
 

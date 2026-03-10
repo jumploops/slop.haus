@@ -92,6 +92,9 @@ NEXT_PUBLIC_COOKIE_BANNER_POLICY_VERSION=2026-02-27 # Optional consent/policy ve
 # Run all services (api, web, worker)
 pnpm dev
 
+# Launch Chrome with the repo's dedicated profile
+pnpm chrome:project
+
 # Database commands
 pnpm db:generate   # Generate migrations
 pnpm db:migrate    # Run migrations
@@ -102,6 +105,29 @@ pnpm db:reset      # Reset + seed local DB (destructive)
 
 `db:reset` is guarded to local DB hosts by default.  
 Set `ALLOW_DB_RESET=1` to bypass the host check.
+
+### Chrome Performance Profile
+
+For local performance work, use the repo-managed Chrome launcher instead of a personal browser profile:
+
+```bash
+pnpm chrome:project
+pnpm chrome:measure:mobile
+pnpm chrome:measure:mobile -- --dismiss-intro
+```
+
+This uses the env vars in `.env` / `.env.example`:
+
+```bash
+CHROME_BIN=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+CHROME_USER_DATA_DIR=.chrome/slop-haus
+CHROME_REMOTE_DEBUGGING_PORT=9222
+CHROME_START_URL=http://localhost:3000/
+```
+
+`CHROME_USER_DATA_DIR` is intentionally project-local and should stay separate from any existing Chrome profile.
+
+`pnpm chrome:measure:mobile` writes artifacts to `.chrome/measurements/`. Use `-- --dismiss-intro` to compare the default feed against a fresh-profile run with `slop:feedIntroDismissed=true`.
 
 ## Ports
 
