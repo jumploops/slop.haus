@@ -32,51 +32,18 @@ function resolveDecisionSource(context: ConsentContext): ConsentDecisionSource {
   return context.required ? "geo_required" : "geo_not_required";
 }
 
-function resolveInitialConsentSnapshot(
-  initialContext: ConsentContext,
-  initialConsentState: CookieConsentState | null,
-  bannerEnabled: boolean
-) {
-  if (!bannerEnabled) {
-    return {
-      context: initialContext,
-      consentState: initialConsentState,
-      bannerOpen: false,
-    };
-  }
-
-  const context = readConsentContextFromDocument() || initialContext;
-  const parsedConsent = loadCookieConsentState();
-  const consentState = isConsentStateCurrent(parsedConsent, CONSENT_POLICY_VERSION)
-    ? parsedConsent
-    : initialConsentState;
-
-  return {
-    context,
-    consentState,
-    bannerOpen: context.required && !consentState,
-  };
-}
-
 export function ConsentManager({
   initialContext,
   initialConsentState,
 }: ConsentManagerProps) {
   const bannerEnabled = isCookieBannerEnabled();
-  const initialSnapshot = useMemo(
-    () =>
-      resolveInitialConsentSnapshot(
-        initialContext,
-        initialConsentState,
-        bannerEnabled
-      ),
-    [bannerEnabled, initialContext, initialConsentState]
+  const [bannerOpen, setBannerOpen] = useState(
+    bannerEnabled && initialContext.required && !initialConsentState
   );
-  const [bannerOpen, setBannerOpen] = useState(initialSnapshot.bannerOpen);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
-  const [context, setContext] = useState<ConsentContext>(initialSnapshot.context);
+  const [context, setContext] = useState<ConsentContext>(initialContext);
   const [consentState, setConsentState] = useState<CookieConsentState | null>(
-    initialSnapshot.consentState
+    initialConsentState
   );
 
   useEffect(() => {
@@ -84,7 +51,39 @@ export function ConsentManager({
       return;
     }
 
-    const openPreferences = () => setPreferencesOpen(true);
+    if (initialConsentState) {
+      return;
+    }
+
+    const nextContext = readConsentContextFromDocument() || initialContext;
+    const parsedConsent = loadCookieConsentState();
+    const nextConsent = isConsentStateCurrent(parsedConsent, CONSENT_POLICY_VERSION)
+      ? parsedConsent
+      : null;
+
+    if (!nextConsent) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setContext(nextContext);
+      setConsentState(nextConsent);
+      setBannerOpen(nextContext.required && !nextConsent);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [bannerEnabled, initialContext, initialConsentState]);
+
+  useEffect(() => {
+    if (!bannerEnabled) {
+      return;
+    }
+
+    const openPreferences = () => {
+      setPreferencesOpen(true);
+    };
     const resetConsent = () => {
       const nextContext = readConsentContextFromDocument() || initialContext;
       setContext(nextContext);

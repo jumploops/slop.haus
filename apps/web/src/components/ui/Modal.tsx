@@ -18,9 +18,9 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (isOpen) {
+    if (isOpen && !dialog.open) {
       dialog.showModal();
-    } else {
+    } else if (!isOpen && dialog.open) {
       dialog.close();
     }
   }, [isOpen]);
